@@ -107,6 +107,43 @@ const totals = (page: Page) =>
     ]),
   )
 
+// The numbers each candidate card shows, once the count-up tweens reach their targets.
+async function boardNumbers(page: Page) {
+  await page.waitForFunction(() =>
+    [...document.querySelectorAll<HTMLElement>('#board .total .n, #board .legend strong')].every(
+      (el) => el.textContent === el.dataset.v,
+    ),
+  )
+  return page.$$eval('#board .cand', (cards) =>
+    Object.fromEntries(
+      cards.map((c) => [
+        (c as HTMLElement).dataset.speaker,
+        {
+          total: Number(c.querySelector('.total .n')?.textContent),
+          bands: [...c.querySelectorAll('.legend strong')].map((el) => Number(el.textContent)),
+        },
+      ]),
+    ),
+  )
+}
+
+// Counted straight from the fixture records, without the site's own filter code.
+const expectedBoard = (keep: (r: CheckRecord) => boolean) =>
+  Object.fromEntries(
+    ['lula', 'flavio'].map((speaker) => {
+      const mine = records.filter((r) => !r.missingSince && r.speaker === speaker && keep(r))
+      return [
+        speaker,
+        {
+          total: mine.length,
+          bands: ['verdadeiro', 'impreciso', 'falso', 'sem faixa'].map(
+            (band) => mine.filter((r) => r.band === band).length,
+          ),
+        },
+      ]
+    }),
+  )
+
 async function choose(page: Page, key: string, value: string) {
   await page.selectOption(`select[data-key="${key}"]`, value)
   await settle(page)
@@ -217,6 +254,28 @@ describe('list, filters and URL (SITE-01, SITE-03, SHARE-01, SHARE-02)', () => {
     expect(
       await empty.evaluate(() => (document.activeElement as HTMLElement).dataset.key ?? null),
     ).toBe('outlet')
+  })
+})
+
+describe('scoreboard numbers (SCORE-01, SCORE-02, SCORE-04)', () => {
+  it('counts only the selected agency, all agencies under "Todas", and the chosen debate', async () => {
+    const page = await open()
+    expect(await boardNumbers(page)).toEqual(expectedBoard(() => true))
+
+    await choose(page, 'outlet', 'lupa')
+    const lupa = expectedBoard((r) => r.outlet === 'lupa')
+    expect(lupa.flavio.total).toBe(3) // one Lupa record is missing at the source
+    expect(await boardNumbers(page)).toEqual(lupa)
+
+    await choose(page, 'outlet', '')
+    expect(await boardNumbers(page)).toEqual(expectedBoard(() => true))
+
+    await page.click('[data-debate="globo-2026-10-23"]')
+    await settle(page)
+    await choose(page, 'outlet', 'estadao')
+    const pair = expectedBoard((r) => r.debate === 'globo-2026-10-23' && r.outlet === 'estadao')
+    expect(await boardNumbers(page)).toEqual(pair)
+    expect(await listedIds(page)).toHaveLength(pair.lula.total + pair.flavio.total)
   })
 })
 
