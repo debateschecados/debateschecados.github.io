@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 20,
+  "next_id": 21,
   "lessons": [
     {
       "id": "L-001",
@@ -346,6 +346,24 @@
       ],
       "created": "2026-10-24T21:09:09Z",
       "last_seen": "2026-10-24T21:09:09Z"
+    },
+    {
+      "id": "L-020",
+      "key": "surviving_mutant::when a test computes what a user sees include what ancestors contribute such as inherited opacity not only the element s own style",
+      "text": "When a test computes what a user sees, include what ancestors contribute, such as inherited opacity, not only the element's own style",
+      "signal": "surviving_mutant",
+      "scope": "site",
+      "status": "candidate",
+      "features": [
+        "agency-comparator"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M22 site/style.css:1126, test/e2e/compare.test.ts:357 (validation.md iteration 3b) (site)"
+      ],
+      "created": "2026-10-24T21:11:03Z",
+      "last_seen": "2026-10-24T21:11:03Z"
     }
   ]
 }

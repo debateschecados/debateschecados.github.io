@@ -128,6 +128,12 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: M20 site/style.css:1126, test/e2e/compare.test.ts:355 (validation.md iteration 3) (site)
 - last seen: 2026-10-24T21:09:09Z
 
+### L-020 - When a test computes what a user sees, include what ancestors contribute, such as inherited opacity, not only the element's own style
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `site` · harmful: 0
+- features: agency-comparator
+- evidence: M22 site/style.css:1126, test/e2e/compare.test.ts:357 (validation.md iteration 3b) (site)
+- last seen: 2026-10-24T21:11:03Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

@@ -2,7 +2,34 @@
 
 No validation.md was committed for phases 1 and 2, so this file starts with phase 3.
 
-## Validation: Phase 3 iteration 3 (final verification) - FAIL
+## Validation: Phase 3 iteration 3b (closing check) - FAIL
+
+**Date**: 2026-10-24
+**Diff range**: `be54f3a..5a02f49` (`5a02f49` test(site): Count opacity in the interval bar contrast; test-only change)
+**Verifier**: independent sub-agent, fresh detached scratch worktree at `5a02f49`
+
+Final verdict for phase 3: FAIL, for a test gap only. Fix 5 works: M20 is killed. A neighbouring mutant of the same kind survives (M22), so the LEAN-06 contrast test still misses one way to fade the bar. The shipped page meets LEAN-06. On the real-data build, every `rect.ci` has fill `rgb(142, 142, 147)` and an effective opacity of 1 through all its ancestors, which gives 3.26:1.
+
+| Mutation | File:line | Description | Test file | Killed? |
+| -------- | --------- | ----------- | --------- | ------- |
+| M20 | `site/style.css:1126` | `opacity: 0.3` on the bar | e2e/compare.test.ts | ✅ Killed (1.36 < 3) |
+| M20b | `site/style.css:1126` | `fill-opacity: 0.3` on the bar | e2e/compare.test.ts | ✅ Killed (1.36 < 3) |
+| M17 | `site/style.css:1126` | bar fill transparent | e2e/compare.test.ts | ✅ Killed |
+| M22 | `site/style.css:1126` | `opacity: 0.3` on the `.track` svg that holds the bar | e2e/compare.test.ts | ❌ Survived |
+
+**Result**: 3/4 killed, 1 survived - FAIL
+
+Gate: `test/e2e/compare.test.ts` 11 passed at `5a02f49`. Scratch removed; `git status --porcelain` of the phase3 tree empty before and after.
+
+### Fix 6: count ancestor opacity in the LEAN-06 contrast test
+
+- **Root cause**: `test/e2e/compare.test.ts:357` multiplies only the bar's own `opacity` and `fillOpacity`. CSS opacity on any ancestor (the `.track` svg, `.lean-row`, `#balance`) also fades the bar, and the test cannot see it.
+- **Fix task**: in the probe, multiply `opacity` for the rect and every ancestor up to `document.documentElement`, then `fillOpacity` for the rect. M22 must then fail.
+- **Priority**: Minor (no ancestor of the bar has opacity below 1 today).
+
+---
+
+## Iteration 3: Phase 3 final verification - FAIL
 
 **Date**: 2026-10-24
 **Diff range**: `1cf9b04..75a4a40` (`75a4a40` fix(site): Give the interval bar the contrast of the point)
