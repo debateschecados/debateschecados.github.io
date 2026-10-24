@@ -4,7 +4,12 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 import { assemble, latestRun } from '../../../src/claims/assemble.ts'
-import { checkGroups, groupId } from '../../../src/claims/groups.ts'
+import {
+  type ClaimGroup,
+  type ClaimGroupsFile,
+  checkGroups,
+  groupId,
+} from '../../../src/claims/groups.ts'
 import type { CheckRecord } from '../../../src/types.ts'
 import workflow from '../../fixtures/claim-curation-2026-10-24-result.json' with { type: 'json' }
 
@@ -115,6 +120,13 @@ describe('check:claims (REPRO-01, REPRO-02)', () => {
       encoding: 'utf8',
     })
   const manualId = groupId([MARKETS_G1, ...MARKETS])
+  // Edits claim-groups.json in a data copy by hand, as a maintainer would.
+  const editGroups = async (dir: string, edit: (file: ClaimGroupsFile) => void) => {
+    const path = join(dir, 'claim-groups.json')
+    const file = JSON.parse(await readFile(path, 'utf8')) as ClaimGroupsFile
+    edit(file)
+    await writeFile(path, JSON.stringify(file))
+  }
 
   it('passes on the committed files and lists the manual group with its reason', async () => {
     const result = check(await dataCopy())
@@ -145,4 +157,50 @@ describe('check:claims (REPRO-01, REPRO-02)', () => {
     expect(result.stderr).not.toContain(manualId)
     expect(result.stdout).toContain(`${manualId}: ${REASON}`)
   })
+
+  it('fails naming the group when the file lists a group twice', async () => {
+    const dir = await dataCopy()
+    let twice = ''
+    await editGroups(dir, (file) => {
+      twice = file.groups[0].id
+      file.groups.splice(1, 0, { ...file.groups[0] })
+    })
+    const result = check(dir)
+    expect(result.status).toBe(1)
+    expect(result.stderr).toContain(twice)
+    expect(result.stderr).not.toContain('    at ') // reported, not an unhandled rejection
+  })
+
+  it.each([
+    ['keeps', false],
+    ['updates', true],
+  ])(
+    'fails naming the group when an adjudicated group gains a record and the edit %s the id',
+    async (_, updateId) => {
+      const dir = await dataCopy()
+      const all = await records()
+      const outlet = new Map(all.map((r) => [r.id, r.outlet]))
+      let original = ''
+      await editGroups(dir, (file) => {
+        const grouped = new Set(file.groups.flatMap((g) => g.records))
+        const edited = file.groups.find((g) => g.origin === 'adjudicated') as ClaimGroup
+        const agencies = new Set(edited.records.map((id) => outlet.get(id)))
+        const extra = all.find(
+          (r) =>
+            r.debate === edited.debate &&
+            r.speaker === edited.speaker &&
+            !grouped.has(r.id) &&
+            !agencies.has(r.outlet),
+        ) as CheckRecord
+        original = edited.id
+        edited.records = [...edited.records, extra.id].sort()
+        if (updateId) edited.id = groupId(edited.records)
+      })
+      const result = check(dir)
+      expect(result.status).toBe(1)
+      expect(result.stderr).toContain(original)
+      expect(result.stderr).not.toContain('    at ') // reported, not an unhandled rejection
+      expect(result.stdout).toContain(`${manualId}: ${REASON}`)
+    },
+  )
 })

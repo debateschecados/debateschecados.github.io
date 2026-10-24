@@ -8,6 +8,7 @@ import { consensus, knownRefs, sanitize } from './consensus.ts'
 import {
   type ClaimGroup,
   type ClaimGroupsFile,
+  ClaimsError,
   checkGroups,
   GROUPS_FILE,
   groupId,
@@ -217,14 +218,18 @@ export async function latestRun(curation: string) {
     .at(-1)
 }
 
-// Group ids whose content differs between two files, in either direction.
+// Ids of groups that one file has more times than the other: a changed group, a missing one
+// or an extra copy of one.
 const differing = (a: ClaimGroupsFile, b: ClaimGroupsFile) => {
-  const byId = (file: ClaimGroupsFile) => new Map(file.groups.map((g) => [g.id, JSON.stringify(g)]))
-  const left = byId(a)
-  const right = byId(b)
-  return [...new Set([...left.keys(), ...right.keys()])].filter(
-    (id) => left.get(id) !== right.get(id),
-  )
+  const count = new Map<string, number>()
+  const add = (g: ClaimGroup, n: number) =>
+    count.set(JSON.stringify(g), (count.get(JSON.stringify(g)) ?? 0) + n)
+  for (const g of a.groups) add(g, 1)
+  for (const g of b.groups) add(g, -1)
+  const ids = [...a.groups, ...b.groups]
+    .filter((g) => count.get(JSON.stringify(g)) !== 0)
+    .map((g) => g.id)
+  return [...new Set(ids)]
 }
 
 if (import.meta.main) {
@@ -263,9 +268,16 @@ committed file differs (REPRO-01); every manual change is listed with its reason
       console.error(`Run ${run} gives invalid groups:\n${broken.join('\n')}`)
       process.exitCode = 1
     } else if (values.check) {
-      const committed = await loadGroups(dataDir, records)
-      const ids = differing(file, committed)
-      if (committed.run !== file.run || ids.length > 0) {
+      // A file that breaks CLAIM-02 is reported like a difference, not thrown.
+      const committed = await loadGroups(dataDir, records).catch((error: unknown) => {
+        if (error instanceof ClaimsError) return error
+        throw error
+      })
+      if (committed instanceof ClaimsError) {
+        console.error(committed.message)
+        process.exitCode = 1
+      } else if (JSON.stringify(committed) !== JSON.stringify(file)) {
+        const ids = differing(file, committed)
         console.error(
           `${GROUPS_FILE} differs from run ${run}${committed.run !== file.run ? ` (file run: ${committed.run})` : ''}:\n${ids.join('\n')}`,
         )
