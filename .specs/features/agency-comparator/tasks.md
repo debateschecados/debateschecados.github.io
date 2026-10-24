@@ -286,14 +286,16 @@ T13 → T15
 
 **Done when**:
 
-- [ ] A reissued key with a label change gives one history entry with `key` and `label`; a key-only change gives an entry with only `key` and keeps the archive copy
-- [ ] Gate check passes: `pnpm vitest run test/unit/merge.test.ts`
-- [ ] Test count: at least 2 new tests pass
+- [x] A reissued key with a label change gives one history entry with `key` and `label`; a key-only change gives an entry with only `key` and keeps the archive copy
+- [x] Gate check passes: `pnpm vitest run test/unit/merge.test.ts`
+- [x] Test count: at least 2 new tests pass
 
 **Tests**: unit
 **Gate**: quick
 
 **Commit**: `feat(ingest): Keep the previous source key in history`
+
+**Status**: ✅ Complete
 
 ---
 

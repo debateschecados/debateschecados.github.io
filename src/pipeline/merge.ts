@@ -144,6 +144,8 @@ function update(record: CheckRecord, item: FreshItem, adapter: string, date: str
   if (item.quote !== record.quote) old.quote = record.quote
   if (item.speaker !== record.speaker) old.speaker = record.speaker
   const verifiedChanged = Object.keys(old).length > 0 || item.evidenceUrl !== record.evidence.url
+  // A reissued key goes into history too, but it does not change what the snapshot proves.
+  if (item.key !== record.key) old.key = record.key
   const silentChanged =
     item.key !== record.key ||
     item.pos !== record.pos ||

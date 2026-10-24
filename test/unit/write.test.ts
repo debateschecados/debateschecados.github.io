@@ -102,6 +102,17 @@ describe('dataset files (DATA-01, DATA-04)', () => {
     ])
   })
 
+  it('keeps a previous key in history, null included (DRIFT-01)', () => {
+    const history = [
+      { until: '2026-10-25', key: 'k-1', label: 'FALSO' },
+      { until: '2026-10-26', key: null },
+    ]
+    expect(JSON.parse(checksJson([record({ history })]))[0].history).toEqual([
+      { label: 'FALSO', key: 'k-1', until: '2026-10-25' },
+      { key: null, until: '2026-10-26' },
+    ])
+  })
+
   it('omits missingSince and history when absent and ends with a newline', () => {
     const text = checksJson([record()])
     expect(text.endsWith(']\n')).toBe(true)

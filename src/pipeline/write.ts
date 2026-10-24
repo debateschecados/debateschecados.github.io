@@ -46,7 +46,7 @@ const orderRecord = (record: CheckRecord) => ({
   ...pick(record, RECORD_KEYS),
   evidence: pick(record.evidence, ['url', 'fetchedAt', 'archiveUrl', 'sha256']),
   ...(record.history && {
-    history: record.history.map((h) => pick(h, ['label', 'quote', 'speaker', 'until'])),
+    history: record.history.map((h) => pick(h, ['label', 'quote', 'speaker', 'key', 'until'])),
   }),
 })
 
