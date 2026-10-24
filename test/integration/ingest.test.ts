@@ -53,12 +53,17 @@ const source = (id: string, adapter = 'fake-page') => ({
   adapter,
   url: url(id),
 })
-const debate = (id: string, date: string, sources: ReturnType<typeof source>[]) => ({
+const debate = (
+  id: string,
+  date: string,
+  sources: ReturnType<typeof source>[],
+  candidates = ['lula', 'flavio'],
+) => ({
   id,
   broadcaster: { name: id, logo: 'logos/x.svg' },
   date,
   round: 2,
-  candidates: ['lula', 'flavio'],
+  candidates,
   sources,
 })
 
@@ -265,6 +270,28 @@ describe('ingest (INGEST-01, INGEST-02, INGEST-05, INGEST-09)', () => {
       [1, 'lula'],
       [3, 'lula'],
     ])
+  })
+
+  it('excludes a configured candidate who is not in the debate (INGEST-05)', async () => {
+    await writeConfig([
+      debate(BAND, '2026-10-18', [source(`alpha-${BAND}`), source(`beta-${BAND}`)]),
+      debate(GLOBO, '2026-10-23', [source(`alpha-${GLOBO}`)], ['lula']),
+    ])
+    await writePage(`alpha-${GLOBO}`, { items: [item(1), item(2), item(3)] })
+    await run(fakeClock())
+    const globo = url(`alpha-${GLOBO}`)
+    expect((await reported()).sources[`alpha-${GLOBO}`]).toMatchObject({
+      status: 'ok',
+      items: 2,
+      excluded: [{ url: globo, pos: 2, reason: 'speaker not resolved: "FLÁVIO BOLSONARO (PL)"' }],
+    })
+    const records = (await published()).filter((r) => r.debate === GLOBO)
+    expect(records.map((r) => [r.pos, r.speaker])).toEqual([
+      [1, 'lula'],
+      [3, 'lula'],
+    ])
+    const band = (await published()).filter((r) => r.sourceId === `alpha-${BAND}` && r.pos === 2)
+    expect(band.map((r) => r.speaker)).toEqual(['flavio'])
   })
 
   it('keeps the old records of a source that fails and reports the failure (INGEST-06)', async () => {
