@@ -478,15 +478,51 @@ describe('leanHtml, the axes (LEAN-03, LEAN-04, LEAN-06)', () => {
     ).toEqual(['−0,50', '−0,25', '0', '+0,25', '+0,50'])
   })
 
-  it('widens the scale in steps of 0.25 so every bar fits, never under 0.5', () => {
+  it('widens the scale in steps of 0.25 up to 1 and of 0.5 past it, never under 0.5', () => {
     const wide = [{ ...result[0], interval: [0.3, 1.1], distance: 0.7 }]
-    expect(axisDomain(wide as never)).toBe(1.25)
+    expect(axisDomain(wide as never)).toBe(1.5)
     expect(axisDomain([{ ...result[0], interval: [-0.02, 0.03], distance: 0 }] as never)).toBe(0.5)
     expect(axisDomain([{ ...result[0], interval: [-0.7, 0.1], distance: -0.3 }] as never)).toBe(
       0.75,
     )
     // A small sample draws nothing, so its distance does not widen the scale.
     expect(axisDomain([result[1], { ...result[2], distance: -1.8 }] as never)).toBe(0.5)
+  })
+
+  it('always has a "0" tick, every 0.25 up to 1 and every 0.5 past it', () => {
+    const ticks = (lo: number, hi: number) => {
+      const one = [{ ...result[0], interval: [lo, hi], distance: (lo + hi) / 2 }]
+      const $ = load(leanHtml(ctx, one as never))
+      return $('.axis text')
+        .map((_, t) => $(t).text())
+        .get()
+    }
+    // Largest end 0.9: each side reaches 1.
+    expect(ticks(-0.2, 0.9)).toEqual([
+      '−1,00',
+      '−0,75',
+      '−0,50',
+      '−0,25',
+      '0',
+      '+0,25',
+      '+0,50',
+      '+0,75',
+      '+1,00',
+    ])
+    // Largest end 1.1 would reach 1.25; past 1 it rounds up to 1.5.
+    expect(ticks(-0.2, 1.1)).toEqual(['−1,50', '−1,00', '−0,50', '0', '+0,50', '+1,00', '+1,50'])
+    // Largest end 1.6 would reach 1.75; it rounds up to 2.
+    expect(ticks(-1.6, 0.2)).toEqual([
+      '−2,00',
+      '−1,50',
+      '−1,00',
+      '−0,50',
+      '0',
+      '+0,50',
+      '+1,00',
+      '+1,50',
+      '+2,00',
+    ])
   })
 })
 

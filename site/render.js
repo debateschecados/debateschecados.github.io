@@ -285,11 +285,13 @@ export function detailHtml(row, ctx) {
 
 // The axes reach a little past the largest point or interval end, in steps of 0.25, never
 // less than 0.5 on each side, so every bar fits. Only agencies with an interval are drawn.
+// Past 1 the ticks go every 0.5, so the domain rounds up to a multiple of 0.5 and 0 stays a tick.
 /** @param {Lean} result */
 export function axisDomain(result) {
   const values = result.flatMap((r) => (r.interval ? [r.distance ?? 0, ...r.interval] : []))
   const top = Math.max(...values.map(Math.abs), 0)
-  return Math.max(0.5, Math.ceil((top + 0.05) * 4) / 4)
+  const domain = Math.max(0.5, Math.ceil((top + 0.05) * 4) / 4)
+  return domain > 1 ? Math.ceil(domain * 2) / 2 : domain
 }
 
 /** @param {number} domain */
