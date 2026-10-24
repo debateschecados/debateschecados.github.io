@@ -359,15 +359,17 @@ T13 → T15
 
 **Done when**:
 
-- [ ] Versions from 0, 1 and 2 history entries, including a quote-only entry that keeps the label, match hand-written expectations
-- [ ] Counts of harsher, milder, gained and lost per agency and candidate match a fixture, with and without a debate filter
-- [ ] Gate check passes: `pnpm vitest run test/unit/site/drift.test.ts`
-- [ ] Test count: at least 6 tests pass
+- [x] Versions from 0, 1 and 2 history entries, including a quote-only entry that keeps the label, match hand-written expectations
+- [x] Counts of harsher, milder, gained and lost per agency and candidate match a fixture, with and without a debate filter
+- [x] Gate check passes: `pnpm vitest run test/unit/site/drift.test.ts`
+- [x] Test count: at least 6 tests pass
 
 **Tests**: unit
 **Gate**: quick
 
 **Commit**: `feat(site): Rebuild the versions of changed checks`
+
+**Status**: ✅ Complete
 
 ---
 
