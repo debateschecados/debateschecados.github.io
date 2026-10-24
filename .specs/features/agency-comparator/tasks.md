@@ -169,16 +169,18 @@ T6 → T8
 
 **Done when**:
 
-- [ ] Hand-counted coverage and harsher/equal/milder for each agency and candidate on the fixture match `coverage` and `rigor`, with and without a debate filter
-- [ ] Divergent filter, speaker filter and debate filter each select the expected row ids; URL state round-trips
-- [ ] The row with a removed member is absent and its remaining record counts as `solo`
-- [ ] Gate check passes: `pnpm vitest run test/unit/site/compare.test.ts`
-- [ ] Test count: at least 8 tests pass
+- [x] Hand-counted coverage and harsher/equal/milder for each agency and candidate on the fixture match `coverage` and `rigor`, with and without a debate filter
+- [x] Divergent filter, speaker filter and debate filter each select the expected row ids; URL state round-trips
+- [x] The row with a removed member is absent and its remaining record counts as `solo`
+- [x] Gate check passes: `pnpm vitest run test/unit/site/compare.test.ts`
+- [x] Test count: at least 8 tests pass
 
 **Tests**: unit
 **Gate**: quick
 
 **Commit**: `feat(site): Compute claim rows, coverage and rigor`
+
+**Status**: ✅ Complete
 
 ---
 
