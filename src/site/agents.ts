@@ -352,8 +352,8 @@ Sitemap: ${abs(origin, 'sitemap.xml')}
 function sitemapXml(origin: string) {
   const paths = [
     '',
-    'como-funciona.html',
-    'metodologia.html',
+    'como-funciona',
+    'metodologia',
     ...AGENT_FILES.filter((file) => file !== 'robots.txt' && file !== 'sitemap.xml'),
     'checks.csv',
     'checks.json',

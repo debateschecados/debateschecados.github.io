@@ -120,8 +120,8 @@ describe('index.html (SITE-01)', () => {
     expect(prompt.match(/^\d\. /gm)).toEqual(['1. ', '2. ', '3. ', '4. ', '5. '])
     expect(indexHtml).not.toMatch(/\{\{|<!--[a-z]+-->/)
     expect(index('footer a[href="checks.csv"]')).toHaveLength(1)
-    expect(index('footer a[href="metodologia.html"]')).toHaveLength(1)
-    expect(index('footer a[href="como-funciona.html"]')).toHaveLength(1)
+    expect(index('footer a[href="metodologia"]')).toHaveLength(1)
+    expect(index('footer a[href="como-funciona"]')).toHaveLength(1)
   })
 
   it('gives the audit prompt URLs an AI can fetch: raw CSV, commits API and the site', () => {
@@ -429,10 +429,10 @@ describe('top bar (AUDIT-02)', () => {
           .map((_, a) => a.attribs.href)
           .get(),
         file,
-      ).toEqual(['como-funciona.html'])
+      ).toEqual(['como-funciona'])
       const current = bar.find('[aria-current="page"]').attr('href')
       expect(current, file).toBe(
-        file === 'index.html' ? './' : file === 'metodologia.html' ? undefined : file,
+        file === 'index.html' ? './' : file === 'metodologia.html' ? undefined : 'como-funciona',
       )
     }
   })

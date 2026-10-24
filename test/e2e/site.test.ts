@@ -33,7 +33,9 @@ let removed: CheckRecord[]
 function serve(root: string) {
   return createServer(async (req, res) => {
     const path = new URL(req.url ?? '/', 'http://x').pathname
-    const file = normalize(join(root, path.endsWith('/') ? `${path}index.html` : path))
+    // Like GitHub Pages: /page serves page.html when no file has that exact name.
+    const clean = extname(path) ? path : `${path}.html`
+    const file = normalize(join(root, path.endsWith('/') ? `${path}index.html` : clean))
     try {
       if (!file.startsWith(root)) throw new Error('outside root')
       const body = await readFile(file)
@@ -171,9 +173,9 @@ describe('layout (SITE-06)', () => {
     expect(await overflow()).toBeLessThanOrEqual(0)
     await page.click('.topbar .audit-btn')
     expect(await overflow()).toBeLessThanOrEqual(0)
-    const how = await open('/como-funciona.html', { viewport: { width: 360, height: 740 } })
+    const how = await open('/como-funciona', { viewport: { width: 360, height: 740 } })
     expect(await how.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBe(0)
-    const method = await open('/metodologia.html', { viewport: { width: 360, height: 740 } })
+    const method = await open('/metodologia', { viewport: { width: 360, height: 740 } })
     expect(await method.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBe(0)
     // Both candidate columns stay on screen, none hidden behind a horizontal scroll.
     const tables = await method.$$eval('.table-wrap', (els) =>
@@ -425,7 +427,7 @@ describe('audit panel (AUDIT-01, AUDIT-02, AUDIT-04, AUDIT-05)', () => {
   })
 
   it('opens the panel on the home page from "Como auditar" on any other page', async () => {
-    for (const path of ['/como-funciona.html', '/metodologia.html']) {
+    for (const path of ['/como-funciona', '/metodologia']) {
       const page = await open(path, { viewport: { width: 360, height: 740 } })
       await page.getByRole('link', { name: 'Como auditar', exact: true }).first().click()
       await page.waitForURL(/#auditar$/)

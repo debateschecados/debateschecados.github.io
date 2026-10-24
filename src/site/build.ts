@@ -133,7 +133,7 @@ function countsTable(config: Config, ctx: Context) {
 const SHIELD =
   '<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><path d="M10 2l6 2.5v4.6c0 4-2.6 7.4-6 8.9-3.4-1.5-6-4.9-6-8.9V4.5L10 2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 10l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 
-const NAV = [{ href: 'como-funciona.html', name: 'Como funciona' }]
+const NAV = [{ href: 'como-funciona', name: 'Como funciona' }]
 
 // The same bar on every page. On the home page "Como auditar" opens the panel in place;
 // elsewhere it links there, and app.js opens the panel from the #auditar hash.
@@ -251,7 +251,7 @@ export async function build({ siteDir, dataDir, configDir, outDir, repo }: Build
 
   const method = fill(await readFile(join(siteDir, 'metodologia.html'), 'utf8'), {
     ...repoSlots,
-    topbar: topbarHtml('metodologia.html'),
+    topbar: topbarHtml('metodologia'),
     sources: sourcesTable(config, ctx),
     bands: bandsTable(config, ctx),
     counts: countsTable(config, ctx),
@@ -261,7 +261,7 @@ export async function build({ siteDir, dataDir, configDir, outDir, repo }: Build
 
   const how = fill(await readFile(join(siteDir, 'como-funciona.html'), 'utf8'), {
     repo: repoSlots.repo,
-    topbar: topbarHtml('como-funciona.html'),
+    topbar: topbarHtml('como-funciona'),
     duel,
     stamps: stampsHtml(config, ctx),
     // One per candidate, the first of each in the home page list, so neither stands alone.
