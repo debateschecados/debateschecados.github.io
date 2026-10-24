@@ -20,15 +20,15 @@ const byId = (n: number) => records[n - 1]
 const item = (r: CheckRecord) => load(itemHtml(r, ctx))('li')
 
 describe('itemHtml (SITE-02)', () => {
-  it('shows label as heading, band, outlet, speaker, quote, excerpt and agency link', () => {
+  it('shows the band as heading, the agency label on hover, outlet, speaker, quote, excerpt and link', () => {
     const r = byId(2) // band, lupa, pos 3: FALSO, lula
     expect(r).toMatchObject({ label: 'FALSO', band: 'falso', speaker: 'lula', outlet: 'lupa' })
     const li = item(r)
     expect(li.attr('data-id')).toBe(r.id)
-    expect(li.find('.verdict h3').text()).toBe('FALSO')
+    expect(li.find('.verdict h3').text()).toBe('Falso')
     expect(li.find('h3')).toHaveLength(1)
-    expect(li.find('.verdict small').first().text()).toBe('Lupa')
-    expect(li.find('.verdict .band').text()).toBe('Falso')
+    expect(li.find('.verdict').attr('title')).toBe('Rótulo da agência: FALSO')
+    expect(li.find('.verdict small').text()).toBe('Lupa')
     expect(li.hasClass('band-falso')).toBe(true)
     expect(li.find('.who').text()).toBe('Lula no debate da Band, 18/10')
     expect(li.find('.quote').text()).toBe(`“${r.quote}”`)

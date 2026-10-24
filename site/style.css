@@ -808,19 +808,6 @@ body:has(dialog[open]) .audit-fab {
   margin-top: 6px;
   letter-spacing: 0;
 }
-.verdict small.band {
-  margin-top: 2px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.verdict small.band::before {
-  content: "";
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--c);
-}
 .who {
   font-size: 14px;
   color: var(--muted);

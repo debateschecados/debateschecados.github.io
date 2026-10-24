@@ -33,7 +33,7 @@ export function itemHtml(r, ctx) {
     ? `<p class="gone">não encontrado na fonte desde ${fullDate(r.missingSince)}</p>`
     : ''
   return `<li class="item ${bandClass(r.band)}${r.missingSince ? ' removed' : ''}" data-id="${esc(r.id)}">
-  <div class="verdict"><h3>${esc(r.label)}</h3><small>${esc(outlet?.name ?? r.outlet)}</small><small class="band">${esc(bandName(r.band))}</small></div>
+  <div class="verdict" title="Rótulo da agência: ${esc(r.label)}"><h3>${esc(bandName(r.band))}</h3><small>${esc(outlet?.name ?? r.outlet)}</small></div>
   <div>
     <div class="who">${esc(speaker?.short ?? r.speaker)} no debate da ${esc(debate?.broadcaster.name ?? r.debate)}, ${debate ? shortDate(debate.date) : ''}</div>
     <p class="quote">“${esc(r.quote)}”</p>

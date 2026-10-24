@@ -23,8 +23,7 @@ A public, open source site that collects the fact-checks four Brazilian agencies
 
 ### Labels
 
-- The agency's original label (EXAGERADO, #NÃOÉBEMASSIM, "é falso") is always the prominent element of an item.
-- A band (verdadeiro / impreciso / falso / sem faixa) exists only to filter and count. The label-to-band table is a public file in the repository.
+- Revised 2026-10-24 after seeing the site: each item shows the band (Verdadeiro / Impreciso / Falso / Sem faixa) as its verdict, so "#FAKE" and "falso" read the same. The agency's original label stays verbatim in the data and appears on hover over the verdict. The label-to-band table is a public file in the repository and the methodology page explains the common scale.
 - Lupa FALTA CONTEXTO and Estadão "é enganoso" go to impreciso (user confirmed 2026-10-24). Because band choices move the scoreboard unevenly, the methodology page shows a label × candidate count table and the "sem faixa" band is always shown.
 
 ### Views and comparison

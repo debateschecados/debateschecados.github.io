@@ -42,6 +42,14 @@
 - **Date**: 2026-10-24
 - **Status**: active
 
+### AD-006
+- **Decision**: Each item shows the band as its verdict (Verdadeiro, Impreciso, Falso, Sem faixa). The agency's original label stays verbatim in `label` and appears on hover over the verdict; the methodology page explains the common scale with the full label table.
+- **Reason**: The user saw "#FAKE" and "falso" side by side and wanted one status vocabulary across agencies.
+- **Trade-off**: The band mapping is now visible on every item, so mapping choices (FALTA CONTEXTO and é enganoso as impreciso) weigh more; the label × candidate table and public `bands.json` stay the check on that. On touch screens the original label is reachable only through the agency link, the CSV and the methodology table.
+- **Scope**: Site item template, spec SITE-02, README, methodology page.
+- **Date**: 2026-10-24
+- **Status**: active
+
 ## Handoff
 
 - **Feature**: `.specs/features/debate-archive`

@@ -6,7 +6,7 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 
 ## Goals
 
-- [ ] Every check published by the four agencies for the two runoff debates is browsable in one public page, with the agency's original label and a link to the source.
+- [ ] Every check published by the four agencies for the two runoff debates is browsable in one public page, with its verdict on a common band scale, the agency's original label kept in the data, and a link to the source.
 - [ ] Anyone can download the full dataset and trace each record back to the agency page, an archived copy, and the parser version that produced it.
 - [ ] Adding a future debate requires a configuration entry, not new pipeline code, for agencies whose page format is already supported.
 
@@ -31,7 +31,7 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 | --------------------- | -------------- | --------- | ---------- |
 | Debates in MVP | Band 2026-10-18 and Globo 2026-10-23, runoff only | User decision | y |
 | Items in scope | Only items inside each agency's debate coverage page, every verdict included | User decision: a record of what was said, not a list of lies | y |
-| Label presentation | Original label prominent; band used only for filters and counts; mapping is a public file | User decision | y |
+| Label presentation | Band is the verdict shown on each item (common scale across agencies); original label kept verbatim in the data and shown on hover; mapping is a public file | User decision (revised 2026-10-24) | y |
 | Default view | "Todos" with all agencies, filterable by agency | User decision | y |
 | Scoreboards | Per-agency scoreboard plus a general one with a fixed notice about double counting | User decision | y |
 | Estadão "é enganoso" | Band impreciso | Estadão also uses "é falso" on the same pages, so enganoso is a distinct, weaker verdict | y |
@@ -89,7 +89,7 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 **Acceptance Criteria**:
 
 1. WHEN a visitor opens the site THEN the system SHALL show the "Todos" view with every published record, without login. (SITE-01)
-2. The system SHALL display on each item the speaker, the quoted statement, the agency's original label as the most prominent element, the band, the agency name, the excerpt and a link to the agency page. (SITE-02)
+2. The system SHALL display on each item the speaker, the quoted statement, the band as the most prominent element, the agency's original label on hover, the agency name, the excerpt and a link to the agency page. (SITE-02)
 3. WHEN the visitor selects filters for debate, agency, speaker or band THEN the system SHALL show only the records matching all selected filters. (SITE-03)
 4. The system SHALL order records by debate newest first, then agency alphabetically, then their order on the agency page. (SITE-04)
 5. IF a filter combination matches no record THEN the system SHALL show the message "Nenhuma checagem com esses filtros." and a control that clears all filters. (SITE-05)

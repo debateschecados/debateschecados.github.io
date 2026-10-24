@@ -51,7 +51,9 @@ describe('index.html (SITE-01)', () => {
         .map((r) => r.id)
         .sort(),
     )
-    expect(index('#list li[data-id="000000000012"] .verdict h3').text()).toBe(records[17].label)
+    expect(index('#list li[data-id="000000000012"] .verdict').attr('title')).toBe(
+      `Rótulo da agência: ${records[17].label}`,
+    )
   })
 
   it('inlines records and config as JSON that a quote cannot break out of', () => {
@@ -124,7 +126,7 @@ describe('index.html (SITE-01)', () => {
       const $ = load(await readFile(join(built.outDir, 'index.html'), 'utf8'))
       const li = $(`#list li[data-id="${odd.id}"]`)
       expect(li.find('.quote').text()).toBe(`“${quote}”`)
-      expect(li.find('.verdict h3').text()).toBe('{{list}}')
+      expect(li.find('.verdict').attr('title')).toBe('Rótulo da agência: {{list}}')
       expect(JSON.parse($('script#data').text()).records[0]).toEqual(odd)
       expect($('#list > li[data-id]')).toHaveLength(records.length)
     } finally {

@@ -6,7 +6,7 @@ Um script lê a página de cobertura de cada agência a cada seis horas, grava a
 
 ## O que é e o que não é
 
-- O veredito é sempre da agência. O site mostra o rótulo do jeito que a agência escreveu (`#NÃOÉBEMASSIM`, `FALTA CONTEXTO`, `é enganoso`). As quatro faixas (verdadeiro, impreciso, falso, sem faixa) só servem para filtrar e contar. A tabela que põe cada rótulo numa faixa é pública, em `config/bands.json`.
+- O veredito é sempre da agência. Cada agência tem os próprios rótulos (`#NÃOÉBEMASSIM`, `FALTA CONTEXTO`, `é enganoso`), e o site mostra todos numa escala comum de quatro faixas (verdadeiro, impreciso, falso, sem faixa). A tabela que põe cada rótulo numa faixa é pública, em `config/bands.json`. O rótulo original fica sem alteração nos dados (`label`) e aparece ao passar o mouse sobre o veredito.
 - Entra tudo o que a agência publicou na página de cobertura do debate, com qualquer veredito. Não é uma lista de mentiras de ninguém.
 - O placar conta checagens, não falas. Cada agência escolhe o que checar, então um candidato com mais "falso" pode simplesmente ter tido mais falas checadas. No placar geral, a mesma fala checada por duas agências conta duas vezes.
 - Rótulos sem correspondência clara (`INSUSTENTÁVEL` da Lupa, `é inconclusivo` do Estadão) ficam em "sem faixa", que aparece em todo placar, mesmo zerado.
