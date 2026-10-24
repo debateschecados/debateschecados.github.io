@@ -342,7 +342,7 @@ export function leanHtml(ctx, result) {
         const [lo, hi] = r.interval.map(x)
         const width = `${Math.round((Number.parseFloat(hi) - Number.parseFloat(lo)) * 100) / 100}%`
         parts.push(
-          `<rect class="ci" x="${lo}" y="31" width="${width}" height="6" rx="3"></rect>`,
+          `<rect class="ci" x="${lo}" y="30" width="${width}" height="8" rx="4"></rect>`,
           `<line class="ci-end" x1="${lo}" x2="${lo}" y1="27" y2="41"></line>`,
           `<line class="ci-end" x1="${hi}" x2="${hi}" y1="27" y2="41"></line>`,
         )
@@ -367,7 +367,7 @@ export function leanHtml(ctx, result) {
       if (r.interval && distance !== null) {
         const at = x(/** @type {number} */ (r.distance))
         parts.push(
-          `<circle class="pt" cx="${at}" cy="34" r="6"></circle>`,
+          `<circle class="pt" cx="${at}" cy="34" r="4"></circle>`,
           `<text class="pt-label" x="${at}" y="14" text-anchor="${anchor(at)}">${distance}</text>`,
         )
       }

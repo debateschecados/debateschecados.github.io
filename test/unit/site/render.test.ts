@@ -461,6 +461,10 @@ describe('leanHtml, the axes (LEAN-03, LEAN-04, LEAN-06)', () => {
     expect(svg.find('rect.ci').attr('width')).toBe('30%')
     expect(svg.find('line.zero').attr('x1')).toBe('50%')
     expect(svg.find('circle.pt').attr('cx')).toBe('75%')
+    // The bar is at least as thick as the point is wide (LEAN-06).
+    expect(Number(svg.find('rect.ci').attr('height'))).toBeGreaterThanOrEqual(
+      2 * Number(svg.find('circle.pt').attr('r')),
+    )
     expect(svg.find('.pt-label').text()).toBe('+0,25')
     expect(
       svg

@@ -1124,7 +1124,7 @@ textarea:focus-visible {
   stroke: var(--line);
 }
 .track .ci {
-  fill: rgba(29, 29, 31, 0.24);
+  fill: #8e8e93;
 }
 .track .ci-end {
   stroke: rgba(29, 29, 31, 0.55);
@@ -1136,8 +1136,6 @@ textarea:focus-visible {
 }
 .track .pt {
   fill: var(--ink);
-  stroke: var(--bg);
-  stroke-width: 2.5;
 }
 .track text,
 .axis text {
@@ -1208,13 +1206,13 @@ textarea:focus-visible {
 }
 .k-ci {
   width: 40px;
-  height: 6px;
-  border-radius: 3px;
-  background: rgba(29, 29, 31, 0.24);
+  height: 8px;
+  border-radius: 4px;
+  background: #8e8e93;
 }
 .k-pt {
-  width: 11px;
-  height: 11px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--ink);
 }
