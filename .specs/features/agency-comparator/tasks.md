@@ -261,3 +261,170 @@ T6 → T8
 ## Parallel Execution Map
 
 Phases run in sequence; inside a phase the diagram order holds. One worker per phase.
+
+---
+
+## Amendment 2026-10-24: distance, changed verdicts, direction A
+
+### Phase 3: Distance and changed verdicts
+
+```
+T9 → T10
+T11 → T13
+T12 → T13
+T13 → T14
+T13 → T15
+```
+
+### T9: Keep key changes in history
+
+**What**: `HistoryEntry.key`; `update` in `src/pipeline/merge.ts` records the previous key in the same history entry.
+**Where**: `src/types.ts`, `src/pipeline/merge.ts`, `test/unit/merge.test.ts`
+**Depends on**: None
+**Reuses**: existing history entry logic
+**Requirement**: DRIFT-01
+
+**Done when**:
+
+- [ ] A reissued key with a label change gives one history entry with `key` and `label`; a key-only change gives an entry with only `key` and keeps the archive copy
+- [ ] Gate check passes: `pnpm vitest run test/unit/merge.test.ts`
+- [ ] Test count: at least 2 new tests pass
+
+**Tests**: unit
+**Gate**: quick
+
+**Commit**: `feat(ingest): Keep the previous source key in history`
+
+---
+
+### T10: Repair the 2026-10-24 Estadão run
+
+**What**: `src/repair/estadao-2026-10-24.ts`, its run on the data, the report `data/repairs/2026-10-24-estadao.json`, and the repaired `data/checks.json` and `data/checks.csv`.
+**Where**: `src/repair/estadao-2026-10-24.ts`, `test/unit/repair.test.ts`, `data/`
+**Depends on**: T9
+**Reuses**: `merge`, the data writer
+**Requirement**: DRIFT-02
+
+**Done when**:
+
+- [ ] On the pinned files: no record of the source is missing, `d5bca87d832d` is Lula's hunger claim again, the report lists the merged IDs, and other sources are byte-identical
+- [ ] Refuses to write when the current source records differ from the `after` ones
+- [ ] `pnpm check:claims` and the build pass on the repaired data
+- [ ] Gate check passes: `pnpm vitest run test/unit/repair.test.ts`
+- [ ] Test count: at least 3 tests pass
+
+**Tests**: unit
+**Gate**: quick
+
+**Commit**: `fix(data): Repair the Estadão checks split by the 2026-10-24 run`
+
+---
+
+### T11: Compute the distance from the other agencies
+
+**What**: `site/lean.js`, `src/lean.ts`, script `lean`.
+**Where**: `site/lean.js`, `src/lean.ts`, `package.json`, `test/unit/site/lean.test.ts`
+**Depends on**: None
+**Reuses**: `site/compare.js` rows
+**Requirement**: LEAN-01, LEAN-02, LEAN-03, LEAN-04, LEAN-05, LEAN-07
+
+**Done when**:
+
+- [ ] Hand-computed deviations, means and distance match on a fixture; the interval is identical across two calls
+- [ ] Each sentence branch, the small-sample case and both headline forms are produced by fixtures built for them
+- [ ] `pnpm lean` prints the same numbers as `lean()` on the fixture data
+- [ ] Gate check passes: `pnpm vitest run test/unit/site/lean.test.ts`
+- [ ] Test count: at least 7 tests pass
+
+**Tests**: unit
+**Gate**: quick
+
+**Commit**: `feat(site): Compute each agency's distance from the others`
+
+---
+
+### T12: Rebuild verdict versions
+
+**What**: `site/drift.js` (versions, wordDiff, changed, driftCounts).
+**Where**: `site/drift.js`, `test/unit/site/drift.test.ts`
+**Depends on**: None
+**Reuses**: `site/core.js` context and band lookup
+**Requirement**: DRIFT-03, DRIFT-04, DRIFT-05
+
+**Done when**:
+
+- [ ] Versions from 0, 1 and 2 history entries, including a quote-only entry that keeps the label, match hand-written expectations
+- [ ] Counts of harsher, milder, gained and lost per agency and candidate match a fixture, with and without a debate filter
+- [ ] Gate check passes: `pnpm vitest run test/unit/site/drift.test.ts`
+- [ ] Test count: at least 6 tests pass
+
+**Tests**: unit
+**Gate**: quick
+
+**Commit**: `feat(site): Rebuild the versions of changed checks`
+
+---
+
+### T13: Render the comparison page in direction A
+
+**What**: new sections, axes SVG, dot matrix, claim detail, coverage ticks, timelines and counts in `site/render.js` and `site/comparar.html`; build wiring; remove the pairwise table and `rigor`; agency count from config; the two test gaps from the phase 2 review (removed record in `curated` stays out of "só ela checou"; escaping of claim and label).
+**Where**: `site/render.js`, `site/comparar.html`, `site/compare.js`, `src/site/build.ts`, `test/unit/site/render.test.ts`, `test/unit/site/build.test.ts`, `test/unit/site/compare.test.ts`, `test/fixtures/site.ts`
+**Depends on**: T11, T12
+**Reuses**: `fill`, `jsonScript`, mock `a-balanca.html` markup
+**Requirement**: CMP-01, CMP-02, CMP-08, RIGOR-01, RIGOR-05, LEAN-06, DRIFT-03, DRIFT-05
+
+**Done when**:
+
+- [ ] Built page has the four sections, one axis per agency in alphabetical order with the sentence, the matrix with one button per visible row, shapes per band and text alternatives, the detail with labels as text, the ticks, the timelines and counts
+- [ ] No element is ordered by a number; no shaded zone around zero
+- [ ] A claim and a label with `<`, `&` and `"` come out escaped; the page still has exactly the expected `</script>` count
+- [ ] Gate check passes: `pnpm vitest run test/unit/site/render.test.ts`, then `build.test.ts`, then `compare.test.ts`
+- [ ] Test count: at least 8 new tests pass
+
+**Tests**: unit
+**Gate**: quick
+
+**Commit**: `feat(site): Render the comparison page as axes, a dot matrix and timelines`
+
+---
+
+### T14: Browser interactions and layout
+
+**What**: `site/comparar.js` re-renders axes, matrix visibility, ticks and counts on filter change; claim detail by click and keyboard; CSS for desktop and the list layout below 720 px.
+**Where**: `site/comparar.js`, `site/style.css`, `test/e2e/compare.test.ts`
+**Depends on**: T13
+**Reuses**: existing URL state and focus handling
+**Requirement**: CMP-03, CMP-07, LEAN-06
+
+**Done when**:
+
+- [ ] e2e: each filter changes the axes numbers, the matrix and the counts as `lean.js` and `drift.js` compute; reload restores the view
+- [ ] e2e: the detail opens with Enter and shows each agency's label; no horizontal scroll at 360 px; no cross-origin request
+- [ ] Gate check passes: `pnpm vitest run test/e2e/compare.test.ts`
+- [ ] Test count: at least 6 tests pass
+
+**Tests**: e2e
+**Gate**: full
+
+**Commit**: `feat(site): Filter the axes, matrix and changes in the browser`
+
+---
+
+### T15: Explain the distance and the changes
+
+**What**: methodology sections "Distância das outras agências" and "Vereditos que mudaram" (LEAN-08), README "Comparador" lines with `pnpm lean` and the repair report.
+**Where**: `site/metodologia.html`, `README.md`, `test/unit/site/build.test.ts`
+**Depends on**: T13
+**Reuses**: existing pages
+**Requirement**: LEAN-08
+
+**Done when**:
+
+- [ ] Built methodology page has the formula, scale, interval, sentence rule, limits and the spec link
+- [ ] Gate check passes: `pnpm vitest run test/unit/site/build.test.ts`
+- [ ] Test count: at least 2 new tests pass
+
+**Tests**: unit
+**Gate**: build
+
+**Commit**: `docs(site): Explain the distance measure and changed verdicts`

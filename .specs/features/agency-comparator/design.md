@@ -158,3 +158,60 @@ interface ManualEdit { from: string[] | null; to: { records: string[]; claim: st
 | Judge decisions | Matched by component refs | Index order depends on map iteration in the workflow; refs do not |
 | Consensus code | Ported to TS and committed, workflow keeps its copy | The run is reproducible without Claude Code; tests pin the behavior |
 | Agent transcripts | Not committed | They carry local environment details; the outputs and prompts are enough to audit |
+
+---
+
+## Amendment 2026-10-24: distance, changed verdicts, visual direction A
+
+Requirements: CMP-01, CMP-02, CMP-07, CMP-08, RIGOR-01, RIGOR-05, LEAN-01..08, DRIFT-01..05. The approved mock is `.specs/features/agency-comparator/mock-a-balanca.html` (direction A, it reads a `data.json` built from the 2026-10-24 data); its copy, layout and section order are the reference, with the corrections listed under "Mock corrections".
+
+### `src/pipeline/merge.ts` and `src/types.ts` (DRIFT-01)
+
+- `HistoryEntry` gains `key?: string | null`. In `update`, a key change adds `old.key = record.key` to the same entry as label, quote and speaker changes. A key-only change writes an entry but is not a verified change: evidence keeps its archive copy, as today.
+
+### `src/repair/estadao-2026-10-24.ts` (DRIFT-02)
+
+- One-off CLI, committed with its output. Inputs pinned by commit: `before` = `git show e13bac2:data/checks.json`, `after` = `git show bc3a25d:data/checks.json`.
+- Fresh items = the live records of `estadao-globo-2026-10-23` in `after`, mapped to `FreshItem` (`evidenceUrl` = `evidence.url`, `fetchedAt` = `evidence.fetchedAt`). Previous = that source's records in `before`. `merge` runs with date `2026-10-24` and the source's adapter.
+- It replaces that source's records in the current `data/checks.json` only when they still equal the `after` ones; otherwise it exits 1 and says the source changed since the run. Every other source is untouched. It writes `data/checks.json` and `data/checks.csv` through the existing writer, and the report `data/repairs/2026-10-24-estadao.json`: `{ source, before, after, merged: [{ from, into }], new: [...], missing: [...] }`.
+
+### `site/lean.js` (LEAN-01..05, LEAN-07)
+
+- Pure module shared by build, browser and the CLI. `SCORE = { verdadeiro: 0, impreciso: 1, falso: 2 }`, `MIN_N = 10`, `B = 5000`.
+- `deviations(rows)`: for each row, members with a band in `SCORE`; when there are 2 or more, each member gets `score - mean(others)`. Returns `[{ outlet, speaker, value }]`.
+- `lean(ctx, rows)`: per outlet in `ctx.outletIds` order, per candidate in ballot order `{ n, mean }`; `distance = mean(c2) - mean(c1)` with c1, c2 the candidates in ballot order (Lula, Flávio); `interval` from the bootstrap; `verdict` = `'small'` when either n < `MIN_N`, else `'none' | 'c1' | 'c2'` (harsher with c1 when the interval is entirely below 0, with c2 when entirely above, `'none'` when lower ≤ 0 ≤ upper).
+- Bootstrap: one generator per outlet, LCG `s = (s * 1664525 + 1013904223) mod 2^32` starting at `s = 42`, `u = s / 2^32`, index `floor(u * len)`. Each of the B resamples draws `len(c2)` values of c2 then `len(c1)` values of c1 and stores `mean(c2*) - mean(c1*)`. Sorted ascending: lower = `sorted[250]`, upper = `sorted[4749]`.
+- `sentence(verdict, ctx)` and `headline(result, ctx)` return the fixed texts of LEAN-03 and LEAN-05.
+- `src/lean.ts` CLI, script `lean`: loads config and data like the build, rows from `createComparison` with no filter, prints one line per agency (n and mean per candidate, distance, interval, sentence) and the headline.
+
+### `site/drift.js` (DRIFT-03..05)
+
+- `versions(record)`: rebuilds versions from the current record backwards through `history` (each entry holds the old values of the fields that changed until its date). Each version: `{ label, band, quote, key, until | since }`. The band of an old label comes from `ctx` band lookup (`bands.json`), so a reader sees the band the label maps to today.
+- `wordDiff(a, b)`: word-level longest common subsequence, returns removed and added runs.
+- `changed(ctx, debate)`: live records with a label, quote or key entry, ordered by debate newest first, agency alphabetical, `pos`.
+- `driftCounts(ctx, debate)`: per outlet and candidate `{ harsher, milder, gained, lost }` over band changes between consecutive versions.
+
+### Page (`site/comparar.html`, `site/render.js`, `site/comparar.js`, `site/style.css`)
+
+- Sections in this order with an in-page nav: "Pendem?" (headline, axes, RIGOR-04, method note), "Fala por fala" (filters, matrix, detail), "Quem checou o quê" (one tick per claim, filled when the agency checked it; "só ela checou" count and the note on records not yet grouped), "Vereditos que mudaram" (counts table, timelines, note on key-only changes).
+- Axes are inline SVG rendered by the build and re-rendered by the browser on filter change; the zero line is drawn over the bar; no shaded tolerance zone around zero.
+- Matrix: per debate, per candidate, one column per row in CMP-04 order, lanes in `ctx.outletIds` order. Bands by color and shape: verdadeiro circle, impreciso triangle, falso cross, sem faixa square; "não checou" hollow ring. Each column is a button with an accessible name; the detail opens below the matrix (not on hover only) and shows each agency's label as text. Divergent columns get a mark above. Below 720 px the matrix becomes a list (one claim per line, agency lanes as four columns).
+- The pairwise harsher/equal/milder table and `rigor` are removed (RIGOR-02 superseded).
+- Agency count comes from `ctx.outletIds.length` (CSS custom property set by the build), not a fixed 4.
+
+### Mock corrections
+
+- History entries hold only the fields that changed: a quote-only entry means the label did not change. The mock showed "sem selo, ganhou faixa" for the two quote edits; the page shows only the quote diff for them.
+- Remove the shaded center zone (it reads as a tolerance margin).
+- Candidate sprites at the axis ends stay small and neutral, with the text labels as the primary cue.
+
+### Testing
+
+| Module | Tests |
+| ------ | ----- |
+| merge key history | `test/unit/merge.test.ts` |
+| repair | `test/unit/repair.test.ts` on copies of the pinned files |
+| lean | `test/unit/site/lean.test.ts`: hand-computed fixture, interval determinism, each sentence branch, small sample, headline |
+| drift | `test/unit/site/drift.test.ts`: versions from 0, 1, 2 entries, word diff, counts |
+| render/build | `test/unit/site/render.test.ts`, `test/unit/site/build.test.ts`: escaping of claim and label, shapes, no ordering by number |
+| browser | `test/e2e/compare.test.ts`: filters update axes, matrix and counts; detail by keyboard; 360 px |

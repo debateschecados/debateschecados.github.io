@@ -58,6 +58,14 @@
 - **Date**: 2026-10-24
 - **Status**: active
 
+### AD-008
+- **Decision**: The comparator shows, per agency, its distance from the other agencies on shared claims (Flávio minus Lula of the mean deviation from the others' mean score) with a deterministic 90% bootstrap interval and one sentence chosen by a fixed rule; it also shows every verdict, quote or key change with its versions. Visual direction A (axes, dot matrix, timelines).
+- **Reason**: The user wants a public, recomputable answer to "as agências pendem?"; fixing the rule before publication keeps the words from following the results.
+- **Trade-off**: Replaces the "no score per agency" rule of RIGOR-05 with one number plus interval per agency; the measure cannot see what each agency chose to check, which the page states next to it.
+- **Scope**: Agency comparator, methodology page, `pnpm lean`, ingest history (key changes).
+- **Date**: 2026-10-24
+- **Status**: active
+
 ## Handoff
 
 - **Feature**: `.specs/features/debate-archive`
