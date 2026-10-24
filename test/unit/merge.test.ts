@@ -315,6 +315,24 @@ describe('step 3: matching (INGEST-04)', () => {
     ])
   })
 
+  it('keeps ids with their speaker when the same quote and label swap places (HIST-01)', () => {
+    const quote = 'O Brasil voltou a crescer'
+    const previous = first([
+      lupa([lupaItem(1, quote, { speaker: 'lula' }), lupaItem(2, quote, { speaker: 'flavio' })]),
+    ])
+    const idOf = (speaker: string) => previous.find((r) => r.speaker === speaker)?.id
+    const { records, events } = merge(
+      previous,
+      [lupa([lupaItem(1, quote, { speaker: 'flavio' }), lupaItem(2, quote, { speaker: 'lula' })])],
+      ctx(),
+    )
+    expect(records.map((r) => [r.id, r.speaker, r.pos, r.history])).toEqual([
+      [idOf('flavio'), 'flavio', 1, undefined],
+      [idOf('lula'), 'lula', 2, undefined],
+    ])
+    expect(events.filter((e) => e.type === 'new' || e.type === 'missing')).toEqual([])
+  })
+
   it('prefers the duplicate with the same label and settles on a second identical run', () => {
     const quote = 'A inflação caiu pela metade no meu governo'
     const previous = first([lupa([lupaItem(1, quote, { label: 'FALSO' }), lupaItem(2, quote)])])
