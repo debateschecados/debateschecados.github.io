@@ -139,13 +139,15 @@ describe('index.html (SITE-01)', () => {
     expect(prompt.match(/^\d\. /gm)).toEqual(['1. ', '2. ', '3. ', '4. ', '5. '])
   })
 
-  it('states what the site does not promise, with the archived share from the data (AUDIT-09)', () => {
+  it('states what the site does not promise, with the archive status from the data and no counts (AUDIT-09)', () => {
     const limits = index('dialog#audit #limits li')
     expect(limits).toHaveLength(5)
-    const archived = records.filter((r) => r.evidence.archiveUrl).length
-    expect(limits.last().text()).toContain(
-      `${archived} de ${records.length} checagens têm cópia conferida na Wayback Machine.`,
+    const allArchived = records.every((r) => r.evidence.archiveUrl)
+    const last = limits.last().text()
+    expect(last).toContain(
+      allArchived ? 'Toda checagem tem cópia arquivada.' : 'A cópia arquivada ainda está chegando.',
     )
+    expect(last).not.toMatch(/\d/)
   })
 
   it('puts the trust line and the audit control right below the subtitle (AUDIT-01)', () => {

@@ -147,10 +147,9 @@ function topbarHtml(page: string) {
 }
 
 function archiveText(records: CheckRecord[]) {
-  const done = records.filter((r) => r.evidence.archiveUrl).length
-  if (done === records.length)
-    return `<strong>Toda checagem tem cópia arquivada.</strong> As ${records.length} checagens têm cópia conferida na Wayback Machine.`
-  return `<strong>A cópia arquivada ainda está chegando.</strong> ${done} de ${records.length} checagens têm cópia conferida na Wayback Machine. As outras esperam a próxima tentativa, e até lá a prova é o link da agência.`
+  if (records.every((r) => r.evidence.archiveUrl))
+    return '<strong>Toda checagem tem cópia arquivada.</strong> Todas têm cópia conferida na Wayback Machine.'
+  return '<strong>A cópia arquivada ainda está chegando.</strong> Parte das checagens já tem cópia conferida na Wayback Machine. As outras esperam a próxima tentativa, e até lá a prova é o link da agência.'
 }
 
 // One stamp per agency with the label it uses for "impreciso": four ways to say the same thing.
