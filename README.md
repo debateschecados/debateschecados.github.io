@@ -78,7 +78,13 @@ São os mesmos cinco passos do roteiro que o site oferece para colar numa IA, no
 4. Recalcule o placar de cada candidato a partir do CSV e compare com o que o site mostra. Deixe de fora as linhas com `missing_since` preenchido, que são checagens que sumiram da página da agência.
 5. Procure no histórico de commits mudanças de rótulo ou remoções e veja se cada uma tem justificativa registrada. Mudanças de rótulo, fala ou candidato também ficam na coluna `history` do CSV, com a data em que foram detectadas.
 
-O `sha256` de cada registro é o hash da cópia arquivada, não da página ao vivo (g1 e Estadão mudam bytes a cada acesso, por causa de anúncios). O `archive_url` já é o endereço `id_` da Wayback Machine, que devolve os bytes originais da página. Para conferir, baixe esse arquivo, calcule o SHA-256 e passe o arquivo pelo leitor indicado em `adapter` (`<tipo>@<versão>`), na versão do código daquele commit.
+O `sha256` de cada registro é o hash da cópia arquivada, não da página ao vivo (g1 e Estadão mudam bytes a cada acesso, por causa de anúncios). O `archive_url` já é o endereço `id_` da Wayback Machine, que devolve os bytes originais da página. A Wayback Machine entrega esse arquivo comprimido em gzip, e o hash é do conteúdo já descomprimido. Para conferir:
+
+```sh
+curl -s --compressed "<archive_url>" | sha256sum
+```
+
+Sem `--compressed` o hash sai diferente. Depois passe o arquivo pelo leitor indicado em `adapter` (`<tipo>@<versão>`), na versão do código daquele commit.
 
 Achou um erro? Abra uma issue dizendo o `id` da checagem e o que está errado. Toda correção vira um commit público, com data.
 
