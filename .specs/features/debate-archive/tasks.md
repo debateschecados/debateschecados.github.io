@@ -593,6 +593,8 @@ T22 → T24
 
 **Commit**: `feat(site): Port filters, ordering and scoreboards to a module`
 
+**Status**: ✅ Complete
+
 ---
 
 ### T18: Share item and scoreboard templates

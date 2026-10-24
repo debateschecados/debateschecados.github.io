@@ -242,16 +242,16 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 | INGEST-09 | P1: Collect the debate checks | Tasks: T7, T15 | Implemented |
 | SITE-01 | P1: Browse every check | Tasks: T20, T21 | Pending |
 | SITE-02 | P1: Browse every check | Tasks: T18 | Pending |
-| SITE-03 | P1: Browse every check | Tasks: T17 | Pending |
-| SITE-04 | P1: Browse every check | Tasks: T17 | Pending |
+| SITE-03 | P1: Browse every check | Tasks: T17 | Implemented |
+| SITE-04 | P1: Browse every check | Tasks: T17 | Implemented |
 | SITE-05 | P1: Browse every check | Tasks: T21 | Pending |
 | SITE-06 | P1: Browse every check | Tasks: T21 | Pending |
 | SITE-07 | P1: Browse every check | Tasks: T19, T21 | Pending |
-| SCORE-01 | P1: Scoreboards | Tasks: T17 | Pending |
-| SCORE-02 | P1: Scoreboards | Tasks: T17 | Pending |
-| SCORE-03 | P1: Scoreboards | Tasks: T17 | Pending |
-| SCORE-04 | P1: Scoreboards | Tasks: T17 | Pending |
-| SCORE-05 | P1: Scoreboards | Tasks: T17 | Pending |
+| SCORE-01 | P1: Scoreboards | Tasks: T17 | Implemented |
+| SCORE-02 | P1: Scoreboards | Tasks: T17 | Implemented |
+| SCORE-03 | P1: Scoreboards | Tasks: T17 | Implemented |
+| SCORE-04 | P1: Scoreboards | Tasks: T17 | Implemented |
+| SCORE-05 | P1: Scoreboards | Tasks: T17 | Implemented |
 | DATA-01 | P1: Open, auditable data | Tasks: T7, T20 | In Progress |
 | DATA-02 | P1: Open, auditable data | Tasks: T14 | Implemented |
 | DATA-03 | P1: Open, auditable data | Tasks: T3, T16, T20 | In Progress |
@@ -269,8 +269,8 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 | AUDIT-08 | P1: Visible impartiality and self-service audit | Tasks: T19, T20 | Pending |
 | HIST-01 | P2: Re-runs keep history | Tasks: T6 | Implemented |
 | HIST-02 | P2: Re-runs keep history | Tasks: T6, T17, T21 | In Progress |
-| SHARE-01 | P2: Shareable filters | Tasks: T17 | Pending |
-| SHARE-02 | P2: Shareable filters | Tasks: T17 | Pending |
+| SHARE-01 | P2: Shareable filters | Tasks: T17 | Implemented |
+| SHARE-02 | P2: Shareable filters | Tasks: T17 | Implemented |
 | CONF-01 | P2: New debate by configuration | Tasks: T3, T15 | Implemented |
 | CONF-02 | P2: New debate by configuration | Tasks: T15 | Implemented |
 
