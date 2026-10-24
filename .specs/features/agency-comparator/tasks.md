@@ -334,16 +334,18 @@ T13 → T15
 
 **Done when**:
 
-- [ ] Hand-computed deviations, means and distance match on a fixture; the interval is identical across two calls
-- [ ] Each sentence branch, the small-sample case and both headline forms are produced by fixtures built for them
-- [ ] `pnpm lean` prints the same numbers as `lean()` on the fixture data
-- [ ] Gate check passes: `pnpm vitest run test/unit/site/lean.test.ts`
-- [ ] Test count: at least 7 tests pass
+- [x] Hand-computed deviations, means and distance match on a fixture; the interval is identical across two calls
+- [x] Each sentence branch, the small-sample case and both headline forms are produced by fixtures built for them
+- [x] `pnpm lean` prints the same numbers as `lean()` on the fixture data
+- [x] Gate check passes: `pnpm vitest run test/unit/site/lean.test.ts`
+- [x] Test count: at least 7 tests pass
 
 **Tests**: unit
 **Gate**: quick
 
 **Commit**: `feat(site): Compute each agency's distance from the others`
+
+**Status**: ✅ Complete
 
 ---
 

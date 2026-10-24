@@ -22,7 +22,8 @@
     "check:labels": "node src/check-labels.ts",
     "claims:input": "node src/claims/blind.ts",
     "claims:assemble": "node src/claims/assemble.ts",
-    "check:claims": "node src/claims/assemble.ts --check"
+    "check:claims": "node src/claims/assemble.ts --check",
+    "lean": "node src/lean.ts"
   },
   "dependencies": {
     "cheerio": "1.2.0",

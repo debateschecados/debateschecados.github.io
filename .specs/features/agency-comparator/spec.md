@@ -239,13 +239,13 @@ The archive shows each agency's checks side by side, but it cannot answer the qu
 | RIGOR-05 | P1: Coverage and relative rigor | Tasks: T6 | Implemented |
 | RIGOR-06 | P1: Coverage and relative rigor | Tasks: T5, T7 | Implemented |
 | CMP-08 | P1: Compare agencies | Tasks: pending | Pending |
-| LEAN-01 | P1: Distance from the other agencies | Tasks: pending | Pending |
-| LEAN-02 | P1: Distance from the other agencies | Tasks: pending | Pending |
-| LEAN-03 | P1: Distance from the other agencies | Tasks: pending | Pending |
-| LEAN-04 | P1: Distance from the other agencies | Tasks: pending | Pending |
-| LEAN-05 | P1: Distance from the other agencies | Tasks: pending | Pending |
+| LEAN-01 | P1: Distance from the other agencies | Tasks: T11 | Implemented |
+| LEAN-02 | P1: Distance from the other agencies | Tasks: T11 | Implemented |
+| LEAN-03 | P1: Distance from the other agencies | Tasks: T11 | Implemented |
+| LEAN-04 | P1: Distance from the other agencies | Tasks: T11 | Implemented |
+| LEAN-05 | P1: Distance from the other agencies | Tasks: T11 | Implemented |
 | LEAN-06 | P1: Distance from the other agencies | Tasks: pending | Pending |
-| LEAN-07 | P1: Distance from the other agencies | Tasks: pending | Pending |
+| LEAN-07 | P1: Distance from the other agencies | Tasks: T11 | Implemented |
 | LEAN-08 | P1: Distance from the other agencies | Tasks: pending | Pending |
 | DRIFT-01 | P1: Verdicts that changed | Tasks: T9 | Implemented |
 | DRIFT-02 | P1: Verdicts that changed | Tasks: T10 | Implemented |
@@ -259,7 +259,7 @@ The archive shows each agency's checks side by side, but it cannot answer the qu
 | REPRO-01 | P2: Reproducible consensus | Tasks: T4 | Implemented |
 | REPRO-02 | P2: Reproducible consensus | Tasks: T4 | Implemented |
 
-**Coverage:** 39 total, 27 mapped to tasks, 12 pending the amendment's tasks
+**Coverage:** 39 total, 33 mapped to tasks, 6 pending the amendment's tasks
 
 ---
 
