@@ -10,6 +10,8 @@ import type { CheckRecord } from '../../../src/types.ts'
 
 const ROOT = join(import.meta.dirname, '../../..')
 const RUN = join(ROOT, 'data/claim-curation/2026-10-24/input.json')
+// data/checks.json as the 2026-10-24 run saw it, so later agency edits do not break this test.
+const RUN_RECORDS = join(ROOT, 'test/fixtures/claim-records-2026-10-24.json')
 const sha = (text: string) => createHash('sha256').update(text).digest('hex')
 const byHash = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0)
 
@@ -102,24 +104,12 @@ describe('blindInput (CLAIM-03)', () => {
     expect(JSON.stringify(input)).not.toContain(REMOVED.id)
   })
 
-  it('reproduces the committed 2026-10-24 input from data/checks.json', async () => {
+  it('reproduces the committed 2026-10-24 input from the records of that day', async () => {
     const committed = JSON.parse(await readFile(RUN, 'utf8'))
-    const ids = new Set(
-      committed.flatMap((d: { partitions: { records: { ref: string }[] }[] }) =>
-        d.partitions.flatMap((p) => p.records.map((r) => r.ref)),
-      ),
-    )
-    expect(ids.size).toBe(314)
-    const records = JSON.parse(
-      await readFile(join(ROOT, 'data/checks.json'), 'utf8'),
-    ) as CheckRecord[]
+    const records = JSON.parse(await readFile(RUN_RECORDS, 'utf8')) as CheckRecord[]
+    expect(records).toHaveLength(314)
     const { candidates } = await loadConfig(join(ROOT, 'config'))
-    expect(
-      blindInput(
-        records.filter((r) => ids.has(r.id)),
-        candidates,
-      ),
-    ).toEqual(committed)
+    expect(blindInput(records, candidates)).toEqual(committed)
   })
 })
 

@@ -3,7 +3,7 @@ import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
-import { assemble } from '../../../src/claims/assemble.ts'
+import { assemble, latestRun } from '../../../src/claims/assemble.ts'
 import { checkGroups, groupId } from '../../../src/claims/groups.ts'
 import type { CheckRecord } from '../../../src/types.ts'
 import workflow from '../../fixtures/claim-curation-2026-10-24-result.json' with { type: 'json' }
@@ -11,27 +11,30 @@ import workflow from '../../fixtures/claim-curation-2026-10-24-result.json' with
 const ROOT = join(import.meta.dirname, '../../..')
 const DATA = join(ROOT, 'data')
 const RUN = join(DATA, 'claim-curation/2026-10-24')
+// data/checks.json as the 2026-10-24 run saw it, so later agency edits do not break these tests.
+const RECORDS = join(ROOT, 'test/fixtures/claim-records-2026-10-24.json')
 const MARKETS = ['92e3caa21ac1', 'df250d7b4df0']
 const MARKETS_G1 = '5434697c0611'
 const REASON =
   'A checagem do g1 (5434697c0611) também avalia os 700 novos mercados; incluída na revisão do mantenedor em 2026-10-24.'
 
 const key = (refs: readonly string[]) => refs.toSorted().join(',')
-const records = async () =>
-  JSON.parse(await readFile(join(DATA, 'checks.json'), 'utf8')) as CheckRecord[]
+const records = async () => JSON.parse(await readFile(RECORDS, 'utf8')) as CheckRecord[]
 
 const dirs: string[] = []
 afterEach(async () => {
   await Promise.all(dirs.splice(0).map((dir) => rm(dir, { recursive: true, force: true })))
 })
 
-// A data dir with checks.json, the committed run and claim-groups.json, for edits.
+// A self-contained data dir for edits: the 2026-10-24 run, the records it saw and the
+// claim-groups.json assembled from it.
 async function dataCopy() {
   const dir = await mkdtemp(join(tmpdir(), 'claims-'))
   dirs.push(dir)
-  await cp(join(DATA, 'checks.json'), join(dir, 'checks.json'))
-  await cp(join(DATA, 'claim-groups.json'), join(dir, 'claim-groups.json'))
+  await cp(RECORDS, join(dir, 'checks.json'))
   await cp(RUN, join(dir, 'claim-curation/2026-10-24'), { recursive: true })
+  const { file } = await assemble(RUN)
+  await writeFile(join(dir, 'claim-groups.json'), `${JSON.stringify(file, null, 2)}\n`)
   return dir
 }
 
@@ -79,9 +82,10 @@ describe('assemble the committed 2026-10-24 run (CLAIM-04, CLAIM-05, CLAIM-06)',
     expect(file.groups.map(order)).toEqual(file.groups.map(order).sort())
   })
 
-  it('matches the committed data/claim-groups.json (REPRO-01)', async () => {
+  it('matches the committed data/claim-groups.json, assembled from the latest run (REPRO-01)', async () => {
     const committed = JSON.parse(await readFile(join(DATA, 'claim-groups.json'), 'utf8'))
-    expect(committed).toEqual((await assemble(RUN)).file)
+    const run = await latestRun(join(DATA, 'claim-curation'))
+    expect(committed).toEqual((await assemble(join(DATA, 'claim-curation', String(run)))).file)
   })
 
   it('leaves a disputed component ungrouped when its judge output is missing (edge case)', async () => {
