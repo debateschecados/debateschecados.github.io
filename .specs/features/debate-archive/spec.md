@@ -231,15 +231,15 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| INGEST-01 | P1: Collect the debate checks | Tasks: T15, T22 | Pending |
-| INGEST-02 | P1: Collect the debate checks | Tasks: T2, T9, T10, T11, T12, T15 | In Progress |
+| INGEST-01 | P1: Collect the debate checks | Tasks: T15, T22 | In Progress |
+| INGEST-02 | P1: Collect the debate checks | Tasks: T2, T9, T10, T11, T12, T15 | Implemented |
 | INGEST-03 | P1: Collect the debate checks | Tasks: T9, T10, T11, T12, T13 | Implemented |
 | INGEST-04 | P1: Collect the debate checks | Tasks: T5, T6 | Implemented |
-| INGEST-05 | P1: Collect the debate checks | Tasks: T4, T15 | In Progress |
-| INGEST-06 | P1: Collect the debate checks | Tasks: T6, T15 | In Progress |
+| INGEST-05 | P1: Collect the debate checks | Tasks: T4, T15 | Implemented |
+| INGEST-06 | P1: Collect the debate checks | Tasks: T6, T15 | Implemented |
 | INGEST-07 | P1: Collect the debate checks | Tasks: T8 | Implemented |
 | INGEST-08 | P1: Collect the debate checks | Tasks: T8 | Implemented |
-| INGEST-09 | P1: Collect the debate checks | Tasks: T7, T15 | In Progress |
+| INGEST-09 | P1: Collect the debate checks | Tasks: T7, T15 | Implemented |
 | SITE-01 | P1: Browse every check | Tasks: T20, T21 | Pending |
 | SITE-02 | P1: Browse every check | Tasks: T18 | Pending |
 | SITE-03 | P1: Browse every check | Tasks: T17 | Pending |
@@ -271,8 +271,8 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 | HIST-02 | P2: Re-runs keep history | Tasks: T6, T17, T21 | In Progress |
 | SHARE-01 | P2: Shareable filters | Tasks: T17 | Pending |
 | SHARE-02 | P2: Shareable filters | Tasks: T17 | Pending |
-| CONF-01 | P2: New debate by configuration | Tasks: T3, T15 | In Progress |
-| CONF-02 | P2: New debate by configuration | Tasks: T15 | Pending |
+| CONF-01 | P2: New debate by configuration | Tasks: T3, T15 | Implemented |
+| CONF-02 | P2: New debate by configuration | Tasks: T15 | Implemented |
 
 **Coverage:** 42 total, 42 mapped to tasks, 0 unmapped
 

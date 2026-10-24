@@ -535,6 +535,8 @@ T22 → T24
 
 **Commit**: `feat(ingest): Wire sources, merge, archive and writers into one command`
 
+**Status**: ✅ Complete
+
 ---
 
 ### T16: Fail on unmapped labels
