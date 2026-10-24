@@ -8,6 +8,9 @@ const configSchema = z.object({ url: z.url() })
 // Verdict tags as printed: #FATO, #FAKE, #NÃOÉBEMASSIM, and the observed typo #/FATO.
 const TAG = /#\/?\p{Lu}+/gu
 
+// Paragraphs that close the checks: the credits line, or the live-update notice.
+const FOOTER = /^(Participaram da checagem|Esta checagem está em andamento)/i
+
 const collapse = (text: string) => text.replace(/\s+/g, ' ').trim()
 
 interface Verdict {
@@ -50,6 +53,7 @@ export function parseG1(docs: Doc[], notes: ParseNote[] = []): ParsedItem[] {
     if (!quote || !$chunk.find('.content-text').length) continue
 
     const text = collapse($chunk.text())
+    if (FOOTER.test(text)) break
     const tags = text.match(TAG) ?? []
     // Labels only come from "A declaração… é #X." or "Veja por que… é #X:" paragraphs. A paragraph
     // with two tags is the summary of a double verdict; its "Veja por que" paragraphs follow.
@@ -93,7 +97,7 @@ export function parseG1(docs: Doc[], notes: ParseNote[] = []): ParsedItem[] {
 
 export const g1: Adapter = {
   kind: 'g1-page',
-  version: 1,
+  version: 2,
   configSchema,
   async load(source, io) {
     return [await io.get(configSchema.parse(source).url)]

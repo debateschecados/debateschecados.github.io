@@ -113,6 +113,28 @@ describe('g1-page parse (INGEST-03)', () => {
     ])
   })
 
+  it.each([
+    'Participaram da checagem: Fulana de Tal e Beltrano Silva.',
+    'Esta checagem está em andamento.',
+  ])('ends the content at the footer "%s"', (footer) => {
+    const out = g1.parse([
+      doc(
+        page(
+          heading('chunk-h', 'CANDIDATA UM (PA)'),
+          quote('chunk-q', 'Plantamos mil árvores na praça central no ano passado.'),
+          label('chunk-l', 'A declaração é #FATO. Veja por quê:'),
+          list('chunk-e', 'A prefeitura registrou o plantio.'),
+          label('chunk-f', footer),
+          quote('chunk-x', 'Uma fala depois do rodapé que não é checagem.'),
+          label('chunk-lx', 'A declaração é #FAKE. Veja por quê:'),
+        ),
+      ),
+    ])
+    expect(out.map((i) => [i.key, i.explanation])).toEqual([
+      ['chunk-q', 'A prefeitura registrou o plantio.'],
+    ])
+  })
+
   it('reports a quote that is too short or has no verdict instead of emitting it', () => {
     const notes: ParseNote[] = []
     const out = g1.parse(
