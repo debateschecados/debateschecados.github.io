@@ -214,6 +214,8 @@ T22 → T24
 
 **Commit**: `feat(pipeline): Normalize speakers, labels, quotes and excerpts`
 
+**Status**: ✅ Complete
+
 ---
 
 ### T5: Assign record IDs

@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { z } from 'zod'
+import { labelKey } from './pipeline/normalize.ts'
 import type { Adapter, SourceConfig } from './types.ts'
 
 const id = z.string().regex(/^[a-z0-9][a-z0-9-]*$/, 'expected a lowercase id (a-z, 0-9, -)')
@@ -74,14 +75,6 @@ export interface Config {
 export class ConfigError extends Error {
   name = 'ConfigError'
 }
-
-// Matching key for labels: NFD, no diacritics, lowercase, only a-z kept.
-export const labelKey = (label: string) =>
-  label
-    .normalize('NFD')
-    .replace(/\p{M}/gu, '')
-    .toLowerCase()
-    .replace(/[^a-z]/g, '')
 
 const fail = (file: string, path: PropertyKey[], message: string): never => {
   throw new ConfigError(`${file}: ${path.join('.') || '(root)'}: ${message}`)
