@@ -154,7 +154,7 @@ describe('index.html (SITE-01)', () => {
     const trust = index('.hero > h1 + p + p.trust')
     expect(trust).toHaveLength(1)
     expect(trust.text().replace(/\s+/g, ' ').trim()).toBe(
-      'O veredito é sempre da agência. Código e dados são abertos. Veja como auditar',
+      'Nenhuma IA decide veredito. Código e dados são abertos. Veja como auditar',
     )
     expect(trust.children().last().is('button[data-open-audit]')).toBe(true)
   })
