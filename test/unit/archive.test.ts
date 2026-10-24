@@ -237,6 +237,45 @@ describe('archive (DATA-02, DATA-06)', () => {
     expect(clock.now() - saved).toBeGreaterThanOrEqual(POLL_LIMIT_MS)
   })
 
+  it('keeps polling the capture status after a poll that throws', async () => {
+    const records = [record(1)]
+    let poll = 0
+    const { run, calls } = setup({
+      'https://web.archive.org/save': () => json({ url: PAGE, job_id: 'job-1' }),
+      'https://web.archive.org/save/status/job-1': () => {
+        if (++poll === 1) throw new TypeError('fetch failed')
+        return json({ status: 'success', timestamp: '20261025090000' })
+      },
+      [idUrl('20261025090000')]: page(...records),
+    })
+    const result = await run(records)
+    expect(result.records[0].evidence.archiveUrl).toBe(idUrl('20261025090000'))
+    expect(result.attempts[0].outcome).toBe('captured')
+    expect(result.attempts[0].steps).toContain('capture: status poll failed, fetch failed')
+    expect(calls.filter((c) => c.url.includes('/save/status/'))).toHaveLength(2)
+    const text = JSON.stringify(result.attempts)
+    expect(text).not.toContain(KEYS.access)
+    expect(text).not.toContain(KEYS.secret)
+  })
+
+  it('keeps polling after a status body that cannot be read', async () => {
+    const records = [record(1)]
+    let poll = 0
+    const { run } = setup({
+      'https://web.archive.org/save': () => json({ url: PAGE, job_id: 'job-1' }),
+      'https://web.archive.org/save/status/job-1': () =>
+        ++poll === 1
+          ? new Response('{"status": "pen', { status: 200 })
+          : json({ status: 'success', timestamp: '20261025090000' }),
+      [idUrl('20261025090000')]: page(...records),
+    })
+    const result = await run(records)
+    expect(result.attempts[0].outcome).toBe('captured')
+    expect(result.attempts[0].steps.some((s) => s.startsWith('capture: status poll failed'))).toBe(
+      true,
+    )
+  })
+
   it('leaves the record waiting when the capture job fails', async () => {
     const records = [record(1)]
     const { run } = setup({

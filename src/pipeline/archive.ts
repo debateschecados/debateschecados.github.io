@@ -175,9 +175,16 @@ export async function archive(
       const deadline = clock.now() + POLL_LIMIT_MS
       while (clock.now() < deadline) {
         await clock.sleep(POLL_MS)
-        const poll = await spn(`${SAVE}/status/${encodeURIComponent(body.job_id)}`)
-        if (!poll.ok) continue
-        const status = await poll.json()
+        // One failed poll (network error, unreadable body) does not end the wait.
+        let status: { status?: string; timestamp?: string; status_ext?: string; message?: string }
+        try {
+          const poll = await spn(`${SAVE}/status/${encodeURIComponent(body.job_id)}`)
+          if (!poll.ok) continue
+          status = await poll.json()
+        } catch (error) {
+          steps.push(`capture: status poll failed, ${message(error)}`)
+          continue
+        }
         if (status.status === 'success' && status.timestamp) {
           steps.push(`capture: snapshot ${status.timestamp}`)
           return String(status.timestamp)
