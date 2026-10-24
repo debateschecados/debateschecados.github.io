@@ -733,6 +733,8 @@ body:has(dialog[open]) .audit-fab {
   justify-content: space-between;
   gap: 12px 24px;
   margin-top: 28px;
+  /* The sticky filter bar paints over the focus ring when it starts at the input's edge. */
+  padding-bottom: 6px;
 }
 .tabs {
   display: inline-flex;
