@@ -710,6 +710,8 @@ T22 → T24
 
 **Commit**: `feat(site): Wire filters, audit panel and motion in the browser`
 
+**Status**: ✅ Complete
+
 ---
 
 ### Phase 6: Delivery

@@ -891,8 +891,9 @@ textarea:focus-visible {
 
 /* Methodology page */
 .doc {
-  padding: 56px 0 64px;
-  max-width: 760px;
+  padding-top: 56px;
+  padding-bottom: 64px;
+  max-width: 804px;
 }
 .doc .back {
   font-size: 15px;
@@ -961,6 +962,21 @@ textarea:focus-visible {
 }
 
 @media (max-width: 720px) {
+  /* Every candidate column must fit without scrolling, so none is hidden off screen. */
+  .doc table {
+    font-size: 12px;
+  }
+  .doc th,
+  .doc td {
+    padding-right: 6px;
+  }
+  .doc .chip {
+    gap: 4px;
+  }
+  .doc td:last-child,
+  .doc th:last-child {
+    padding-right: 0;
+  }
   .board {
     grid-template-columns: 1fr;
   }

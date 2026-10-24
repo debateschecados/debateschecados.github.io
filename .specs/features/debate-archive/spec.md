@@ -240,13 +240,13 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 | INGEST-07 | P1: Collect the debate checks | Tasks: T8 | Implemented |
 | INGEST-08 | P1: Collect the debate checks | Tasks: T8 | Implemented |
 | INGEST-09 | P1: Collect the debate checks | Tasks: T7, T15 | Implemented |
-| SITE-01 | P1: Browse every check | Tasks: T20, T21 | In Progress |
+| SITE-01 | P1: Browse every check | Tasks: T20, T21 | Implemented |
 | SITE-02 | P1: Browse every check | Tasks: T18 | Implemented |
 | SITE-03 | P1: Browse every check | Tasks: T17 | Implemented |
 | SITE-04 | P1: Browse every check | Tasks: T17 | Implemented |
-| SITE-05 | P1: Browse every check | Tasks: T21 | Pending |
-| SITE-06 | P1: Browse every check | Tasks: T21 | Pending |
-| SITE-07 | P1: Browse every check | Tasks: T19, T21 | In Progress |
+| SITE-05 | P1: Browse every check | Tasks: T21 | Implemented |
+| SITE-06 | P1: Browse every check | Tasks: T21 | Implemented |
+| SITE-07 | P1: Browse every check | Tasks: T19, T21 | Implemented |
 | SCORE-01 | P1: Scoreboards | Tasks: T17 | Implemented |
 | SCORE-02 | P1: Scoreboards | Tasks: T17 | Implemented |
 | SCORE-03 | P1: Scoreboards | Tasks: T17 | Implemented |
@@ -259,16 +259,16 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 | DATA-05 | P1: Open, auditable data | Tasks: T1, T20 | Implemented |
 | DATA-06 | P1: Open, auditable data | Tasks: T14 | Implemented |
 | DATA-07 | P1: Open, auditable data | Tasks: T20, T23 | In Progress |
-| AUDIT-01 | P1: Visible impartiality and self-service audit | Tasks: T21 | Pending |
-| AUDIT-02 | P1: Visible impartiality and self-service audit | Tasks: T21 | Pending |
+| AUDIT-01 | P1: Visible impartiality and self-service audit | Tasks: T21 | Implemented |
+| AUDIT-02 | P1: Visible impartiality and self-service audit | Tasks: T21 | Implemented |
 | AUDIT-03 | P1: Visible impartiality and self-service audit | Tasks: T19 | Implemented |
-| AUDIT-04 | P1: Visible impartiality and self-service audit | Tasks: T21 | Pending |
-| AUDIT-05 | P1: Visible impartiality and self-service audit | Tasks: T21 | Pending |
+| AUDIT-04 | P1: Visible impartiality and self-service audit | Tasks: T21 | Implemented |
+| AUDIT-05 | P1: Visible impartiality and self-service audit | Tasks: T21 | Implemented |
 | AUDIT-06 | P1: Visible impartiality and self-service audit | Tasks: T19 | Implemented |
-| AUDIT-07 | P1: Visible impartiality and self-service audit | Tasks: T21 | Pending |
+| AUDIT-07 | P1: Visible impartiality and self-service audit | Tasks: T21 | Implemented |
 | AUDIT-08 | P1: Visible impartiality and self-service audit | Tasks: T19, T20 | Implemented |
 | HIST-01 | P2: Re-runs keep history | Tasks: T6 | Implemented |
-| HIST-02 | P2: Re-runs keep history | Tasks: T6, T17, T21 | In Progress |
+| HIST-02 | P2: Re-runs keep history | Tasks: T6, T17, T21 | Implemented |
 | SHARE-01 | P2: Shareable filters | Tasks: T17 | Implemented |
 | SHARE-02 | P2: Shareable filters | Tasks: T17 | Implemented |
 | CONF-01 | P2: New debate by configuration | Tasks: T3, T15 | Implemented |
