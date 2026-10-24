@@ -786,15 +786,17 @@ T22 → T24
 
 **Done when**:
 
-- [ ] Run report shows 8 sources `ok` and 292 records (or the difference is explained by agency changes since 2026-10-24)
-- [ ] Second run: `git status --porcelain data/` is empty
-- [ ] Five random records match statement, speaker and label on the agency page and, where present, the archived copy
-- [ ] Records still waiting for a snapshot are listed for the user (expected until the archive.org keys exist)
+- [x] Run report shows 8 sources `ok` and 292 records (or the difference is explained by agency changes since 2026-10-24): 314 records; Aos Fatos Globo grew 37 → 46 and g1 Globo 20 → 33 after the 04:32 fixtures
+- [x] Second run: `git status --porcelain data/` is empty
+- [x] Five random records match statement, speaker and label on the agency page and, where present, the archived copy
+- [x] Records still waiting for a snapshot are listed for the user (expected until the archive.org keys exist): 83, g1 Band (37) and Aos Fatos Globo Escriba (46)
 
 **Tests**: none
 **Gate**: full
 
 **Commit**: `chore(data): Publish the first collected dataset`
+
+**Status**: ✅ Complete
 
 ---
 
