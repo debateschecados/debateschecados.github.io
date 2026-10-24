@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debates checados</title>
+<meta name="description" content="As checagens de quatro agências sobre os debates do 2º turno, num lugar só, com o veredito original de cada uma.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="wrap">
+  <section class="hero">
+    <div class="duel" id="duel" aria-hidden="true" title="Clique para ver de novo"><!--duel--></div>
+    <h1>Tudo o que foi checado nos debates.</h1>
+    <p>As checagens de quatro agências sobre os debates do 2º turno, num lugar só, com o veredito original de cada uma.</p>
+    <p class="trust">O veredito é sempre da agência. Código e dados são abertos. <button type="button" class="linkish" data-open-audit aria-haspopup="dialog">Veja como auditar</button></p>
+    <!-- biome-ignore lint/a11y/useSemanticElements: a pill of toggle buttons, not a form fieldset -->
+    <div class="segmented" id="debates" role="group" aria-label="Debate"><!--debates--></div>
+  </section>
+  <section class="board" id="board" aria-label="Placar"><!--board--></section>
+  <p class="notice" id="notice"><!--notice--></p>
+  <div class="filters" id="filters"><!--filters--></div>
+  <ul class="list" id="list"><!--list--></ul>
+</main>
+<button type="button" class="audit-fab" data-open-audit aria-haspopup="dialog">
+  <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M10 2l6 2.5v4.6c0 4-2.6 7.4-6 8.9-3.4-1.5-6-4.9-6-8.9V4.5L10 2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 10l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  Como auditar
+</button>
+
+<dialog class="audit" id="audit" aria-labelledby="audit-title">
+  <div class="audit-head">
+    <h2 id="audit-title">Como garantimos a imparcialidade</h2>
+    <button type="button" class="close" data-close-audit aria-label="Fechar">
+      <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+
+  <ul class="rules">
+    <li><strong>O veredito é da agência, com as palavras dela.</strong> O site não muda, não reinterpreta e não escolhe: entra tudo o que as quatro agências publicaram sobre os dois debates.</li>
+    <li><strong>As mesmas regras valem para os dois candidatos.</strong> É o mesmo código que lê as checagens de Lula e de Flávio Bolsonaro.</li>
+    <li><strong>Nenhum texto passa por inteligência artificial.</strong> A coleta e a organização são feitas por código simples, que qualquer pessoa pode ler.</li>
+    <li><strong>Cada checagem tem prova de origem.</strong> Link da agência, cópia arquivada na Wayback Machine e a data em que foi coletada.</li>
+    <li><strong>Os bonecos têm o mesmo peso.</strong> Mesmo tamanho, mesma pose e o mesmo tempo de fala, desenhados a partir dos retratos oficiais.</li>
+  </ul>
+
+  <h3>Confira você mesmo</h3>
+  <ul class="links">
+    <li><a href="{{repo}}">Código e dados no GitHub</a><span>{{repoLabel}}</span></li>
+    <li><a href="{{repo}}/tree/main/data">Baixar todas as checagens</a><span>CSV e JSON, os mesmos dados desta página</span></li>
+    <li><a href="{{repo}}/blob/main/config/bands.json">Tabela de faixas</a><span>Em qual faixa cai cada rótulo de cada agência</span></li>
+    <li><a href="{{repo}}/commits/main">Histórico de mudanças</a><span>Toda correção vira um registro público, com data</span></li>
+  </ul>
+
+  <h3>Peça para uma IA auditar</h3>
+  <p class="hint">Copie o roteiro abaixo e cole na IA que você usa. Ela confere o código e os dados sem depender da nossa palavra.</p>
+  <textarea class="prompt" id="prompt" readonly aria-label="Roteiro de auditoria">Quero que você faça uma auditoria independente do site Debates Checados, que reúne as checagens de quatro agências (Aos Fatos, Estadão Verifica, g1 Fato ou Fake e Lupa) sobre os debates do 2º turno de 2026 entre Lula e Flávio Bolsonaro.
+
+Código e dados: {{repo}}
+Todas as checagens: {{repo}}/blob/main/data/checks.csv
+
+Faça cada passo abaixo e mostre a evidência de cada um (arquivo e linha, ou link):
+
+1. Leia os parsers em src/adapters e diga se algum trata Lula e Flávio Bolsonaro de forma diferente.
+2. Sorteie 10 checagens do CSV. Para cada uma, abra o link da agência ou a cópia na Wayback Machine e confira se a fala, o candidato e o rótulo batem.
+3. Confira se a tabela de faixas (config/bands.json) classifica cada rótulo sem depender de quem falou.
+4. Recalcule o placar de cada candidato a partir do CSV e compare com o que o site mostra.
+5. Procure no histórico de commits mudanças de rótulo ou remoções e diga se cada uma tem justificativa registrada.
+
+Aponte qualquer sinal de viés ou erro, mesmo pequeno. Se não conseguir verificar algum ponto, diga que não conseguiu, em vez de supor.</textarea>
+  <button type="button" class="copy" id="copy">Copiar prompt</button>
+  <span class="copied" id="copied" role="status"></span>
+</dialog>
+
+<footer class="foot">
+  <div class="wrap">
+    <nav><a href="checks.csv">Baixar os dados</a><a href="metodologia.html">Como funciona</a><a href="{{repo}}">Código no GitHub</a></nav>
+    <p>Os vereditos são das agências. Este site só reúne e organiza o que elas publicaram. Ilustrações feitas a partir de retratos oficiais: Palácio do Planalto (CC BY 2.0) e Agência Senado. Logos dos partidos e das emissoras: Wikimedia Commons.</p>
+  </div>
+</footer>
+<!--data-->
+<script type="module" src="app.js"></script>
+</body>
+</html>

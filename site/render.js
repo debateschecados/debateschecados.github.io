@@ -38,7 +38,7 @@ export function itemHtml(r, ctx) {
     <div class="who">${esc(speaker?.short ?? r.speaker)} no debate da ${esc(debate?.broadcaster.name ?? r.debate)}, ${debate ? shortDate(debate.date) : ''}</div>
     <p class="quote">“${esc(r.quote)}”</p>
     ${r.excerpt ? `<p class="excerpt">${esc(r.excerpt)}</p>` : ''}
-    <p class="links"><a class="src" href="${esc(r.url)}">Ler a checagem completa</a>${archived}</p>
+    <p class="srcs"><a class="src" href="${esc(r.url)}">Ler a checagem completa</a>${archived}</p>
     ${removed}
   </div>
 </li>`

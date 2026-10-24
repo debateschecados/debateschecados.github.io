@@ -9,6 +9,8 @@
       "!dist",
       "!.cache",
       "!data",
+      "!site/logos",
+      "!site/sprites/*.svg",
       "!pnpm-lock.yaml",
       "!pnpm-workspace.yaml"
     ]

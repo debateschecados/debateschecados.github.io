@@ -246,7 +246,7 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 | SITE-04 | P1: Browse every check | Tasks: T17 | Implemented |
 | SITE-05 | P1: Browse every check | Tasks: T21 | Pending |
 | SITE-06 | P1: Browse every check | Tasks: T21 | Pending |
-| SITE-07 | P1: Browse every check | Tasks: T19, T21 | Pending |
+| SITE-07 | P1: Browse every check | Tasks: T19, T21 | In Progress |
 | SCORE-01 | P1: Scoreboards | Tasks: T17 | Implemented |
 | SCORE-02 | P1: Scoreboards | Tasks: T17 | Implemented |
 | SCORE-03 | P1: Scoreboards | Tasks: T17 | Implemented |
@@ -261,12 +261,12 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 | DATA-07 | P1: Open, auditable data | Tasks: T20, T23 | Pending |
 | AUDIT-01 | P1: Visible impartiality and self-service audit | Tasks: T21 | Pending |
 | AUDIT-02 | P1: Visible impartiality and self-service audit | Tasks: T21 | Pending |
-| AUDIT-03 | P1: Visible impartiality and self-service audit | Tasks: T19 | Pending |
+| AUDIT-03 | P1: Visible impartiality and self-service audit | Tasks: T19 | Implemented |
 | AUDIT-04 | P1: Visible impartiality and self-service audit | Tasks: T21 | Pending |
 | AUDIT-05 | P1: Visible impartiality and self-service audit | Tasks: T21 | Pending |
-| AUDIT-06 | P1: Visible impartiality and self-service audit | Tasks: T19 | Pending |
+| AUDIT-06 | P1: Visible impartiality and self-service audit | Tasks: T19 | Implemented |
 | AUDIT-07 | P1: Visible impartiality and self-service audit | Tasks: T21 | Pending |
-| AUDIT-08 | P1: Visible impartiality and self-service audit | Tasks: T19, T20 | Pending |
+| AUDIT-08 | P1: Visible impartiality and self-service audit | Tasks: T19, T20 | In Progress |
 | HIST-01 | P2: Re-runs keep history | Tasks: T6 | Implemented |
 | HIST-02 | P2: Re-runs keep history | Tasks: T6, T17, T21 | In Progress |
 | SHARE-01 | P2: Shareable filters | Tasks: T17 | Implemented |

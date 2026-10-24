@@ -33,3 +33,5 @@ portraits as reference:
 
 Fonts (site/fonts/): Inter and Inter Tight by Rasmus Andersson and The Inter
 Project Authors, SIL Open Font License 1.1 (https://openfontlicense.org).
+Latin subset woff2 files taken from the npm packages @fontsource/inter 5.3.0
+and @fontsource/inter-tight 5.3.0; license texts in site/fonts/OFL-*.txt.

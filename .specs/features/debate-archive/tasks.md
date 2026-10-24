@@ -651,6 +651,8 @@ T22 → T24
 
 **Commit**: `feat(site): Add page shell, self-hosted fonts and sprites`
 
+**Status**: ✅ Complete
+
 ---
 
 ### T20: Build the static site
