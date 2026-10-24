@@ -7,15 +7,9 @@ import { extname, join, normalize } from 'node:path'
 import { load } from 'cheerio'
 import { type Browser, type BrowserContextOptions, chromium, type Page } from 'playwright-core'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
-import {
-  coverage,
-  createComparison,
-  emptyCompareState,
-  rigor,
-  visibleRows,
-} from '../../site/compare.js'
+import { coverage, createComparison, emptyCompareState, visibleRows } from '../../site/compare.js'
 import { createContext } from '../../site/core.js'
-import { coverageHtml, rigorHtml } from '../../site/render.js'
+import { coverageHtml } from '../../site/render.js'
 import { loadConfig } from '../../src/config.ts'
 import {
   buildFixture,
@@ -114,22 +108,16 @@ const visibleIds = (page: Page) =>
     lis.filter((li) => li.checkVisibility()).map((li) => (li as HTMLElement).dataset.id),
   )
 
-// Cell texts of both tables, as the page shows them.
-const tables = (page: Page) =>
-  page.$$eval('#coverage td, #rigor td', (tds) => tds.map((td) => td.textContent))
+// Cell texts of the coverage table, as the page shows them.
+const tables = (page: Page) => page.$$eval('#coverage td', (tds) => tds.map((td) => td.textContent))
 
 // The same cells, rendered from compare.js for the debate filter alone (RIGOR-06).
-const expectedTables = (debate: string | null) =>
-  ['coverage', 'rigor'].flatMap((id) => {
-    const html =
-      id === 'coverage'
-        ? coverageHtml(ctx, coverage(ctx, comparison, debate))
-        : rigorHtml(ctx, rigor(ctx, comparison, debate))
-    const $ = load(html)
-    return $('td')
-      .map((_, td) => $(td).text())
-      .get()
-  })
+const expectedTables = (debate: string | null) => {
+  const $ = load(coverageHtml(ctx, coverage(ctx, comparison, debate)))
+  return $('td')
+    .map((_, td) => $(td).text())
+    .get()
+}
 
 const expectedIds = (over: Partial<ReturnType<typeof emptyCompareState>>) =>
   visibleRows(comparison.rows, { ...emptyCompareState(), ...over }).map((r) => r.id)

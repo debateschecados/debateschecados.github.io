@@ -6,23 +6,27 @@ import {
   coverage,
   createComparison,
   emptyCompareState,
+  inDebate,
   pendingCount,
-  rigor,
 } from '../../site/compare.js'
 import { BANDS, createContext, emptyState, listed, notice, scoreboard } from '../../site/core.js'
+import { changed, driftCounts } from '../../site/drift.js'
+import { headline, lean } from '../../site/lean.js'
 import {
   bandClass,
   boardHtml,
+  changesHtml,
   compareFiltersHtml,
-  compareRowHtml,
   coverageHtml,
   debatesHtml,
+  driftCountsHtml,
   esc,
   filtersHtml,
   fullDate,
   itemHtml,
+  leanHtml,
+  matrixHtml,
   pendingText,
-  rigorHtml,
 } from '../../site/render.js'
 import type { BlindDebate } from '../claims/blind.ts'
 import { GROUPS_FILE, loadGroups } from '../claims/groups.ts'
@@ -210,21 +214,24 @@ export async function build({ siteDir, dataDir, configDir, outDir, repo }: Build
   await writeFile(join(outDir, 'metodologia.html'), method)
 
   const compareState = emptyCompareState()
+  const distances = lean(ctx, inDebate(comparison.rows, compareState.debate))
   const compare = fill(await readFile(join(siteDir, 'comparar.html'), 'utf8'), {
     ...repoSlots,
     debates: debatesHtml(ctx),
-    pending: esc(pendingText(pendingCount(ctx, comparison.curated))),
-    coverage: coverageHtml(ctx, coverage(ctx, comparison, compareState.debate)),
-    rigor: rigorHtml(ctx, rigor(ctx, comparison, compareState.debate)),
+    answer: esc(headline(distances, ctx)),
+    balance: leanHtml(ctx, distances),
     filters: compareFiltersHtml(ctx, comparison.rows, compareState, comparison.rows.length),
-    agencies: ['Alegação', ...ctx.outletIds.map((id) => config.outlets[id].name)]
-      .map((name) => `<span>${esc(name)}</span>`)
-      .join(''),
-    rows: comparison.rows.map((row) => compareRowHtml(row, ctx)).join('\n'),
-    // Only the record fields the comparison reads, to keep the page light.
+    agencyCount: String(ctx.outletIds.length),
+    matrix: matrixHtml(ctx, comparison.rows),
+    coverage: coverageHtml(ctx, coverage(ctx, comparison, compareState.debate)),
+    pending: esc(pendingText(pendingCount(ctx, comparison.curated))),
+    drift: driftCountsHtml(ctx, driftCounts(ctx, compareState.debate)),
+    changes: changesHtml(changed(ctx, null), ctx),
+    // Only the record fields the comparison reads, to keep the page light: history rebuilds
+    // the old bands with the band table.
     data: jsonScript('compare-data', {
       records: records.map(
-        ({ id, debate, outlet, speaker, pos, band, label, url, missingSince }) => ({
+        ({ id, debate, outlet, speaker, pos, band, label, url, missingSince, history }) => ({
           id,
           debate,
           outlet,
@@ -234,11 +241,13 @@ export async function build({ siteDir, dataDir, configDir, outDir, repo }: Build
           label,
           url,
           missingSince,
+          history,
         }),
       ),
       candidates: config.candidates,
       outlets: config.outlets,
       debates,
+      bands: config.bands,
       groups: groups.groups,
       curated,
     }),

@@ -4,7 +4,10 @@ import { join } from 'node:path'
 import { type CheerioAPI, load } from 'cheerio'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import pkg from '../../../package.json' with { type: 'json' }
+import { createComparison } from '../../../site/compare.js'
 import { createContext, emptyState, listed } from '../../../site/core.js'
+import { headline, lean } from '../../../site/lean.js'
+import { leanHtml } from '../../../site/render.js'
 import { type Config, loadConfig } from '../../../src/config.ts'
 import type { CheckRecord } from '../../../src/types.ts'
 import {
@@ -320,57 +323,139 @@ describe('dist layout (DATA-01, DATA-05)', () => {
   })
 })
 
-describe('comparar.html (CMP-01, CMP-02, CMP-06)', () => {
+describe('comparar.html (CMP-01, CMP-06, CMP-08, LEAN-06, DRIFT-03)', () => {
   const OUTLETS = ['aosfatos', 'estadao', 'g1', 'lupa']
   const text = (sel: string) => compare(sel).text().replace(/\s+/g, ' ').trim()
 
-  it('pre-renders one row per group with two or more live records, verdict or "não checou" per agency', () => {
-    const rows = compare('#rows > li.claim')
+  it('pre-renders the matrix: per debate and candidate, one button per group with two or more live records', () => {
     // D lost its Lupa record (removed at the source) and has one record left.
-    expect(rows.map((_, li) => li.attribs['data-id']).get()).toEqual(
-      ['G', 'F', 'H', 'E', 'A', 'I', 'B', 'C'].map(fixtureGroupId),
+    // Globo: Lula F, E; Flávio G, H. Band: Lula A, B; Flávio I, C.
+    const buttons = compare('#matrix button.claim')
+    expect(buttons.map((_, b) => b.attribs['data-id']).get()).toEqual(
+      ['F', 'E', 'G', 'H', 'A', 'B', 'I', 'C'].map(fixtureGroupId),
     )
-    rows.each((_, li) => {
+    buttons.each((_, b) => {
       const letter = Object.keys(FIXTURE_GROUPS).find(
-        (l) => fixtureGroupId(l) === li.attribs['data-id'],
+        (l) => fixtureGroupId(l) === b.attribs['data-id'],
       )
       const members = FIXTURE_GROUPS[letter as string]
         .map((n) => records[n - 1])
         .filter((r) => !r.missingSince)
-      const cells = compare(li).find('.cells > li')
-      expect(cells).toHaveLength(4)
+      const dots = compare(b).find('.dots .dot')
+      expect(dots).toHaveLength(4)
       OUTLETS.forEach((outlet, i) => {
         const record = members.find((r) => r.outlet === outlet)
-        const cell = cells.eq(i)
-        expect(cell.find('.agency').text()).toBe(config.outlets[outlet].name)
+        const name = config.outlets[outlet].name
+        const dot = dots.eq(i)
+        expect(dot.attr('role')).toBe('img')
         if (!record) {
-          expect(cell.find('.none').text()).toBe('não checou')
-          expect(cell.find('a')).toHaveLength(0)
+          expect(dot.attr('class')).toBe('dot none')
+          expect(dot.attr('aria-label')).toMatch(
+            new RegExp(`^${name}: não checou\\. Alegação de teste ${letter},`),
+          )
           return
         }
-        const chip = cell.find('a.chip')
-        expect(chip.attr('title')).toBe(`Rótulo da agência: ${record.label}`)
-        expect(chip.attr('href')).toBe(record.url)
+        expect(dot.hasClass(`band-${record.band.replace(' ', '-')}`)).toBe(true)
+        expect(dot.attr('aria-label')).toContain(`${name}: ${record.band}`)
+        expect(dot.attr('aria-label')).toContain(`Alegação de teste ${letter},`)
       })
-      expect(compare(li).find('.gid').text()).toBe(li.attribs['data-id'])
+      expect(compare(b).find('.txt').text()).toBe(
+        `Alegação de teste ${letter}, inventada para a suíte do site.`,
+      )
     })
-    expect(compare('#rows .none')).toHaveLength(10)
+    expect(compare('#matrix .dot.none')).toHaveLength(10)
+    // g1 5 in I changed from "#FAKE" to "#FATO": its dot is marked (DRIFT-05).
+    expect(
+      compare('#matrix .dot.moved')
+        .map((_, d) => d.attribs['aria-label'])
+        .get(),
+    ).toEqual([
+      'g1 Fato ou Fake: verdadeiro, antes falso. Alegação de teste I, inventada para a suíte do site',
+    ])
+    expect(compare('#matrix').attr('style')).toBe('--agencies: 4')
+    expect(compare('#detail').attr('hidden')).toBe('hidden')
+    // A section with a name is a region landmark.
+    expect(compare('#detail').prop('tagName')).toBe('SECTION')
+    expect(compare('#detail').attr('aria-label')).toBe('Detalhe da fala')
+    expect(compare('#detail').children()).toHaveLength(0)
   })
 
-  it('shows how many published records are not grouped yet', () => {
-    expect(text('#pending')).toBe(
-      `${FIXTURE_PENDING.length} checagens publicadas depois da última revisão ainda não foram agrupadas.`,
+  it('has the four sections in order, linked from the page nav', () => {
+    expect(
+      compare('main > section')
+        .map((_, s) => [[s.attribs.id, compare(s).children('h1, h2').text()]])
+        .get(),
+    ).toEqual([
+      ['pende', 'As agências pendem para um lado?'],
+      ['falas', 'Fala por fala'],
+      ['cobertura', 'Quem checou o quê'],
+      ['mudancas', 'Vereditos que mudaram'],
+    ])
+    expect(
+      compare('nav.toc a')
+        .map((_, a) => [[a.attribs.href, compare(a).text()]])
+        .get(),
+    ).toEqual([
+      ['#pende', 'Pendem?'],
+      ['#falas', 'Fala por fala'],
+      ['#cobertura', 'Quem checou o quê'],
+      ['#mudancas', 'Vereditos que mudaram'],
+    ])
+    // Every band by color and shape in the legend, with "não checou", a band change and divergence.
+    expect(
+      compare('#legend li')
+        .map((_, li) => [[compare(li).find('i').attr('class'), compare(li).text()]])
+        .get(),
+    ).toEqual([
+      ['dot band-verdadeiro', 'verdadeiro'],
+      ['dot band-impreciso', 'impreciso'],
+      ['dot band-falso', 'falso'],
+      ['dot band-sem-faixa', 'sem faixa'],
+      ['dot none', 'não checou'],
+      ['dot band-impreciso moved', 'mudou de faixa depois de publicada'],
+      ['divmark', 'divergência'],
+    ])
+  })
+
+  it('opens with the headline and one axis per agency as lean.js computes them (LEAN-05, LEAN-06)', () => {
+    const ctx = createContext({ ...config, records })
+    const result = lean(ctx, createComparison(ctx, fixtureGroups(), []).rows)
+    expect(text('#answer')).toBe(headline(result, ctx))
+    expect(compare('#balance').html()).toBe(leanHtml(ctx, result))
+    expect(
+      compare('#balance li.lean-row')
+        .map((_, li) => li.attribs['data-outlet'])
+        .get(),
+    ).toEqual(OUTLETS)
+    expect(compare('#balance .lean-row svg[role="img"]')).toHaveLength(4)
+    // The fixture is small: every agency has fewer than 10 deviations per candidate.
+    expect(
+      compare('#balance .rule')
+        .map((_, r) => compare(r).text())
+        .get(),
+    ).toEqual(Array(4).fill('Amostra pequena.'))
+    expect(text('#answer')).toBe(
+      'Pelos dados de hoje, nenhuma das quatro mostra diferença clara entre os candidatos.',
     )
   })
 
-  it('states the caveat above both tables, with agencies by name and candidates in ballot order', () => {
-    const caveat = compare('#caveat')
-    expect(caveat.text()).toBe(
+  it('states the caveat and the method note next to the axes, above both tables (RIGOR-04, LEAN-06)', () => {
+    expect(compare('#caveat').text()).toBe(
       'Cada agência escolhe o que checar e pode checar partes diferentes da mesma fala. Estes números mostram diferenças, não provam favorecimento.',
     )
-    expect(caveat.nextAll().find('table')).toHaveLength(2)
-    expect(caveat.prevAll().find('table')).toHaveLength(0)
-    for (const id of ['#coverage', '#rigor']) {
+    expect(compare('#caveat').closest('section').attr('id')).toBe('pende')
+    const note = text('#method-note')
+    for (const part of [
+      'A conta só usa falas checadas por duas ou mais agências.',
+      'A referência são as outras agências, não a verdade',
+      'O que cada agência escolheu checar não entra na conta.',
+    ])
+      expect(note).toContain(part)
+    expect(compare('#method-note a').attr('href')).toBe('metodologia.html#distancia')
+    // Document order: the caveat comes before every table.
+    expect(compare('#caveat, table').first().attr('id')).toBe('caveat')
+    expect(compare('table')).toHaveLength(2)
+    for (const id of ['#coverage', '#drift']) {
       expect(
         compare(`${id} thead th`)
           .map((_, th) => compare(th).text())
@@ -383,8 +468,87 @@ describe('comparar.html (CMP-01, CMP-02, CMP-06)', () => {
       ).toEqual(OUTLETS.map((o) => config.outlets[o].name))
     }
     // Lupa, both debates: Lula in A, B, E, F; Flávio in C and G.
-    expect(compare('#coverage tbody tr').eq(3).find('td .line').first().text()).toBe(
-      '4 de 4 alegações',
+    const lupa = compare('#coverage tbody tr').eq(3).find('td').first()
+    expect(lupa.find('.line').first().text()).toBe('4 de 4 falas')
+    expect(lupa.find('.marks i.on')).toHaveLength(4)
+    expect(compare('#pending').closest('section').attr('id')).toBe('cobertura')
+  })
+
+  it('lists the changed verdicts with their counts and timelines (DRIFT-03, DRIFT-04)', () => {
+    // g1 5 (Band, Flávio) is "#FATO" now and was "#FAKE": one milder change.
+    expect(
+      compare('#drift tbody tr')
+        .map((_, tr) => [
+          compare(tr)
+            .find('td')
+            .map((_, td) => compare(td).text())
+            .get(),
+        ])
+        .get(),
+    ).toEqual([
+      ['nenhuma mudança', 'nenhuma mudança'],
+      ['nenhuma mudança', 'nenhuma mudança'],
+      ['nenhuma mudança', '1 ficou mais branda'],
+      ['nenhuma mudança', 'nenhuma mudança'],
+    ])
+    expect(
+      compare('#changes > li.change')
+        .map((_, li) => li.attribs['data-id'])
+        .get(),
+    ).toEqual([recordId(5)])
+    expect(
+      compare('#changes .tl > li')
+        .map((_, li) => compare(li).find('.v').text())
+        .get(),
+    ).toEqual(['#FAKE', '#FATO'])
+    expect(compare('details#keyonly')).toHaveLength(0)
+  })
+
+  it('escapes <, & and " in a claim and a label, and keeps exactly two </script>', async () => {
+    const CLAIM = 'Disse <script>alert("x")</script> & "aspas"'
+    const LABEL = '</script><b>"FALSO"</b> & cia'
+    const dir = await mkdtemp(join(tmpdir(), 'site-build-'))
+    try {
+      const recs = fixtureRecords()
+      Object.assign(recs[13], {
+        label: LABEL,
+        history: [{ label: 'verdadeiro', until: '2026-10-24' }],
+      })
+      const groups = fixtureGroups()
+      const a = groups.groups.find((g) => g.id === fixtureGroupId('A'))
+      Object.assign(a as object, { claim: CLAIM })
+      const built = await buildFixture(dir, recs, groups)
+      const html = await readFile(join(built.outDir, 'comparar.html'), 'utf8')
+      const $ = load(html)
+      expect(html.split('</script>')).toHaveLength(3)
+      expect($('script')).toHaveLength(2)
+      expect($('main script, #matrix b, #changes b')).toHaveLength(0)
+      const button = $(`#matrix button[data-id="${fixtureGroupId('A')}"]`)
+      expect(button.find('.txt').text()).toBe(CLAIM)
+      expect(button.attr('aria-label')).toContain(`Lula: ${CLAIM}. Divergência.`)
+      expect(button.find('.dot').first().attr('aria-label')).toBe(
+        `Aos Fatos: falso, antes verdadeiro. ${CLAIM}`,
+      )
+      const change = $(`#changes li[data-id="${recordId(14)}"]`)
+      expect(
+        change
+          .find('.tl > li .v')
+          .map((_, v) => $(v).text())
+          .get(),
+      ).toEqual(['verdadeiro', LABEL])
+      const data = JSON.parse($('script#compare-data').text())
+      expect(data.groups.find((g: { id: string }) => g.id === fixtureGroupId('A')).claim).toBe(
+        CLAIM,
+      )
+      expect(data.records.find((r: CheckRecord) => r.id === recordId(14)).label).toBe(LABEL)
+    } finally {
+      await rm(dir, { recursive: true, force: true })
+    }
+  })
+
+  it('shows how many published records are not grouped yet', () => {
+    expect(text('#pending')).toBe(
+      `${FIXTURE_PENDING.length} checagens publicadas depois da última revisão ainda não foram agrupadas.`,
     )
   })
 
@@ -433,6 +597,10 @@ describe('comparar.html (CMP-01, CMP-02, CMP-06)', () => {
     )
     expect(data.records.map((r: CheckRecord) => r.id)).toEqual(records.map((r) => r.id))
     expect(data.candidates).toEqual(config.candidates)
+    // The band table and the history rebuild old bands in the browser (DRIFT-04, DRIFT-05).
+    expect(data.bands).toEqual(config.bands)
+    expect(data.records[4].history).toEqual(records[4].history)
+    expect(data.records[3].history).toBeUndefined()
   })
 
   it('fails the build on a broken claim group and names it (CLAIM-02)', async () => {

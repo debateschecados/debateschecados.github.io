@@ -383,16 +383,18 @@ T13 → T15
 
 **Done when**:
 
-- [ ] Built page has the four sections, one axis per agency in alphabetical order with the sentence, the matrix with one button per visible row, shapes per band and text alternatives, the detail with labels as text, the ticks, the timelines and counts
-- [ ] No element is ordered by a number; no shaded zone around zero
-- [ ] A claim and a label with `<`, `&` and `"` come out escaped; the page still has exactly the expected `</script>` count
-- [ ] Gate check passes: `pnpm vitest run test/unit/site/render.test.ts`, then `build.test.ts`, then `compare.test.ts`
-- [ ] Test count: at least 8 new tests pass
+- [x] Built page has the four sections, one axis per agency in alphabetical order with the sentence, the matrix with one button per visible row, shapes per band and text alternatives, the detail with labels as text, the ticks, the timelines and counts
+- [x] No element is ordered by a number; no shaded zone around zero
+- [x] A claim and a label with `<`, `&` and `"` come out escaped; the page still has exactly the expected `</script>` count
+- [x] Gate check passes: `pnpm vitest run test/unit/site/render.test.ts`, then `build.test.ts`, then `compare.test.ts`
+- [x] Test count: at least 8 new tests pass
 
 **Tests**: unit
 **Gate**: quick
 
 **Commit**: `feat(site): Render the comparison page as axes, a dot matrix and timelines`
+
+**Status**: ✅ Complete
 
 ---
 

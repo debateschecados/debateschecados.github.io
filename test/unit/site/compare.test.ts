@@ -6,7 +6,6 @@ import {
   emptyCompareState,
   pendingCount,
   readCompareState,
-  rigor,
   visibleRows,
   writeCompareState,
 } from '../../../site/compare.js'
@@ -40,7 +39,7 @@ const letters = (...ls: string[]) => ls.map(fixtureGroupId)
 const state = (over = {}) => ({ ...emptyCompareState(), ...over })
 const OUTLETS = ['aosfatos', 'estadao', 'g1', 'lupa']
 
-// Per agency in alphabetical order: [n, of, solo] for coverage, [harsher, equal, milder] for rigor.
+// Per agency in alphabetical order: [n, of, solo].
 const coverageOf = (debate: string | null) =>
   Object.fromEntries(
     coverage(ctx, comparison(), debate).map((c) => [
@@ -48,14 +47,6 @@ const coverageOf = (debate: string | null) =>
       c.outlets.map((o) => [o.n, o.of, o.solo]),
     ]),
   )
-const rigorOf = (debate: string | null) =>
-  Object.fromEntries(
-    rigor(ctx, comparison(), debate).map((c) => [
-      c.candidate.id,
-      c.outlets.map((o) => [o.harsher, o.equal, o.milder]),
-    ]),
-  )
-
 describe('rows (CMP-04, CMP-05)', () => {
   it('orders rows by debate newest first, then the smallest page position, then id', () => {
     // Globo: G (pos 1), F (2), H (3), E (4). Band: A (1), I (2), B (3), C (4). D is hidden.
@@ -197,89 +188,48 @@ describe('coverage (RIGOR-01, RIGOR-06)', () => {
 
   it('counts the record left alone by a hidden group as solo, never a removed one', () => {
     // g1 7 stays from D after Lupa 3 was removed; it is the only solo g1 record of Flávio.
+    // Flávio's Band rows are I (g1 5) and C (no g1).
     const g1 = coverage(ctx, comparison(), 'band-2026-10-18')[1].outlets[2]
-    expect(g1).toEqual({ outlet: 'g1', n: 1, of: 2, solo: 1 })
+    expect(g1).toEqual({ outlet: 'g1', n: 1, of: 2, marks: [true, false], solo: 1 })
     const lupa = coverage(ctx, comparison(), 'band-2026-10-18')[1].outlets[3]
     expect(lupa.solo).toBe(0)
   })
-})
 
-describe('rigor (RIGOR-02, RIGOR-06)', () => {
-  it('counts harsher, equal and milder comparisons per agency and candidate', () => {
-    expect(rigorOf(null)).toEqual({
-      lula: [
-        [3, 1, 0],
-        [0, 3, 1],
-        [0, 4, 1],
-        [0, 4, 1],
-      ],
-      flavio: [
-        [0, 2, 0],
-        [1, 3, 1],
-        [0, 3, 2],
-        [2, 0, 0],
-      ],
+  it('keeps a removed record out of "só ela checou" even when the curation input held it', () => {
+    // Lupa 3 (Band, Flávio) was curated before it disappeared from the source.
+    expect(records[2]).toMatchObject({
+      outlet: 'lupa',
+      speaker: 'flavio',
+      missingSince: '2026-10-25',
     })
-    for (const c of rigor(ctx, comparison(), null)) {
-      for (const o of c.outlets) expect(o.n).toBe(o.harsher + o.equal + o.milder)
-    }
+    const cmp = createComparison(ctx, fixtureGroups(), [...curated, recordId(3)])
+    expect(cmp.curated.has(recordId(3))).toBe(true)
+    expect(coverage(ctx, cmp, 'band-2026-10-18')[1].outlets[3]).toMatchObject({
+      outlet: 'lupa',
+      solo: 0,
+    })
+    // With both debates, Lupa's one solo record of Flávio is Globo 20, never 3.
+    expect(coverage(ctx, cmp, null)).toEqual(coverage(ctx, comparison(), null))
+    expect(coverage(ctx, cmp, null)[1].outlets[3].solo).toBe(1)
   })
 
-  it('counts only the selected debate and skips "sem faixa" records', () => {
-    expect(rigorOf('band-2026-10-18')).toEqual({
-      lula: [
-        [3, 0, 0],
-        [0, 2, 1],
-        [0, 3, 1],
-        [0, 3, 1],
-      ],
-      // Row C (two "sem faixa" and Aos Fatos verdadeiro) counts no comparison.
-      flavio: [
-        [0, 0, 0],
-        [1, 0, 0],
-        [0, 0, 1],
-        [0, 0, 0],
-      ],
-    })
-    expect(rigorOf('globo-2026-10-23')).toEqual({
-      lula: [
-        [0, 1, 0],
-        [0, 1, 0],
-        [0, 1, 0],
-        [0, 1, 0],
-      ],
-      flavio: [
-        [0, 2, 0],
-        [0, 3, 1],
-        [0, 3, 1],
-        [2, 0, 0],
-      ],
-    })
-  })
-
-  it('orders bands verdadeiro < impreciso < falso', () => {
-    const base = records[3] // Band, Lupa, Lula
-    const recs = [
-      { ...base, id: 'r1', outlet: 'aosfatos', band: 'falso' as const },
-      { ...base, id: 'r2', outlet: 'estadao', band: 'impreciso' as const },
-      { ...base, id: 'r3', outlet: 'g1', band: 'verdadeiro' as const },
-    ]
-    const local = createContext({ ...config, records: recs })
-    const group = {
-      id: groupId(['r1', 'r2', 'r3']),
-      debate: base.debate,
-      speaker: base.speaker,
-      claim: 'x',
-      records: ['r1', 'r2', 'r3'],
-      origin: 'manual' as const,
+  it('gives one mark per claim of the candidate, in page order, filled where the agency checked it', () => {
+    const rows = comparison().rows
+    for (const c of coverage(ctx, comparison(), null)) {
+      const mine = rows.filter((r) => r.speaker === c.candidate.id)
+      c.outlets.forEach((o, i) => {
+        expect(o.marks).toEqual(mine.map((r) => r.cells[i] !== null))
+        expect(o.marks.filter(Boolean)).toHaveLength(o.n)
+      })
     }
-    const cmp = createComparison(local, { groups: [group] }, ['r1', 'r2', 'r3'])
-    const lula = rigor(local, cmp, null)[0].outlets.map((o) => [o.harsher, o.equal, o.milder])
-    expect(lula).toEqual([
-      [2, 0, 0],
-      [1, 0, 1],
-      [0, 0, 2],
-      [0, 0, 0],
+    // Lula's rows in page order are F, E (Globo), A, B (Band); Aos Fatos checked E and A.
+    const lula = rows.filter((r) => r.speaker === 'lula').map((r) => r.id)
+    expect(lula).toEqual(letters('F', 'E', 'A', 'B'))
+    expect(coverage(ctx, comparison(), null)[0].outlets[0].marks).toEqual([
+      false,
+      true,
+      true,
+      false,
     ])
   })
 })

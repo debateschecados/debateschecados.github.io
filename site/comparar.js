@@ -6,12 +6,11 @@ import {
   createComparison,
   emptyCompareState,
   readCompareState,
-  rigor,
   visibleRows,
   writeCompareState,
 } from './compare.js'
 import { createContext } from './core.js'
-import { compareFiltersHtml, coverageHtml, rigorHtml } from './render.js'
+import { compareFiltersHtml, coverageHtml } from './render.js'
 
 const $ = (/** @type {string} */ sel) => /** @type {HTMLElement} */ (document.querySelector(sel))
 
@@ -35,24 +34,16 @@ function renderSegmented() {
 }
 
 // Every row is pre-rendered; filtering only hides and shows them.
-const list = $('#rows')
-const rows = /** @type {NodeListOf<HTMLElement>} */ (list.querySelectorAll('li[data-id]'))
+const rows = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('#matrix .claim'))
 const filters = $('#filters')
 
 function render() {
   const shown = visibleRows(comparison.rows, state)
   const keep = new Set(shown.map((r) => r.id))
   for (const li of rows) li.hidden = !keep.has(/** @type {string} */ (li.dataset.id))
-  list.querySelector('.empty')?.remove()
-  if (!shown.length) {
-    list.insertAdjacentHTML(
-      'beforeend',
-      '<li class="empty">Nenhuma alegação com esses filtros. <button type="button" data-clear>Limpar filtros</button></li>',
-    )
-  }
+  $('#empty').hidden = shown.length > 0
   renderSegmented()
   $('#coverage').innerHTML = coverageHtml(ctx, coverage(ctx, comparison, state.debate))
-  $('#rigor').innerHTML = rigorHtml(ctx, rigor(ctx, comparison, state.debate))
   // The controls are rebuilt, so keyboard focus goes back to the one the visitor was using.
   const focused = /** @type {HTMLElement | null} */ (filters.querySelector(':focus'))
   const again = focused?.dataset.key ? `[data-key="${focused.dataset.key}"]` : '[data-div]'

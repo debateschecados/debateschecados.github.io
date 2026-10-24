@@ -1,4 +1,4 @@
-// Claim rows, coverage and relative rigor for the comparison page. Pure, like core.js:
+// Claim rows and coverage for the comparison page. Pure, like core.js:
 // the build, the browser and the tests all run the same code.
 
 import { options } from './core.js'
@@ -91,12 +91,14 @@ export const visibleRows = (rows, state) =>
       (!state.div || r.divergent),
   )
 
-// Both tables count the rows the page lists for the debate filter, whatever the other filters.
+// The distances, the coverage and the changed-verdict counts all count the rows the page lists
+// for the debate filter, whatever the other filters (RIGOR-06).
 /** @param {Row[]} rows @param {string | null} debate */
-const inDebate = (rows, debate) => rows.filter((r) => !debate || r.debate === debate)
+export const inDebate = (rows, debate) => rows.filter((r) => !debate || r.debate === debate)
 
 // Per candidate and agency: rows that include the agency (`n`) out of the candidate's rows
-// (`of`), and the agency's curated records in no row (`solo`, "só ela checou").
+// (`of`), one mark per row in page order, true when the agency checked it (`marks`), and the
+// agency's curated records in no row (`solo`, "só ela checou").
 // SPEC_DEVIATION: records missing from the curation input are left out of `solo`.
 // Reason: nobody has looked for other agencies' checks of them yet, so "só ela checou" would
 // not be known; the page counts them in the pending notice instead (CMP-06).
@@ -119,36 +121,11 @@ export function coverage(ctx, { rows, curated }, debate) {
         outlet,
         n: mine.filter((r) => r.cells[i]).length,
         of: mine.length,
+        marks: mine.map((r) => Boolean(r.cells[i])),
         solo: solo.filter((r) => r.outlet === outlet && r.speaker === candidate.id).length,
       })),
     }
   })
-}
-
-// Per candidate and agency: on each row, one comparison with every other agency whose band is
-// in the order; the agency is harsher when its band is higher (RIGOR-02).
-/** @param {Context} ctx @param {Comparison} comparison @param {string | null} debate */
-export function rigor(ctx, { rows }, debate) {
-  const shown = inDebate(rows, debate)
-  return ctx.candidates.map((candidate) => ({
-    candidate,
-    outlets: ctx.outletIds.map((outlet, i) => {
-      const cell = { outlet, harsher: 0, equal: 0, milder: 0, n: 0 }
-      for (const row of shown) {
-        const mine = rankOf(row.cells[i]?.band)
-        if (row.speaker !== candidate.id || mine < 0) continue
-        row.cells.forEach((other, j) => {
-          const theirs = rankOf(other?.band)
-          if (j === i || theirs < 0) return
-          if (mine > theirs) cell.harsher++
-          else if (mine < theirs) cell.milder++
-          else cell.equal++
-          cell.n++
-        })
-      }
-      return cell
-    }),
-  }))
 }
 
 // Live records that the latest curation input does not hold yet (CMP-06).
