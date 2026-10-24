@@ -2,7 +2,77 @@
 
 No validation.md was committed for phases 1 and 2, so this file starts with phase 3.
 
-## Validation: Phase 3 (T9-T15 and review fixes) - FAIL
+## Validation: Phase 3 iteration 2 (re-verification) - FAIL
+
+**Date**: 2026-10-24
+**Diff range**: `a621de8..f22d0a6` (`9a93406` style of the axes, `f22d0a6` tests for gaps 1-3 and the DRIFT-03 wording)
+**Verifier**: independent sub-agent, fresh detached scratch worktree at `f22d0a6`
+
+Final verdict for phase 3: FAIL. Gaps 1 to 4 of iteration 1 are closed. `9a93406` opened a new one: it makes the interval bar less visible than the point, against LEAN-06, and no test can see it.
+
+### Iteration 1 gaps
+
+| Gap | Evidence now | Mutant rerun | Status |
+| --- | ------------ | ------------ | ------ |
+| 1. CMP-08 shape | `test/e2e/compare.test.ts:354` `expect(new Set(shapes).size).toBe(5)` over border-radius, clip-path and fill of the legend dots | M16 killed (`expected 4 to be 5`) | ✅ Closed |
+| 2. quote diff escaping | `test/unit/site/render.test.ts:348` `expect($('.qdiff b, .qdiff i')).toHaveLength(0)`, plus `del`/`ins` text | M15 killed | ✅ Closed |
+| 3. repair `new` list | `test/unit/repair.test.ts:59` `report.new` equals the 7 ids derived from `after`, `before` and `merged` | M12 killed (`expected [] to deeply equal [ Array(7) ]`) | ✅ Closed |
+| 4. DRIFT-03 first version | spec.md:153 now names the three date forms; `test/unit/site/render.test.ts:721`, `:722`, `:729` assert "até 24/10", "de 24/10 a 25/10", "desde 26/10, versão atual" | n/a | ✅ Closed |
+
+### LEAN-04 and LEAN-06 after `9a93406`
+
+- LEAN-04 holds: a small sample still draws neither point nor bar (`test/unit/site/render.test.ts:476`, spec value "neither the point nor the bar"); M13 (point drawn for a small sample) killed.
+- LEAN-06 position and order hold: bar at `x="60%"` and point at `cx="75%"` on a ±0.5 domain (`test/unit/site/render.test.ts:460`, `:463`), zero line between bar and point in paint order (`:451` block); M19 (bar removed) killed.
+- LEAN-06 "the interval as a bar at least as visible as the point" no longer holds. Measured in Chromium on the built page with the real data (`site/render.js:345`, `:370`, `site/style.css:1126`):
+
+| Mark | Before `9a93406` | After `9a93406` |
+| ---- | ---------------- | --------------- |
+| bar (`rect.ci`) | 20 px tall, fill ink at 13% with a 1.5 px outline at 42% | 6 px tall, fill ink at 24%, no outline: about 1.7:1 against the white background |
+| point (`circle.pt`) | 14 px hollow ring, 3 px ink stroke | 12 px solid ink with a white halo: about 16.8:1 |
+
+  The bar is now thinner than the point's diameter and has about a tenth of its contrast; the point's white halo also cuts the bar where they meet. The goal at spec.md:10 asks for "the uncertainty drawn as large as the number", and LEAN-06 for a bar at least as visible as the point. On screen the point reads first and the interval reads as a light grey line. The 14 px end ticks (ink at 55%, about 3.9:1) help, but the AC is about the bar.
+- No test asserts the bar's size or contrast: M17 (bar fill transparent, `test/e2e/compare.test.ts`) and M18 (bar height 0, `test/unit/site/render.test.ts`) both survived.
+
+### Spec-precision gap
+
+LEAN-06 does not say how "at least as visible" is measured, so neither the author nor a test can check it. Fix: state it in the AC, for example "the bar is at least as thick as the point's diameter and its fill has at least 3:1 contrast against the background (WCAG 1.4.11)".
+
+### Sensor, iteration 2
+
+| Mutation | File:line | Description | Test file | Killed? |
+| -------- | --------- | ----------- | --------- | ------- |
+| M12 | `src/repair/estadao-2026-10-24.ts:104` | report `new` always empty | repair.test.ts | ✅ Killed |
+| M13 | `site/render.js:367` | point drawn for a small sample | render.test.ts | ✅ Killed |
+| M15 | `site/render.js:421` | removed words of the quote diff not escaped | render.test.ts | ✅ Killed |
+| M16 | `site/style.css:1258` | impreciso drawn as a circle | e2e/compare.test.ts | ✅ Killed |
+| M17 | `site/style.css:1126` | interval bar fill transparent | e2e/compare.test.ts | ❌ Survived |
+| M18 | `site/render.js:345` | interval bar height 0 | render.test.ts | ❌ Survived |
+| M19 | `site/render.js:345` | interval bar removed | render.test.ts | ✅ Killed |
+
+**Result**: 5/7 killed, 2 survived (both LEAN-06 visibility) - FAIL
+
+### Gate, iteration 2
+
+One file per command in the scratch at `f22d0a6`: `test/unit/site/render.test.ts` 26 passed, `test/unit/site/build.test.ts` 30 passed, `test/unit/site/lean.test.ts` 17 passed, `test/unit/repair.test.ts` 6 passed, `test/e2e/compare.test.ts` 10 passed. `node src/site/build.ts` exit 0. Scratch removed; `git status --porcelain` of the phase3 tree empty before and after.
+
+### Fix 4: make the bar at least as visible as the point (LEAN-06)
+
+- **Root cause**: `9a93406` thinned the bar to 6 px at 24% ink and filled the point solid ink (`site/render.js:345`, `:370`, `site/style.css:1126-1141`, legend keys `.k-ci`, `.k-pt`).
+- **Fix task**: first amend LEAN-06 with a measurable rule (above). Then either revert the bar to at least the point's diameter with a fill of at least 3:1 contrast, or go back to a hollow or lighter point. Add `test/unit/site/render.test.ts`: `rect.ci` height ≥ 2 × `circle.pt` r. Add `test/e2e/compare.test.ts`: computed bar fill contrast against the page background ≥ 3:1. M17 and M18 must then fail.
+- **Priority**: Major (LEAN-06 is the page's uncertainty display; the goal is that it reads as large as the number).
+
+### Traceability update
+
+| Requirement | Status |
+| ----------- | ------ |
+| CMP-08 | ✅ Verified |
+| DRIFT-02, DRIFT-03 | ✅ Verified |
+| LEAN-04 | ✅ Verified |
+| LEAN-06 | ❌ Needs fix (Fix 4) |
+
+---
+
+## Iteration 1: Phase 3 (T9-T15 and review fixes) - FAIL
 
 **Date**: 2026-10-24
 **Spec**: `.specs/features/agency-comparator/spec.md` (amendment of 2026-10-24: LEAN-01..08, DRIFT-01..05, CMP-01/02/07/08, RIGOR-01/05)
