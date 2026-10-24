@@ -80,12 +80,12 @@ export function createHttp(options: HttpOptions): Http {
     return run
   }
 
-  const send = (url: URL, redirect: RequestRedirect) =>
+  const send = (url: URL) =>
     polite(url.hostname, async () => {
       try {
         return await fetchFn(url.href, {
           headers: { 'user-agent': userAgent },
-          redirect,
+          redirect: 'manual',
           signal: AbortSignal.timeout(timeoutMs),
         })
       } catch (error) {
@@ -96,14 +96,31 @@ export function createHttp(options: HttpOptions): Http {
       }
     })
 
-  // robots.txt is read once per host. A 4xx means no rules; any other failure refuses the host.
+  // Redirects are followed by hand so every hop passes the allowlist, `check` and its host's spacing.
+  const follow = async (start: URL, check?: (url: URL) => Promise<void>) => {
+    let url = start
+    for (let hop = 0; ; hop++) {
+      if (!allowed.has(url.hostname)) throw new HttpError('host', url.href, 'host not allowed')
+      await check?.(url)
+      const response = await send(url)
+      const location = response.headers.get('location')
+      if (response.status >= 300 && response.status < 400 && location && hop < MAX_REDIRECTS) {
+        url = new URL(location, url)
+        continue
+      }
+      return { url, response }
+    }
+  }
+
+  // robots.txt is read once per host. A 4xx means no rules; any other failure, too many
+  // redirects included, refuses the host.
   const readRobots = async (origin: string) => {
     const robotsUrl = new URL('/robots.txt', origin)
-    const response = await send(robotsUrl, 'follow')
+    const { url, response } = await follow(robotsUrl)
     let text = ''
     if (response.status === 200) text = await response.text()
     else if (response.status < 400 || response.status >= 500)
-      throw new HttpError('robots', robotsUrl.href, 'robots.txt unavailable', response.status)
+      throw new HttpError('robots', url.href, 'robots.txt unavailable', response.status)
     return robotsParser(robotsUrl.href, text)
   }
 
@@ -119,27 +136,19 @@ export function createHttp(options: HttpOptions): Http {
 
   return {
     async get(start) {
-      let url = new URL(start)
-      for (let hop = 0; ; hop++) {
-        if (!allowed.has(url.hostname)) throw new HttpError('host', url.href, 'host not allowed')
-        const robot = await robotsFor(url)
-        if (robot.isAllowed(url.href, userAgent) === false)
-          throw new HttpError('robots', url.href, 'disallowed by robots.txt')
-        const response = await send(url, 'manual')
-        const location = response.headers.get('location')
-        if (response.status >= 300 && response.status < 400 && location && hop < MAX_REDIRECTS) {
-          url = new URL(location, url)
-          continue
-        }
-        if (response.status !== 200)
-          throw new HttpError('status', url.href, `HTTP ${response.status}`, response.status)
-        const bytes = new Uint8Array(await response.arrayBuffer())
-        return {
-          url: url.href,
-          body: new TextDecoder().decode(bytes),
-          sha256: createHash('sha256').update(bytes).digest('hex'),
-          fetchedAt: new Date(clock.now()).toISOString(),
-        }
+      const { url, response } = await follow(new URL(start), async (hop) => {
+        const robot = await robotsFor(hop)
+        if (robot.isAllowed(hop.href, userAgent) === false)
+          throw new HttpError('robots', hop.href, 'disallowed by robots.txt')
+      })
+      if (response.status !== 200)
+        throw new HttpError('status', url.href, `HTTP ${response.status}`, response.status)
+      const bytes = new Uint8Array(await response.arrayBuffer())
+      return {
+        url: url.href,
+        body: new TextDecoder().decode(bytes),
+        sha256: createHash('sha256').update(bytes).digest('hex'),
+        fetchedAt: new Date(clock.now()).toISOString(),
       }
     },
   }

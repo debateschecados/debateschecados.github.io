@@ -32,6 +32,7 @@ interface Call {
   url: string
   at: number
   userAgent: string | null
+  redirect: RequestRedirect | undefined
 }
 
 type Route = string | number | ((init: RequestInit) => Promise<Response>) | Response
@@ -41,7 +42,12 @@ function fakeFetch(clock: Clock, routes: Record<string, Route>) {
   const calls: Call[] = []
   const fn = async (input: string | URL | Request, init: RequestInit = {}) => {
     const url = String(input)
-    calls.push({ url, at: clock.now(), userAgent: new Headers(init.headers).get('user-agent') })
+    calls.push({
+      url,
+      at: clock.now(),
+      userAgent: new Headers(init.headers).get('user-agent'),
+      redirect: init.redirect,
+    })
     const route = routes[url]
     if (route === undefined) return new Response('', { status: 404 })
     if (typeof route === 'string') return new Response(route, { status: 200 })
@@ -51,6 +57,9 @@ function fakeFetch(clock: Clock, routes: Record<string, Route>) {
   }
   return { calls, fetch: fn as typeof fetch }
 }
+
+const redirect = (location: string, status = 301) =>
+  new Response('', { status, headers: { location } })
 
 const setup = (
   routes: Record<string, Route>,
@@ -125,6 +134,59 @@ describe('robots.txt (INGEST-07)', () => {
       'https://a.test/1': 'x',
     })
     expect((await http.get('https://a.test/1').catch((e) => e)).kind).toBe('robots')
+  })
+
+  it('refuses a redirect into a path robots.txt disallows without requesting it', async () => {
+    const { http, calls } = setup({
+      'https://a.test/robots.txt': 'User-agent: *\nDisallow: /private',
+      'https://a.test/moved': redirect('/private/x'),
+      'https://a.test/private/x': 'secret',
+    })
+    const error = await http.get('https://a.test/moved').catch((e) => e)
+    expect(error).toMatchObject({ kind: 'robots', url: 'https://a.test/private/x' })
+    expect(calls.map((c) => c.url)).toEqual(['https://a.test/robots.txt', 'https://a.test/moved'])
+  })
+
+  it('never lets a robots.txt redirect leave the allowlist', async () => {
+    const { http, calls } = setup({
+      'https://a.test/robots.txt': redirect('https://evil.test/robots.txt'),
+      'https://evil.test/robots.txt': 'User-agent: *\nAllow: /',
+      'https://a.test/1': 'x',
+    })
+    const error = await http.get('https://a.test/1').catch((e) => e)
+    expect(error).toMatchObject({ kind: 'host', url: 'https://evil.test/robots.txt' })
+    expect(calls.map((c) => c.url)).toEqual(['https://a.test/robots.txt'])
+    expect(calls.every((c) => c.redirect === 'manual')).toBe(true)
+  })
+
+  it('follows a robots.txt redirect inside the allowlist with the target host spacing', async () => {
+    const { http, calls } = setup({
+      'https://a.test/robots.txt': redirect('https://b.test/robots.txt'),
+      'https://b.test/robots.txt': 'User-agent: *\nDisallow: /private',
+      'https://b.test/1': 'b',
+      'https://a.test/1': 'a',
+    })
+    await http.get('https://b.test/1')
+    expect((await http.get('https://a.test/1')).body).toBe('a')
+    expect((await http.get('https://a.test/private').catch((e) => e)).kind).toBe('robots')
+    const b = calls.filter((c) => c.url.startsWith('https://b.test'))
+    expect(b.map((c) => c.url)).toEqual([
+      'https://b.test/robots.txt',
+      'https://b.test/1',
+      'https://b.test/robots.txt',
+    ])
+    expect(b[2].at - b[1].at).toBeGreaterThanOrEqual(SPACING_MS)
+    expect(calls.every((c) => c.redirect === 'manual')).toBe(true)
+  })
+
+  it('refuses the domain when robots.txt keeps redirecting', async () => {
+    const { http, calls } = setup({
+      'https://a.test/robots.txt': redirect('/robots.txt'),
+      'https://a.test/1': 'x',
+    })
+    const error = await http.get('https://a.test/1').catch((e) => e)
+    expect(error).toMatchObject({ kind: 'robots', status: 301 })
+    expect(calls.some((c) => c.url === 'https://a.test/1')).toBe(false)
   })
 
   it('refuses the domain when robots.txt answers 5xx', async () => {
