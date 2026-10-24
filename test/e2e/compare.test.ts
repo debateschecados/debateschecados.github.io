@@ -341,6 +341,20 @@ describe('layout (CMP-07)', () => {
   })
 })
 
+describe('verdict shapes (CMP-08)', () => {
+  it('draws each band and "não checou" with its own shape, not only its own color', async () => {
+    const page = await open()
+    const shapes = await page.$$eval('#legend li > .dot:not(.moved)', (dots) =>
+      dots.map((d) => {
+        const s = getComputedStyle(d, '::before')
+        return [s.borderRadius, s.clipPath, s.boxShadow === 'none' ? 'filled' : 'hollow'].join('|')
+      }),
+    )
+    expect(shapes).toHaveLength(5)
+    expect(new Set(shapes).size).toBe(5)
+  })
+})
+
 describe('privacy (SITE-07)', () => {
   it('requests nothing from another origin', async () => {
     const page = await open()

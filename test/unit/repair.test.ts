@@ -50,6 +50,13 @@ describe('repair of the 2026-10-24 Estadão run (DRIFT-02)', () => {
     for (const { from } of report.merged) expect(ids.has(from)).toBe(into.has(from))
     expect(report).toMatchObject({ source: SOURCE, before: 'e13bac2', after: 'bc3a25d' })
     expect(report.missing).toEqual([])
+    // New: live checks the run published for the first time, neither before it nor merged away.
+    const known = new Set([...before.map((r) => r.id), ...report.merged.map((m) => m.from)])
+    const fresh = after
+      .filter((r) => r.missingSince === undefined && !known.has(r.id))
+      .map((r) => r.id)
+    expect(fresh).toHaveLength(7)
+    expect([...report.new].sort()).toEqual(fresh.sort())
   })
 
   it('keeps the label, quote and key changes in history and never moves a speaker', async () => {

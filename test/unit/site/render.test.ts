@@ -335,6 +335,20 @@ describe('escaping in the comparison page', () => {
         .get(),
     ).toEqual([LABEL, LABEL])
   })
+
+  it('shows the words of a quote edit with <, & and " as text (DRIFT-03)', () => {
+    const OLD = 'a <b>x</b> & "y"'
+    const record = {
+      ...records[13],
+      quote: 'a <i>z</i> & "y"',
+      history: [{ quote: OLD, until: '2026-10-24' }],
+    }
+    const local = createContext({ ...config, records: [record] })
+    const $ = load(changeHtml(record, local))
+    expect($('.qdiff b, .qdiff i')).toHaveLength(0)
+    expect($('.qdiff del').text()).toContain('<b>x</b>')
+    expect($('.qdiff ins').text()).toContain('<i>z</i>')
+  })
 })
 
 describe('leanHtml, the axes (LEAN-03, LEAN-04, LEAN-06)', () => {
