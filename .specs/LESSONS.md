@@ -86,6 +86,30 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: R04 src/pipeline/merge.ts:158 (merge)
 - last seen: 2026-10-24T09:20:34Z
 
+### L-013 - When an AC requires an encoding that lives only in CSS, assert the computed style in a browser test
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `site` · harmful: 0
+- features: agency-comparator
+- evidence: M16 site/style.css:1258 (CMP-08) (site)
+- last seen: 2026-10-24T20:57:06Z
+
+### L-014 - Feed hostile markup through every field that reaches HTML, including derived text such as diffs, and assert it comes out escaped
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `site` · harmful: 0
+- features: agency-comparator
+- evidence: M15 site/render.js:421 (DRIFT-03) (site)
+- last seen: 2026-10-24T20:57:06Z
+
+### L-015 - Assert every list a report publishes, including the ones expected to be short, against an independently derived value
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `data` · harmful: 0
+- features: agency-comparator
+- evidence: M12 src/repair/estadao-2026-10-24.ts:104 (DRIFT-02) (data)
+- last seen: 2026-10-24T20:57:06Z
+
+### L-016 - When an AC asks for a range per item, state what the first or last item shows when one end is unknown
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `spec` · harmful: 0
+- features: agency-comparator
+- evidence: DRIFT-03 site/render.js:413 (spec)
+- last seen: 2026-10-24T20:57:06Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

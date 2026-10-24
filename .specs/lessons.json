@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 13,
+  "next_id": 17,
   "lessons": [
     {
       "id": "L-001",
@@ -220,6 +220,78 @@
       ],
       "created": "2026-10-24T09:20:34Z",
       "last_seen": "2026-10-24T09:20:34Z"
+    },
+    {
+      "id": "L-013",
+      "key": "surviving_mutant::when an ac requires an encoding that lives only in css assert the computed style in a browser test",
+      "text": "When an AC requires an encoding that lives only in CSS, assert the computed style in a browser test",
+      "signal": "surviving_mutant",
+      "scope": "site",
+      "status": "candidate",
+      "features": [
+        "agency-comparator"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M16 site/style.css:1258 (CMP-08) (site)"
+      ],
+      "created": "2026-10-24T20:57:06Z",
+      "last_seen": "2026-10-24T20:57:06Z"
+    },
+    {
+      "id": "L-014",
+      "key": "surviving_mutant::feed hostile markup through every field that reaches html including derived text such as diffs and assert it comes out escaped",
+      "text": "Feed hostile markup through every field that reaches HTML, including derived text such as diffs, and assert it comes out escaped",
+      "signal": "surviving_mutant",
+      "scope": "site",
+      "status": "candidate",
+      "features": [
+        "agency-comparator"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M15 site/render.js:421 (DRIFT-03) (site)"
+      ],
+      "created": "2026-10-24T20:57:06Z",
+      "last_seen": "2026-10-24T20:57:06Z"
+    },
+    {
+      "id": "L-015",
+      "key": "surviving_mutant::assert every list a report publishes including the ones expected to be short against an independently derived value",
+      "text": "Assert every list a report publishes, including the ones expected to be short, against an independently derived value",
+      "signal": "surviving_mutant",
+      "scope": "data",
+      "status": "candidate",
+      "features": [
+        "agency-comparator"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M12 src/repair/estadao-2026-10-24.ts:104 (DRIFT-02) (data)"
+      ],
+      "created": "2026-10-24T20:57:06Z",
+      "last_seen": "2026-10-24T20:57:06Z"
+    },
+    {
+      "id": "L-016",
+      "key": "spec_precision_gap::when an ac asks for a range per item state what the first or last item shows when one end is unknown",
+      "text": "When an AC asks for a range per item, state what the first or last item shows when one end is unknown",
+      "signal": "spec_precision_gap",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "agency-comparator"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "DRIFT-03 site/render.js:413 (spec)"
+      ],
+      "created": "2026-10-24T20:57:06Z",
+      "last_seen": "2026-10-24T20:57:06Z"
     }
   ]
 }
