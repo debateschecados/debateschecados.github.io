@@ -352,6 +352,37 @@ describe('step 3: matching (INGEST-04)', () => {
     expect(third.events.filter((e) => e.type !== 'source')).toEqual([])
   })
 
+  it('gives a keyed item with a new key a new id even when its quote is known', () => {
+    const previous = first([g1([g1Item(1), g1Item(2)])])
+    const reborn = g1Item(9, { quote: previous[0].quote })
+    const { records, events } = merge(previous, [g1([reborn, g1Item(2)])], ctx())
+    const oldId = recordId(G1, 'chunk-1')
+    const newId = recordId(G1, 'chunk-9')
+    expect(records.map((r) => [r.id, r.key, r.pos])).toEqual([
+      [oldId, 'chunk-1', 1],
+      [recordId(G1, 'chunk-2'), 'chunk-2', 2],
+      [newId, 'chunk-9', 9],
+    ])
+    expect(byId(records, oldId)).toEqual({ ...previous[0], missingSince: '2026-10-25' })
+    expect(byId(records, newId)).toMatchObject({
+      quote: previous[0].quote,
+      speaker: 'lula',
+      label: '#FATO',
+    })
+    expect(byId(records, newId)?.history).toBeUndefined()
+    expect(events).toContainEqual({ type: 'new', sourceId: G1, id: newId })
+    expect(events).toContainEqual({ type: 'missing', sourceId: G1, id: oldId })
+  })
+
+  it('does not match a keyed item to a keyless record by quote', () => {
+    const previous = first([g1([g1Item(1, { key: null })])])
+    const { records } = merge(previous, [g1([g1Item(1)])], ctx())
+    expect(records.map((r) => [r.id, r.key, r.missingSince])).toEqual([
+      [recordId(G1, 'chunk-1'), 'chunk-1', undefined],
+      [previous[0].id, null, '2026-10-25'],
+    ])
+  })
+
   it('gives a new item a fresh id when its quote hashes to an id already taken', () => {
     const before = 'O salário mínimo subiu acima da inflação em todos os anos do meu governo'
     const after = 'O salário mínimo subiu acima da inflação em quase os anos do meu governo'
