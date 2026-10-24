@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { type Clock, createHttp, HttpError, SPACING_MS, sourceHosts } from '../../../src/io/http.ts'
 
 const REPO = 'https://example.org/debates-checados'
@@ -242,6 +242,30 @@ describe('errors and allowlist', () => {
     const error = await http.get('https://a.test/slow').catch((e) => e)
     expect(error).toBeInstanceOf(HttpError)
     expect(error.kind).toBe('timeout')
+  })
+
+  // AbortSignal.timeout runs on Node's internal timers, which fake timers do not reach, so the
+  // test records the delay each request asks for and fires the signal itself.
+  it('gives every request a 30 s timeout by default (INGEST-06)', async () => {
+    const delays: number[] = []
+    const spy = vi.spyOn(AbortSignal, 'timeout').mockImplementation((ms) => {
+      delays.push(ms)
+      return AbortSignal.abort(new DOMException('timed out', 'TimeoutError'))
+    })
+    try {
+      const clock = fakeClock()
+      const timedOut = async (init: RequestInit) => {
+        throw init.signal?.reason
+      }
+      const fake = fakeFetch(clock, { 'https://a.test/slow': timedOut })
+      const http = createHttp({ hosts: ['a.test'], repoUrl: REPO, clock, fetch: fake.fetch })
+      const error = await http.get('https://a.test/slow').catch((e) => e)
+      expect(error).toMatchObject({ kind: 'timeout', url: 'https://a.test/slow' })
+      expect(error.message).toBe('no response after 30000 ms: https://a.test/slow')
+      expect(delays).toEqual([30_000, 30_000]) // robots.txt, then the page
+    } finally {
+      spy.mockRestore()
+    }
   })
 
   it('throws a timeout error when the body stalls after the headers', async () => {
