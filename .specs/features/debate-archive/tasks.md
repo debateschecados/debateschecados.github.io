@@ -151,6 +151,8 @@ T22 → T24
 
 **Commit**: `feat(core): Add shared pipeline and record types`
 
+**Status**: ✅ Complete
+
 ---
 
 ### T3: Load and validate the config files
