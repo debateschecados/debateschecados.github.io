@@ -389,6 +389,8 @@ T22 → T24
 
 **Commit**: `feat(adapters): Parse Lupa debate pages`
 
+**Status**: ✅ Complete
+
 ---
 
 ### T11: Parse Estadão debate pages
