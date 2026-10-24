@@ -84,17 +84,21 @@ export function lean(ctx, rows) {
         interval: null,
         verdict: /** @type {Verdict} */ ('small'),
       }
-    const [lo, hi] = interval(values[0], values[1])
-    /** @type {Verdict} */
-    const verdict = lo > 0 ? 'c2' : hi < 0 ? 'c1' : 'none'
-    return {
-      outlet,
-      candidates,
-      distance,
-      interval: /** @type {[number, number]} */ ([lo, hi]),
-      verdict,
-    }
+    const range = interval(values[0], values[1])
+    return { outlet, candidates, distance, interval: range, verdict: verdictOf(range) }
   })
+}
+
+// Two decimals, as the page prints them; -0 included, so it compares like 0.
+const round2 = (/** @type {number} */ v) => Math.round(v * 100) / 100
+
+// The sentence rule of LEAN-03 on the interval ends as printed: an end shown as "0,00" counts
+// as containing 0.
+/** @param {[number, number]} range @returns {Verdict} */
+export function verdictOf([lo, hi]) {
+  if (round2(lo) > 0) return 'c2'
+  if (round2(hi) < 0) return 'c1'
+  return 'none'
 }
 
 const called = (/** @type {{ id: string, short: string }} */ c) => NAMES[c.id] ?? c.short
@@ -125,9 +129,9 @@ export function headline(result, ctx) {
     .join(' ')
 }
 
-// "+0,12", "−0,05", "0,00": two decimals, pt-BR comma, a real minus sign.
+// "+0,12", "−0,05", "0,00": two decimals, pt-BR comma, a real minus sign, never "−0,00".
 export const signed = (/** @type {number} */ v) => {
-  const r = Math.round(v * 100) / 100
+  const r = round2(v)
   const s = Math.abs(r).toFixed(2).replace('.', ',')
   return r > 0 ? `+${s}` : r < 0 ? `−${s}` : s
 }

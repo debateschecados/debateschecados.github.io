@@ -14,6 +14,7 @@ import {
   MIN_N,
   sentence,
   signed,
+  verdictOf,
 } from '../../../site/lean.js'
 import { type Config, loadConfig } from '../../../src/config.ts'
 import { writeData } from '../../../src/pipeline/write.ts'
@@ -167,6 +168,27 @@ describe('sentence rule (LEAN-03, LEAN-04)', () => {
     expect(m.aosfatos.interval?.[0]).toBeLessThan(0)
     expect(m.aosfatos.interval?.[1]).toBe(0)
     expect(m.aosfatos.verdict).toBe('none')
+  })
+
+  it('applies the rule to the interval ends rounded to two decimals, as the page prints them', () => {
+    // An end printed as "0,00" counts as 0; one printed as "−0,01" does not.
+    expect(signed(-0.004)).toBe('0,00')
+    expect(verdictOf([-0.3, -0.004])).toBe('none')
+    expect(sentence(verdictOf([-0.3, -0.004]), ctx)).toBe('sem diferença clara entre os candidatos')
+    expect(signed(-0.006)).toBe('−0,01')
+    expect(verdictOf([-0.3, -0.006])).toBe('c1')
+    expect(sentence(verdictOf([-0.3, -0.006]), ctx)).toBe(
+      'mais dura com Lula do que as outras agências',
+    )
+    expect(signed(0.004)).toBe('0,00')
+    expect(verdictOf([0.004, 0.3])).toBe('none')
+    expect(signed(0.006)).toBe('+0,01')
+    expect(verdictOf([0.006, 0.3])).toBe('c2')
+  })
+
+  it('never prints "−0,00"', () => {
+    for (const v of [-0, -0.001, -0.004, -0.0049]) expect(signed(v)).toBe('0,00')
+    expect(signed(0)).toBe('0,00')
   })
 
   it('shows "amostra pequena" instead of interval and sentence under 10 deviations', () => {

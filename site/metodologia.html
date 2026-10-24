@@ -59,6 +59,7 @@
     <li>intervalo todo abaixo de zero: “mais dura com Lula do que as outras agências”;</li>
     <li>menos de 10 desvios para algum dos candidatos: “amostra pequena”, sem intervalo nem frase.</li>
   </ul>
+  <p>A regra olha as pontas do intervalo arredondadas para duas casas, como a página mostra: uma ponta que aparece como 0,00 conta como zero.</p>
   <p>A frase do topo da página nomeia cada agência com diferença clara. Quando nenhuma tem, inclusive quando alguma tem amostra pequena, ela diz que nenhuma das quatro mostra diferença clara. Com um debate escolhido, a conta usa só as falas daquele debate. O comando <code>pnpm lean</code> imprime os mesmos números a partir dos dados do repositório.</p>
   <p>Limites: a conta só usa falas que duas ou mais agências checaram; o que cada agência escolheu checar, e o que deixou de checar, não entra. Agências diferentes podem checar partes diferentes da mesma fala. A distância mostra quem foi mais dura ou mais branda que as outras, não quem acertou, e não prova favorecimento. A regra completa está na <a href="{{repo}}/blob/main/.specs/features/agency-comparator/spec.md">especificação do comparador</a>.</p>
 

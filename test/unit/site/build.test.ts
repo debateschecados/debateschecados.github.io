@@ -305,6 +305,9 @@ describe('metodologia.html, distance and changed verdicts (LEAN-08)', () => {
       expect(text).toContain(`${rule}: “${sentence(verdict, ctx)}”`)
     }
     expect(text).toContain(`menos de ${MIN_N} desvios para algum dos candidatos: “amostra pequena”`)
+    expect(text).toContain(
+      'A regra olha as pontas do intervalo arredondadas para duas casas, como a página mostra: uma ponta que aparece como 0,00 conta como zero.',
+    )
     expect(sentence('small', ctx)).toBe('amostra pequena')
     for (const limit of [
       'a conta só usa falas que duas ou mais agências checaram',
