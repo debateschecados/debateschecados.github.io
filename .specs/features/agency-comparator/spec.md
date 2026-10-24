@@ -58,7 +58,7 @@ The archive shows each agency's checks side by side, but it cannot answer the qu
 
 **Acceptance Criteria**:
 
-1. The system SHALL store claim groups in the public file `config/claim-groups.json`, each group with an ID, debate, speaker, claim sentence, member record IDs and origin (`unanimous`, `adjudicated` or `manual`). (CLAIM-01)
+1. The system SHALL store claim groups in the public file `data/claim-groups.json`, each group with an ID, debate, speaker, claim sentence, member record IDs and origin (`unanimous`, `adjudicated` or `manual`). (CLAIM-01)
 2. IF a group references a record ID that does not exist, mixes debates or speakers, repeats an agency, has fewer than two records, shares a record with another group, or has an empty claim sentence or one longer than 120 characters THEN the build SHALL fail and name the group ID and the broken rule. (CLAIM-02)
 3. The system SHALL build the curation input with only the record ID, an agency letter assigned per debate, the quoted statement and the excerpt, and SHALL leave out the agency name, URL, label and band. (CLAIM-03)
 4. WHEN all three curators place the same set of records in one group and no curator links any of those records to another record THEN the system SHALL keep that group with origin `unanimous`. (CLAIM-04)
@@ -117,7 +117,7 @@ The archive shows each agency's checks side by side, but it cannot answer the qu
 **Acceptance Criteria**:
 
 1. The system SHALL replace the audit panel rule "Nenhum texto passa por inteligência artificial." with "A IA só agrupa checagens da mesma alegação, sem saber a agência nem o veredito. Ela nunca define veredito." (DISC-01)
-2. The system SHALL explain on the comparison page and on the methodology page how groups are formed (blind input, three curators, judge, neutrality review, maintainer review) and link to `config/claim-groups.json` and `data/claim-curation/`. (DISC-02)
+2. The system SHALL explain on the comparison page and on the methodology page how groups are formed (blind input, three curators, judge, neutrality review, maintainer review) and link to `data/claim-groups.json` and `data/claim-curation/`. (DISC-02)
 3. The system SHALL show on the comparison page how to contest a group: open an issue in the repository with the group ID. (DISC-03)
 4. The system SHALL update the README's impartiality rules with the same sentence as DISC-01. (DISC-04)
 
@@ -133,7 +133,7 @@ The archive shows each agency's checks side by side, but it cannot answer the qu
 
 **Acceptance Criteria**:
 
-1. WHEN `pnpm check:claims` runs THEN the system SHALL recompute the `unanimous` and `adjudicated` groups from the latest run's committed outputs and SHALL fail if they differ from `config/claim-groups.json`. (REPRO-01)
+1. WHEN `pnpm check:claims` runs THEN the system SHALL recompute the `unanimous` and `adjudicated` groups from the latest run's committed outputs and SHALL fail if they differ from `data/claim-groups.json`. (REPRO-01)
 2. WHEN `pnpm check:claims` runs THEN the system SHALL list every group with origin `manual`. (REPRO-02)
 
 **Independent Test**: Edit one adjudicated group's members in a copy of the file and run the check.
@@ -167,33 +167,33 @@ The archive shows each agency's checks side by side, but it cannot answer the qu
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| CLAIM-01 | P1: Claim groups | - | Pending |
-| CLAIM-02 | P1: Claim groups | - | Pending |
-| CLAIM-03 | P1: Claim groups | - | Pending |
-| CLAIM-04 | P1: Claim groups | - | Pending |
-| CLAIM-05 | P1: Claim groups | - | Pending |
-| CLAIM-06 | P1: Claim groups | - | Pending |
-| CMP-01 | P1: Compare agencies | - | Pending |
-| CMP-02 | P1: Compare agencies | - | Pending |
-| CMP-03 | P1: Compare agencies | - | Pending |
-| CMP-04 | P1: Compare agencies | - | Pending |
-| CMP-05 | P1: Compare agencies | - | Pending |
-| CMP-06 | P1: Compare agencies | - | Pending |
-| CMP-07 | P1: Compare agencies | - | Pending |
-| RIGOR-01 | P1: Coverage and relative rigor | - | Pending |
-| RIGOR-02 | P1: Coverage and relative rigor | - | Pending |
-| RIGOR-03 | P1: Coverage and relative rigor | - | Pending |
-| RIGOR-04 | P1: Coverage and relative rigor | - | Pending |
-| RIGOR-05 | P1: Coverage and relative rigor | - | Pending |
-| RIGOR-06 | P1: Coverage and relative rigor | - | Pending |
-| DISC-01 | P1: Honest AI disclosure | - | Pending |
-| DISC-02 | P1: Honest AI disclosure | - | Pending |
-| DISC-03 | P1: Honest AI disclosure | - | Pending |
-| DISC-04 | P1: Honest AI disclosure | - | Pending |
-| REPRO-01 | P2: Reproducible consensus | - | Pending |
-| REPRO-02 | P2: Reproducible consensus | - | Pending |
+| CLAIM-01 | P1: Claim groups | Tasks: T1 | In Tasks |
+| CLAIM-02 | P1: Claim groups | Tasks: T1, T6 | In Tasks |
+| CLAIM-03 | P1: Claim groups | Tasks: T2 | In Tasks |
+| CLAIM-04 | P1: Claim groups | Tasks: T3, T4 | In Tasks |
+| CLAIM-05 | P1: Claim groups | Tasks: T3, T4 | In Tasks |
+| CLAIM-06 | P1: Claim groups | Tasks: T4 | In Tasks |
+| CMP-01 | P1: Compare agencies | Tasks: T6 | In Tasks |
+| CMP-02 | P1: Compare agencies | Tasks: T6 | In Tasks |
+| CMP-03 | P1: Compare agencies | Tasks: T5, T7 | In Tasks |
+| CMP-04 | P1: Compare agencies | Tasks: T5 | In Tasks |
+| CMP-05 | P1: Compare agencies | Tasks: T5 | In Tasks |
+| CMP-06 | P1: Compare agencies | Tasks: T5, T6 | In Tasks |
+| CMP-07 | P1: Compare agencies | Tasks: T7 | In Tasks |
+| RIGOR-01 | P1: Coverage and relative rigor | Tasks: T5 | In Tasks |
+| RIGOR-02 | P1: Coverage and relative rigor | Tasks: T5 | In Tasks |
+| RIGOR-03 | P1: Coverage and relative rigor | Tasks: T5, T6 | In Tasks |
+| RIGOR-04 | P1: Coverage and relative rigor | Tasks: T6 | In Tasks |
+| RIGOR-05 | P1: Coverage and relative rigor | Tasks: T6 | In Tasks |
+| RIGOR-06 | P1: Coverage and relative rigor | Tasks: T5, T7 | In Tasks |
+| DISC-01 | P1: Honest AI disclosure | Tasks: T8 | In Tasks |
+| DISC-02 | P1: Honest AI disclosure | Tasks: T6, T8 | In Tasks |
+| DISC-03 | P1: Honest AI disclosure | Tasks: T6 | In Tasks |
+| DISC-04 | P1: Honest AI disclosure | Tasks: T8 | In Tasks |
+| REPRO-01 | P2: Reproducible consensus | Tasks: T4 | In Tasks |
+| REPRO-02 | P2: Reproducible consensus | Tasks: T4 | In Tasks |
 
-**Coverage:** 25 total, 0 mapped to tasks, 25 unmapped
+**Coverage:** 25 total, 25 mapped to tasks, 0 unmapped
 
 ---
 
@@ -208,5 +208,5 @@ The archive shows each agency's checks side by side, but it cannot answer the qu
 
 - [ ] The comparison page lists every claim group with two or more live records, and a person can follow each cell to the agency item.
 - [ ] Five sampled groups, read by the maintainer, check the same assertion in every member record.
-- [ ] Coverage and rigor numbers for one agency and candidate match a hand count from `config/claim-groups.json` and `data/checks.json`.
+- [ ] Coverage and rigor numbers for one agency and candidate match a hand count from `data/claim-groups.json` and `data/checks.json`.
 - [ ] No page of the built site still says that no text passes through AI.

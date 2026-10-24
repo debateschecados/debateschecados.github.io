@@ -1,0 +1,247 @@
+# Agency Comparator Tasks
+
+## Execution Protocol (MANDATORY -- do not skip)
+
+Implement these tasks with the `tlc-spec-driven` skill: **activate it by name and follow its Execute flow and Critical Rules.** Do not search for skill files by filesystem path. The skill is the source of truth for the full flow (per-task cycle, sub-agent delegation, adequacy review, Verifier, discrimination sensor).
+
+**If the skill cannot be activated, STOP and tell the user - do not proceed without it.**
+
+---
+
+**Design**: `.specs/features/agency-comparator/design.md`
+**Status**: Draft
+
+Local commits only. `git push` and deploy need the user's explicit go-ahead.
+
+---
+
+## Test Coverage Matrix
+
+| Code Layer | Required Test Type | Coverage Expectation | Location Pattern | Run Command |
+| ---------- | ------------------ | -------------------- | ---------------- | ----------- |
+| Claims modules (groups, blind, consensus, assemble) | unit | 1:1 to CLAIM and REPRO ACs, both edge cases on curator failure | `test/unit/claims/<module>.test.ts` | `pnpm vitest run test/unit/claims/<module>.test.ts` |
+| Comparison logic (`site/compare.js`) | unit | 1:1 to CMP-03..06 and RIGOR-01..03, RIGOR-06; sem faixa and removed-record edge cases | `test/unit/site/compare.test.ts` | `pnpm vitest run test/unit/site/compare.test.ts` |
+| Templates and build | unit | CMP-01, CMP-02, CMP-06, RIGOR-04, RIGOR-05, DISC-01..03, CLAIM-02 build failure | `test/unit/site/build.test.ts`, `test/unit/site/render.test.ts` | `pnpm vitest run <file>` |
+| Comparison UI | e2e (playwright-core) | Filters, URL state, 360 px | `test/e2e/compare.test.ts` | `pnpm vitest run test/e2e/compare.test.ts` |
+| Docs, workflow, committed curation data | none | Build gate and `pnpm check:claims` | - | build gate only |
+
+## Gate Check Commands
+
+> Scoped by file every time. Never `pnpm vitest run` without a path.
+
+| Gate Level | When to Use | Command |
+| ---------- | ----------- | ------- |
+| Quick | Tasks with unit tests only | `pnpm vitest run <test files touched by the task>` |
+| Full | Tasks with e2e tests | Quick, then `pnpm vitest run test/e2e/compare.test.ts` |
+| Build | End of each phase | `pnpm typecheck && pnpm lint`, then `pnpm vitest run test/unit/claims`, then `pnpm vitest run test/unit/site` (one at a time) |
+
+---
+
+## Execution Plan
+
+### Phase 1: Claim groups
+
+```
+T1 → T3 → T4
+T1 → T4
+T2 → T4
+```
+
+### Phase 2: Comparison page
+
+```
+T5 → T6 → T7
+T6 → T8
+```
+
+---
+
+## Task Breakdown
+
+### T1: Validate the claim groups file
+
+**What**: `src/claims/groups.ts` with the zod schema, `groupId`, `checkGroups` (every CLAIM-02 rule, all messages collected) and `loadGroups` (missing file gives an empty file with `run: null`, failures throw `ClaimsError`).
+**Where**: `src/claims/groups.ts`, `test/unit/claims/groups.test.ts`
+**Depends on**: None
+**Reuses**: `src/config.ts` readJson and fail pattern
+**Requirement**: CLAIM-01, CLAIM-02
+
+**Done when**:
+
+- [ ] Each CLAIM-02 rule has a test that feeds a broken group and expects `"<id>: <rule>"`
+- [ ] A valid file with two groups passes with no message
+- [ ] Gate check passes: `pnpm vitest run test/unit/claims/groups.test.ts`
+- [ ] Test count: at least 9 tests pass
+
+**Tests**: unit
+**Gate**: quick
+
+**Commit**: `feat(claims): Validate the claim groups file against the records`
+
+---
+
+### T2: Build the blind curation input
+
+**What**: `src/claims/blind.ts` `blindInput(records, candidates)` and a CLI `--run <date>` writing `data/claim-curation/<date>/input.json`; script `claims:input` in package.json.
+**Where**: `src/claims/blind.ts`, `test/unit/claims/blind.test.ts`, `package.json`
+**Depends on**: None
+**Reuses**: `src/config.ts` loadConfig for candidates
+**Requirement**: CLAIM-03
+
+**Done when**:
+
+- [ ] Each record in the output has exactly the keys `ref`, `src`, `quote`, `excerpt`; no agency name, URL, label or band appears anywhere in the serialized output
+- [ ] Letters follow sha256(debate + outlet) order, records follow sha256(id) order, removed records are absent
+- [ ] Given the 314 ids of `data/claim-curation/2026-10-24/input.json` and their records from `data/checks.json`, `blindInput` equals that file after JSON parse
+- [ ] Gate check passes: `pnpm vitest run test/unit/claims/blind.test.ts`
+- [ ] Test count: at least 4 tests pass
+
+**Tests**: unit
+**Gate**: quick
+
+**Commit**: `feat(claims): Build the blind input for claim curation`
+
+---
+
+### T3: Port the curator consensus
+
+**What**: `src/claims/consensus.ts` `sanitize` and `consensus`, a faithful port of `data/claim-curation/2026-10-24/workflow.js` (sanitize, pair votes, components, unanimity, proposals, fewer-runs rule).
+**Where**: `src/claims/consensus.ts`, `test/unit/claims/consensus.test.ts`
+**Depends on**: T1
+**Reuses**: workflow.js logic
+**Requirement**: CLAIM-04, CLAIM-05
+
+**Done when**:
+
+- [ ] Three identical groups → one settled group with three candidate claims
+- [ ] A chain A-B (3 votes) plus B-C (1 vote) → one disputed component {A, B, C} with each curator's proposal
+- [ ] Unknown ref, reused ref and repeated letter are dropped by `sanitize`
+- [ ] Two curator runs with `expected = 3` → nothing settled
+- [ ] Gate check passes: `pnpm vitest run test/unit/claims/consensus.test.ts`
+- [ ] Test count: at least 6 tests pass
+
+**Tests**: unit
+**Gate**: quick
+
+**Commit**: `feat(claims): Port the curator consensus to a tested module`
+
+---
+
+### T4: Assemble and check the claim groups
+
+**What**: `src/claims/assemble.ts` (design steps, manual edits, CLI write and `--check`), scripts `claims:assemble` and `check:claims`, the 2026-10-24 run committed under `data/claim-curation/2026-10-24/` (files from the orchestrator's scratch folder given in the worker prompt) with `manual.json` adding record `5434697c0611` to the 700-markets group, the generated `data/claim-groups.json`, and a `pnpm check:claims` step after `check:labels` in `.github/workflows/update.yml`.
+**Where**: `src/claims/assemble.ts`, `test/unit/claims/assemble.test.ts`, `data/claim-curation/2026-10-24/`, `data/claim-groups.json`, `package.json`, `.github/workflows/update.yml`
+**Depends on**: T1, T2, T3
+**Reuses**: T3 consensus, T1 groupId and checkGroups
+**Requirement**: CLAIM-04, CLAIM-05, CLAIM-06, REPRO-01, REPRO-02
+
+**Done when**:
+
+- [ ] Assembling the committed run yields 81 groups: 78 unanimous, 2 adjudicated, 1 manual (the 700-markets group with 3 records), and passes `checkGroups` against `data/checks.json`
+- [ ] Every claim equals the workflow result in the orchestrator's scratch `result.json` for the same refs, reviewer rewrites included
+- [ ] `check:claims` fails on a copy with one adjudicated group edited and lists the manual group with its reason
+- [ ] A manual edit whose `from` matches no group throws
+- [ ] Gate check passes: `pnpm vitest run test/unit/claims/assemble.test.ts`
+- [ ] Test count: at least 5 tests pass
+
+**Tests**: unit
+**Gate**: build
+
+**Commit**: `feat(claims): Assemble claim groups from the committed curation run`
+
+---
+
+### T5: Comparison logic
+
+**What**: `site/compare.js` (createComparison, state, visibleRows, coverage, rigor, SMALL, pendingCount) and fixture groups plus a fixture curation input in `test/fixtures/site.ts` (`buildFixture` writes both into the data dir). Fixture groups cover: a 4-agency row, a divergent row, a row with a `sem faixa` member, a row losing a member to `missingSince` and falling under 2, one per debate and candidate.
+**Where**: `site/compare.js`, `test/unit/site/compare.test.ts`, `test/fixtures/site.ts`
+**Depends on**: None (Phase 1 done)
+**Reuses**: `site/core.js` createContext
+**Requirement**: CMP-03, CMP-04, CMP-05, CMP-06, RIGOR-01, RIGOR-02, RIGOR-03, RIGOR-06
+
+**Done when**:
+
+- [ ] Hand-counted coverage and harsher/equal/milder for each agency and candidate on the fixture match `coverage` and `rigor`, with and without a debate filter
+- [ ] Divergent filter, speaker filter and debate filter each select the expected row ids; URL state round-trips
+- [ ] The row with a removed member is absent and its remaining record counts as `solo`
+- [ ] Gate check passes: `pnpm vitest run test/unit/site/compare.test.ts`
+- [ ] Test count: at least 8 tests pass
+
+**Tests**: unit
+**Gate**: quick
+
+**Commit**: `feat(site): Compute claim rows, coverage and rigor`
+
+---
+
+### T6: Render and build the comparison page
+
+**What**: render functions in `site/render.js`, `site/comparar.html`, build wiring in `src/site/build.ts` (loadGroups, pending count from the run input, copy `claim-groups.json`, links from index and methodology).
+**Where**: `site/render.js`, `site/comparar.html`, `src/site/build.ts`, `site/index.html`, `site/metodologia.html`, `test/unit/site/build.test.ts`, `test/unit/site/render.test.ts`
+**Depends on**: T5
+**Reuses**: `fill`, `jsonScript`, segmented debate control
+**Requirement**: CMP-01, CMP-02, CMP-06, RIGOR-03, RIGOR-04, RIGOR-05, DISC-02, DISC-03
+
+**Done when**:
+
+- [ ] Built `comparar.html` has one row per visible fixture group with "não checou" in empty agency cells and the agency label in each verdict's title
+- [ ] RIGOR-04 text, contest instruction and the "Como os grupos foram feitos" section with both links are present; the pending notice shows the fixture count
+- [ ] No element orders agencies by a number and no per-agency total exists (RIGOR-05)
+- [ ] A fixture with a broken group makes `build` reject with the group id in the message
+- [ ] Gate check passes: `pnpm vitest run test/unit/site/build.test.ts` then `pnpm vitest run test/unit/site/render.test.ts`
+- [ ] Test count: at least 7 new tests pass
+
+**Tests**: unit
+**Gate**: quick
+
+**Commit**: `feat(site): Build the agency comparison page`
+
+---
+
+### T7: Browser filters and layout
+
+**What**: `site/comparar.js` (filters, URL, tables re-render, focus kept) and CSS for the grid and the stacked mobile layout, following direction A.
+**Where**: `site/comparar.js`, `site/style.css`, `test/e2e/compare.test.ts`
+**Depends on**: T6
+**Reuses**: `site/app.js` focus handling, e2e server from `test/e2e/site.test.ts`
+**Requirement**: CMP-03, CMP-07, RIGOR-06
+
+**Done when**:
+
+- [ ] e2e: each filter changes visible rows and table numbers as `compare.js` computes; reload with the URL restores the view
+- [ ] e2e: no horizontal scroll at 360 px; no cross-origin request
+- [ ] Gate check passes: `pnpm vitest run test/e2e/compare.test.ts`
+- [ ] Test count: at least 4 tests pass
+
+**Tests**: e2e
+**Gate**: full
+
+**Commit**: `feat(site): Filter the comparison page in the browser`
+
+---
+
+### T8: Disclose the AI grouping
+
+**What**: replace the audit-panel rule with the DISC-01 sentence, add the methodology section on how groups are made, update README rules and add a "Grupos de alegações" section with the commands.
+**Where**: `site/index.html`, `site/metodologia.html`, `README.md`, `test/unit/site/build.test.ts`
+**Depends on**: T6
+**Reuses**: existing pages
+**Requirement**: DISC-01, DISC-02, DISC-04
+
+**Done when**:
+
+- [ ] Built site contains the DISC-01 sentence and no longer contains "Nenhum texto passa por inteligência artificial"
+- [ ] README contains the DISC-01 sentence
+- [ ] Gate check passes: `pnpm vitest run test/unit/site/build.test.ts`
+- [ ] Test count: at least 2 new tests pass
+
+**Tests**: unit
+**Gate**: build
+
+**Commit**: `docs(site): Disclose that AI groups claims blind to agency and verdict`
+
+---
+
+## Parallel Execution Map
+
+Phases run in sequence; inside a phase the diagram order holds. One worker per phase.
