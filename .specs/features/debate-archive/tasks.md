@@ -333,6 +333,8 @@ T22 → T24
 
 **Commit**: `feat(io): Add rate-limited, robots-aware HTTP client`
 
+**Status**: ✅ Complete
+
 ---
 
 ### T9: Parse g1 debate pages

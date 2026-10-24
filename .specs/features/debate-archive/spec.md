@@ -237,8 +237,8 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 | INGEST-04 | P1: Collect the debate checks | Tasks: T5, T6 | Implemented |
 | INGEST-05 | P1: Collect the debate checks | Tasks: T4, T15 | In Progress |
 | INGEST-06 | P1: Collect the debate checks | Tasks: T6, T15 | In Progress |
-| INGEST-07 | P1: Collect the debate checks | Tasks: T8 | Pending |
-| INGEST-08 | P1: Collect the debate checks | Tasks: T8 | Pending |
+| INGEST-07 | P1: Collect the debate checks | Tasks: T8 | Implemented |
+| INGEST-08 | P1: Collect the debate checks | Tasks: T8 | Implemented |
 | INGEST-09 | P1: Collect the debate checks | Tasks: T7, T15 | In Progress |
 | SITE-01 | P1: Browse every check | Tasks: T20, T21 | Pending |
 | SITE-02 | P1: Browse every check | Tasks: T18 | Pending |
