@@ -354,6 +354,15 @@ describe('ingest (INGEST-01, INGEST-02, INGEST-05, INGEST-09)', () => {
     expect((await reported()).sources[`alpha-${BAND}`]).toMatchObject({ status: 'ok', items: 3 })
   })
 
+  it('dates a missing record by the calendar day in Brasília, not in UTC (HIST-02)', async () => {
+    await run(fakeClock('2026-10-24T12:00:00.000Z'))
+    await writePage(`alpha-${BAND}`, { items: [1, 2, 3, 4].map((n) => item(n)) })
+    // 22:30 on Oct 24 in Brasília is already Oct 25 in UTC.
+    await run(fakeClock('2026-10-25T01:30:00.000Z'))
+    const gone = (await published()).filter((r) => r.missingSince)
+    expect(gone.map((r) => [r.key, r.missingSince])).toEqual([['k5', '2026-10-24']])
+  })
+
   it('fails only the source with an unknown adapter and names it (CONF-02)', async () => {
     await writeConfig([
       debate(BAND, '2026-10-18', [

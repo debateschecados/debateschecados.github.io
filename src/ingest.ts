@@ -82,6 +82,10 @@ export interface IngestOptions {
   offline?: boolean // docs do not come from HTTP, so no HTTP status is reported
 }
 
+// Calendar day in Brasília as YYYY-MM-DD ("en-CA" formats dates that way). Detection dates are
+// read by people in Brazil, so a run at 22:30 local time must not land on the next day.
+const brasiliaDay = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' })
+
 const sha256 = (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('hex')
 
 const fileDoc = async (path: string, url: string, clock: Clock): Promise<Doc> => {
@@ -270,7 +274,8 @@ async function collect(
 // written to options.dataDir. Returns what was written and the per-run log.
 export async function ingest(options: IngestOptions) {
   const { clock } = options
-  const startedAt = new Date(clock.now()).toISOString()
+  const started = clock.now()
+  const startedAt = new Date(started).toISOString()
   const { config } = options
   const previous = await readRecords(options.dataDir)
 
@@ -284,7 +289,7 @@ export async function ingest(options: IngestOptions) {
     previous,
     collected.map((c) => c.result),
     {
-      date: startedAt.slice(0, 10),
+      date: brasiliaDay.format(started),
       bands: config.bands,
       outlets: config.outlets,
       debates: config.debates,
