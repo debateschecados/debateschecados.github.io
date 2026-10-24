@@ -87,6 +87,14 @@ describe('checkGroups (CLAIM-01, CLAIM-02)', () => {
     ])
   })
 
+  it('rejects the same group listed twice', () => {
+    const g = group(['a1', 'a2'])
+    expect(checkGroups(file(g, { ...g }), RECORDS)).toEqual([
+      `${g.id}: record "a1" is also in group ${g.id}`,
+      `${g.id}: record "a2" is also in group ${g.id}`,
+    ])
+  })
+
   it('rejects an empty claim', () => {
     const g = group(['a1', 'a2'], { claim: '  ' })
     expect(checkGroups(file(g), RECORDS)).toEqual([`${g.id}: claim is empty`])

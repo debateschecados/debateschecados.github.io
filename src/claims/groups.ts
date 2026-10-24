@@ -38,9 +38,9 @@ export const groupId = (records: readonly string[]) =>
 // One "<group id>: <rule>" message per broken CLAIM-02 rule, in file order.
 export function checkGroups(file: ClaimGroupsFile, records: readonly CheckRecord[]) {
   const byId = new Map(records.map((r) => [r.id, r]))
-  const owner = new Map<string, string>()
+  const owner = new Map<string, number>() // record id -> index of its first group
   const messages: string[] = []
-  for (const group of file.groups) {
+  for (const [index, group] of file.groups.entries()) {
     const broken = (rule: string) => messages.push(`${group.id}: ${rule}`)
     const outlets = new Set<string>()
     if (group.records.length < 2) broken('fewer than 2 records')
@@ -56,10 +56,11 @@ export function checkGroups(file: ClaimGroupsFile, records: readonly CheckRecord
         broken(`record "${id}" is from speaker "${record.speaker}", not "${group.speaker}"`)
       if (outlets.has(record.outlet)) broken(`agency "${record.outlet}" appears more than once`)
       outlets.add(record.outlet)
+      // By index, not id: a group listed twice has the same id both times.
       const other = owner.get(id)
-      if (other !== undefined && other !== group.id)
-        broken(`record "${id}" is also in group ${other}`)
-      owner.set(id, other ?? group.id)
+      if (other !== undefined && other !== index)
+        broken(`record "${id}" is also in group ${file.groups[other].id}`)
+      owner.set(id, other ?? index)
     }
     if (group.claim.trim() === '') broken('claim is empty')
     else if (group.claim.length > MAX_CLAIM)
