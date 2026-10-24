@@ -50,6 +50,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: INGEST-04 spec.md:72 (spec)
 - last seen: 2026-10-24T08:53:06Z
 
+### L-007 - Assert the values the UI renders after a state change, not only the pure function that computes them
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `site` · harmful: 0
+- features: debate-archive
+- evidence: N06 site/app.js:60 (validation.md iteration 2) (site)
+- last seen: 2026-10-24T09:05:44Z
+
+### L-008 - Test that the caller passes the narrowed input a function expects, not only the function with an input the test narrowed itself
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `ingest` · harmful: 0
+- features: debate-archive
+- evidence: N04 src/ingest.ts:197 (validation.md iteration 2) (ingest)
+- last seen: 2026-10-24T09:05:44Z
+
+### L-009 - For a rule limited to one kind of input, test that the other kind does not trigger it
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `merge` · harmful: 0
+- features: debate-archive
+- evidence: N14 src/pipeline/merge.ts:93 (validation.md iteration 2) (merge)
+- last seen: 2026-10-24T09:05:45Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

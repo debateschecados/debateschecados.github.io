@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 7,
+  "next_id": 10,
   "lessons": [
     {
       "id": "L-001",
@@ -112,6 +112,60 @@
       ],
       "created": "2026-10-24T08:53:06Z",
       "last_seen": "2026-10-24T08:53:06Z"
+    },
+    {
+      "id": "L-007",
+      "key": "surviving_mutant::assert the values the ui renders after a state change not only the pure function that computes them",
+      "text": "Assert the values the UI renders after a state change, not only the pure function that computes them",
+      "signal": "surviving_mutant",
+      "scope": "site",
+      "status": "candidate",
+      "features": [
+        "debate-archive"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "N06 site/app.js:60 (validation.md iteration 2) (site)"
+      ],
+      "created": "2026-10-24T09:05:44Z",
+      "last_seen": "2026-10-24T09:05:44Z"
+    },
+    {
+      "id": "L-008",
+      "key": "surviving_mutant::test that the caller passes the narrowed input a function expects not only the function with an input the test narrowed itself",
+      "text": "Test that the caller passes the narrowed input a function expects, not only the function with an input the test narrowed itself",
+      "signal": "surviving_mutant",
+      "scope": "ingest",
+      "status": "candidate",
+      "features": [
+        "debate-archive"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "N04 src/ingest.ts:197 (validation.md iteration 2) (ingest)"
+      ],
+      "created": "2026-10-24T09:05:44Z",
+      "last_seen": "2026-10-24T09:05:44Z"
+    },
+    {
+      "id": "L-009",
+      "key": "surviving_mutant::for a rule limited to one kind of input test that the other kind does not trigger it",
+      "text": "For a rule limited to one kind of input, test that the other kind does not trigger it",
+      "signal": "surviving_mutant",
+      "scope": "merge",
+      "status": "candidate",
+      "features": [
+        "debate-archive"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "N14 src/pipeline/merge.ts:93 (validation.md iteration 2) (merge)"
+      ],
+      "created": "2026-10-24T09:05:45Z",
+      "last_seen": "2026-10-24T09:05:45Z"
     }
   ]
 }
