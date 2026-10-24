@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Debates checados</title>
 <meta name="description" content="As checagens de quatro agências sobre os debates do 2º turno, num lugar só, com o veredito de cada uma numa escala comum.">
+<link rel="describedby" href="llms.txt" type="text/markdown">
+<link rel="alternate" type="text/markdown" href="index.md" title="Markdown">
+<script type="application/ld+json">{{jsonLd}}</script>
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -54,27 +57,14 @@
 
   <h3>Peça para uma IA auditar</h3>
   <p class="hint">Copie o roteiro abaixo e cole na IA que você usa. Ela confere o código e os dados sem depender da nossa palavra.</p>
-  <textarea class="prompt" id="prompt" readonly aria-label="Roteiro de auditoria">Quero que você faça uma auditoria independente do site Debates Checados, que reúne as checagens de quatro agências (Aos Fatos, Estadão Verifica, g1 Fato ou Fake e Lupa) sobre os debates do 2º turno de 2026 entre Lula e Flávio Bolsonaro.
-
-Código e dados: {{repo}}
-Todas as checagens: {{repo}}/blob/main/data/checks.csv
-
-Faça cada passo abaixo e mostre a evidência de cada um (arquivo e linha, ou link):
-
-1. Leia os parsers em src/adapters e diga se algum trata Lula e Flávio Bolsonaro de forma diferente.
-2. Sorteie 10 checagens do CSV. Para cada uma, abra o link da agência ou a cópia na Wayback Machine e confira se a fala, o candidato e o rótulo batem.
-3. Confira se a tabela de faixas (config/bands.json) classifica cada rótulo sem depender de quem falou.
-4. Recalcule o placar de cada candidato a partir do CSV e compare com o que o site mostra.
-5. Procure no histórico de commits mudanças de rótulo ou remoções e diga se cada uma tem justificativa registrada.
-
-Aponte qualquer sinal de viés ou erro, mesmo pequeno. Se não conseguir verificar algum ponto, diga que não conseguiu, em vez de supor.</textarea>
+  <textarea class="prompt" id="prompt" readonly aria-label="Roteiro de auditoria">{{auditPrompt}}</textarea>
   <button type="button" class="copy" id="copy">Copiar prompt</button>
   <span class="copied" id="copied" role="status"></span>
 </dialog>
 
 <footer class="foot">
   <div class="wrap">
-    <nav><a href="checks.csv">Baixar os dados</a><a href="metodologia.html">Como funciona</a><a href="{{repo}}">Código no GitHub</a></nav>
+    <nav><a href="checks.csv">Baixar os dados</a><a href="metodologia.html">Como funciona</a><a href="llms.txt">Para agentes</a><a href="{{repo}}">Código no GitHub</a></nav>
     <p>Os vereditos são das agências. Este site só reúne e organiza o que elas publicaram. Ilustrações feitas a partir de retratos oficiais: Palácio do Planalto (CC BY 2.0) e Agência Senado. Logos dos partidos e das emissoras: Wikimedia Commons.</p>
   </div>
 </footer>

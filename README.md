@@ -71,7 +71,8 @@ Rode os testes um arquivo por vez, como acima. Os testes golden usam as páginas
 
 ## Como auditar
 
-São os mesmos cinco passos do roteiro que o site oferece para colar numa IA, no botão "Como auditar". Dá para fazer à mão.
+São os mesmos cinco passos do roteiro que o site oferece para colar numa IA, no botão "Como auditar". Dá para fazer à mão. O site também publica esse roteiro para um agente que receber só o endereço. `/llms.txt` é o índice, no formato proposto em https://llmstxt.org/. `/auditoria.md` repete os passos abaixo. `/robots.txt` deixa ler e recusa treino de modelo, porque as falas e os rótulos são das agências.
+
 1. Leia os parsers em `src/adapters` e veja se algum trata Lula e Flávio Bolsonaro de forma diferente. O nome de quem falou só vira um candidato em `src/pipeline/normalize.ts`, pela lista de apelidos de `config/candidates.json`.
 2. Sorteie 10 checagens de `data/checks.csv`. Para cada uma, abra o link da agência (`url`) ou a cópia na Wayback Machine (`archive_url`) e confira se a fala, o candidato e o rótulo batem.
 3. Confira se a tabela de faixas (`config/bands.json`) classifica cada rótulo sem depender de quem falou. A página "Como funciona" do site mostra, ao lado da tabela, quantas vezes cada rótulo aparece para cada candidato.
