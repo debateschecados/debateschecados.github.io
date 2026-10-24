@@ -239,7 +239,7 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 | INGEST-06 | P1: Collect the debate checks | Tasks: T6, T15 | In Progress |
 | INGEST-07 | P1: Collect the debate checks | Tasks: T8 | Pending |
 | INGEST-08 | P1: Collect the debate checks | Tasks: T8 | Pending |
-| INGEST-09 | P1: Collect the debate checks | Tasks: T7, T15 | Pending |
+| INGEST-09 | P1: Collect the debate checks | Tasks: T7, T15 | In Progress |
 | SITE-01 | P1: Browse every check | Tasks: T20, T21 | Pending |
 | SITE-02 | P1: Browse every check | Tasks: T18 | Pending |
 | SITE-03 | P1: Browse every check | Tasks: T17 | Pending |
@@ -252,10 +252,10 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 | SCORE-03 | P1: Scoreboards | Tasks: T17 | Pending |
 | SCORE-04 | P1: Scoreboards | Tasks: T17 | Pending |
 | SCORE-05 | P1: Scoreboards | Tasks: T17 | Pending |
-| DATA-01 | P1: Open, auditable data | Tasks: T7, T20 | Pending |
+| DATA-01 | P1: Open, auditable data | Tasks: T7, T20 | In Progress |
 | DATA-02 | P1: Open, auditable data | Tasks: T14 | Pending |
 | DATA-03 | P1: Open, auditable data | Tasks: T3, T16, T20 | In Progress |
-| DATA-04 | P1: Open, auditable data | Tasks: T7, T13 | Pending |
+| DATA-04 | P1: Open, auditable data | Tasks: T7, T13 | In Progress |
 | DATA-05 | P1: Open, auditable data | Tasks: T1, T20 | In Progress |
 | DATA-06 | P1: Open, auditable data | Tasks: T14 | Pending |
 | DATA-07 | P1: Open, auditable data | Tasks: T20, T23 | Pending |

@@ -301,6 +301,8 @@ T22 → T24
 
 **Commit**: `feat(pipeline): Write checks JSON, CSV and run report`
 
+**Status**: ✅ Complete
+
 ---
 
 ### Phase 3: Sources
