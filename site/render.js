@@ -94,15 +94,32 @@ export function debatesHtml(ctx) {
   return `<span class="seg-thumb"></span>${buttons.join('')}`
 }
 
+// Popup button in the site's style instead of the native select (site/combo.js runs it).
+// Every label sits in the button, stacked, so its width fits the longest one and never jumps.
 /** @param {Context} ctx @param {State} state @param {string} key @param {string} label @param {string} all @param {[string, string][]} values */
 const select = (ctx, state, key, label, all, values) => {
-  const opts = values
+  const current = state[/** @type {'outlet'} */ (key)] ?? ''
+  const options = [
+    ['', all, ''],
+    ...values.map(([v, t]) => [v, t, String(optionCount(ctx, state, key, v))]),
+  ]
+  const faces = options
     .map(
-      ([v, t]) =>
-        `<option value="${esc(v)}"${state[/** @type {'outlet'} */ (key)] === v ? ' selected' : ''}>${esc(t)} (${optionCount(ctx, state, key, v)})</option>`,
+      ([v, t, n]) =>
+        `<span${v === current ? ` id="f-${key}-v"` : ' aria-hidden="true"'}>${esc(t)}${n ? ` <span class="n">(${n})</span>` : ''}</span>`,
     )
     .join('')
-  return `<label>${label}<select data-key="${key}"><option value="">${all}</option>${opts}</select></label>`
+  const items = options
+    .map(
+      ([v, t, n], i) =>
+        `<li role="option" id="f-${key}-${i}" data-value="${esc(v)}" aria-selected="${v === current}">${esc(t)}${n ? `<span class="n">${n}</span>` : ''}</li>`,
+    )
+    .join('')
+  return (
+    `<div class="combo"><span class="combo-label" id="f-${key}">${label}</span>` +
+    `<button type="button" class="combo-btn" data-key="${key}" data-value="${esc(current)}" aria-haspopup="listbox" aria-expanded="false" aria-controls="f-${key}-list" aria-labelledby="f-${key} f-${key}-v">${faces}</button>` +
+    `<ul class="combo-list" id="f-${key}-list" role="listbox" tabindex="-1" aria-labelledby="f-${key}">${items}</ul></div>`
+  )
 }
 
 // Tabs: live checks, and the ones the agencies took down (HIST-02). Counts follow the filters.

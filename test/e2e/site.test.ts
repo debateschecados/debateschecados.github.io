@@ -155,9 +155,12 @@ const expectedBoard = (keep: (r: CheckRecord) => boolean) =>
   )
 
 async function choose(page: Page, key: string, value: string) {
-  await page.selectOption(`select[data-key="${key}"]`, value)
+  await page.click(`button[data-key="${key}"]`)
+  await page.click(`#f-${key}-list [data-value="${value}"]`)
   await settle(page)
 }
+
+const chosen = (page: Page, key: string) => page.getAttribute(`[data-key="${key}"]`, 'data-value')
 
 describe('layout (SITE-06)', () => {
   it('has no horizontal scroll at 360 px, with removed items and the panel open', async () => {
@@ -215,7 +218,8 @@ describe('list, filters and URL (SITE-01, SITE-03, SHARE-01, SHARE-02)', () => {
     expect(await shared.getAttribute('[data-debate="band-2026-10-18"]', 'aria-pressed')).toBe(
       'true',
     )
-    expect(await shared.inputValue('select[data-key="outlet"]')).toBe('lupa')
+    expect(await chosen(shared, 'outlet')).toBe('lupa')
+    expect(await shared.textContent('#f-outlet-v')).toMatch(/^Lupa \(\d+\)$/)
   })
 
   it('shows items again at full opacity when a filter brings them back', async () => {
@@ -242,7 +246,7 @@ describe('list, filters and URL (SITE-01, SITE-03, SHARE-01, SHARE-02)', () => {
     await settle(page)
     expect(await listedIds(page)).toHaveLength(records.length - removed.length)
     expect(new URL(page.url()).search).toBe('')
-    expect(await page.inputValue('select[data-key="outlet"]')).toBe('')
+    expect(await chosen(page, 'outlet')).toBe('')
   })
 
   it('keeps keyboard focus on the control in use while the filters re-render', async () => {
@@ -252,17 +256,31 @@ describe('list, filters and URL (SITE-01, SITE-03, SHARE-01, SHARE-02)', () => {
         const el = document.activeElement as HTMLElement
         return el.dataset.key ?? el.dataset.tab ?? el.tagName
       })
-    const outlets = await page.$$eval('select[data-key="outlet"] option', (os) =>
-      os.map((o) => (o as HTMLOptionElement).value),
+    const outlets = await page.$$eval('#f-outlet-list [role="option"]', (os) =>
+      os.map((o) => (o as HTMLElement).dataset.value),
     )
-    await page.focus('select[data-key="outlet"]')
+    // Arrow opens the list on the current value, arrow moves, Enter picks and closes.
+    await page.focus('[data-key="outlet"]')
     await page.keyboard.press('ArrowDown')
+    expect(await page.getAttribute('[data-key="outlet"]', 'aria-expanded')).toBe('true')
+    await page.keyboard.press('ArrowDown')
+    await page.keyboard.press('Enter')
     await settle(page)
     expect(new URL(page.url()).searchParams.get('outlet')).toBe(outlets[1])
+    expect(await page.getAttribute('[data-key="outlet"]', 'aria-expanded')).toBe('false')
     expect(await focused()).toBe('outlet')
     await page.keyboard.press('ArrowDown')
+    await page.keyboard.press('ArrowDown')
+    await page.keyboard.press('Enter')
     await settle(page)
     expect(new URL(page.url()).searchParams.get('outlet')).toBe(outlets[2])
+    expect(await focused()).toBe('outlet')
+    // Escape closes without picking and gives focus back to the button.
+    await page.keyboard.press('ArrowDown')
+    await page.keyboard.press('ArrowDown')
+    await page.keyboard.press('Escape')
+    expect(new URL(page.url()).searchParams.get('outlet')).toBe(outlets[2])
+    expect(await page.getAttribute('[data-key="outlet"]', 'aria-expanded')).toBe('false')
     expect(await focused()).toBe('outlet')
 
     const all = await open()
