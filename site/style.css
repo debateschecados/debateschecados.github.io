@@ -775,24 +775,125 @@ body {
   backdrop-filter: saturate(180%) blur(20px);
   z-index: 2;
 }
-.filters label {
-  font-size: 13px;
-  color: var(--muted);
+.combo {
+  position: relative;
   display: grid;
   gap: 4px;
 }
-.filters select {
+.combo-label {
+  font-size: 13px;
+  color: var(--muted);
+}
+.combo-btn {
+  display: grid;
   font: inherit;
   font-size: 15px;
   color: var(--ink);
+  text-align: left;
   background: var(--surface);
   border: 0;
   border-radius: 10px;
   padding: 7px 30px 7px 12px;
-  appearance: none;
+  cursor: pointer;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236e6e73' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 11px center;
+  transition: background-color 0.15s;
+}
+.combo-btn:hover,
+.combo-btn[aria-expanded="true"] {
+  background-color: #ebebf0;
+}
+/* All labels share one cell; only the current one shows, the rest only set the width. */
+.combo-btn > span {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+}
+.combo-btn > [aria-hidden] {
+  visibility: hidden;
+}
+.combo-btn .n {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.combo-list {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 3;
+  min-width: 100%;
+  max-height: min(320px, 60vh);
+  overflow-y: auto;
+  margin: 0;
+  padding: 5px;
+  list-style: none;
+  /* Opaque: backdrop-filter does not work inside the already filtered sticky bar. */
+  background: var(--bg);
+  border-radius: 12px;
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.12),
+    0 10px 30px rgba(0, 0, 0, 0.12),
+    0 2px 6px rgba(0, 0, 0, 0.06);
+  transform-origin: top left;
+  outline: none;
+}
+.combo-list.end {
+  left: auto;
+  right: 0;
+  transform-origin: top right;
+}
+.combo-btn[aria-expanded="true"] + .combo-list {
+  display: block;
+  animation: combo-in 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes combo-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+}
+.combo-list [role="option"] {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 7px 12px 7px 30px;
+  border-radius: 8px;
+  font-size: 15px;
+  color: var(--ink);
+  white-space: nowrap;
+  cursor: pointer;
+  position: relative;
+}
+.combo-list [role="option"].active {
+  background: var(--link);
+  color: #fff;
+}
+.combo-list [aria-selected="true"]::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  width: 11px;
+  height: 9px;
+  margin-top: -5px;
+  background: currentColor;
+  mask:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='9'%3E%3Cpath d='M1 4.5l3.2 3.2L10 1.5' stroke='%23000' fill='none' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+.combo-list [aria-selected="true"] {
+  font-weight: 500;
+}
+.combo-list .n {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+.combo-list .active .n {
+  color: rgba(255, 255, 255, 0.8);
 }
 .filters .count {
   margin-left: auto;
@@ -900,7 +1001,6 @@ body {
   cursor: pointer;
 }
 button:focus-visible,
-select:focus-visible,
 a:focus-visible,
 input:focus-visible,
 textarea:focus-visible {
@@ -1366,15 +1466,16 @@ textarea:focus-visible {
   .filters {
     gap: 10px;
   }
-  .filters label {
-    flex: 1 1 40%;
-  }
   .search {
     flex: 1 1 100%;
     margin-left: 0;
   }
-  .filters select {
-    width: 100%;
+  .filters .combo {
+    flex: 1 1 40%;
+  }
+  .combo-btn > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .filters .count {
     margin-left: 0;
@@ -1425,6 +1526,7 @@ textarea:focus-visible {
   .fighter.left,
   .fighter.right,
   .audit[open],
+  .combo-btn[aria-expanded="true"] + .combo-list,
   .duel.talking .fighter [class^="m-"] {
     animation: none;
   }

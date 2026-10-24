@@ -1,5 +1,6 @@
 // Browser side: adopts the pre-rendered page, then filters, animates and runs the audit panel.
 
+import { combos } from './combo.js'
 import {
   createContext,
   emptyState,
@@ -217,7 +218,7 @@ function render() {
   $('#tabs').innerHTML = tabsHtml(ctx, state)
   // The controls are rebuilt, so keyboard focus goes back to the one the visitor was using.
   const focused = /** @type {HTMLElement | null} */ (filters.querySelector(':focus'))
-  const again = focused?.dataset.key ? `[data-key="${focused.dataset.key}"]` : 'select'
+  const again = focused?.dataset.key ? `[data-key="${focused.dataset.key}"]` : '.combo-btn'
   filters.innerHTML = filtersHtml(ctx, state, items.length)
   if (focused) /** @type {HTMLElement | null} */ (filters.querySelector(again))?.focus()
   const count = /** @type {HTMLElement} */ (filters.querySelector('.count .n'))
@@ -258,14 +259,7 @@ document.addEventListener('click', (e) => {
     search.value = ''
     update()
     // The button left with the empty state; focus moves to the first filter.
-    filters.querySelector('select')?.focus()
-  }
-})
-document.addEventListener('change', (e) => {
-  const target = /** @type {HTMLInputElement} */ (e.target)
-  if (target.matches('select[data-key]')) {
-    state[/** @type {'outlet'} */ (target.dataset.key)] = target.value || null
-    update()
+    filters.querySelector('button')?.focus()
   }
 })
 // Each keystroke would filter every record, redraw the board and animate the list, so the
@@ -278,6 +272,11 @@ search.addEventListener('input', () => {
     state.q = search.value
     update()
   }, TYPING_PAUSE)
+})
+
+combos(filters, (key, value) => {
+  state[/** @type {'outlet'} */ (key)] = value || null
+  update()
 })
 
 render()
