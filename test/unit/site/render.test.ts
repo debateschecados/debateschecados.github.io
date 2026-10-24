@@ -457,11 +457,20 @@ describe('leanHtml, the axes (LEAN-03, LEAN-04, LEAN-06)', () => {
     // Only interval bars are rectangles: nothing shades the area around zero.
     expect($('rect').not('.ci')).toHaveLength(0)
     expect($('rect.ci')).toHaveLength(2)
-    // Under "amostra pequena" the point stays, with no bar; with no data, nothing is drawn.
-    const g1 = $('li.lean-row').eq(2).find('svg')
-    expect(g1.find('.ci, .end')).toHaveLength(0)
-    expect(g1.find('circle.pt').attr('cx')).toBe('40%')
-    expect($('li.lean-row').eq(3).find('.pt, .ci')).toHaveLength(0)
+    // Under "amostra pequena" the axis has neither point nor bar; the numbers stay as text.
+    const g1 = $('li.lean-row').eq(2)
+    expect(g1.find('svg .pt, svg .pt-label, svg .ci, svg .ci-end, svg .end')).toHaveLength(0)
+    expect(
+      g1
+        .find('.sub span')
+        .map((_, s) => $(s).text())
+        .get(),
+    ).toEqual(['com Lula +0,10, 12 falas', 'com Flávio 0,00, 9 falas'])
+    expect(g1.find('.rule').text()).toBe('Amostra pequena.')
+    expect(g1.find('.nums').text()).toBe(
+      'Distância −0,10. Menos de 10 falas de um dos candidatos, sem intervalo.',
+    )
+    expect($('li.lean-row').eq(3).find('svg .pt, svg .ci')).toHaveLength(0)
     expect(
       $('.axis text')
         .map((_, t) => $(t).text())
@@ -476,6 +485,8 @@ describe('leanHtml, the axes (LEAN-03, LEAN-04, LEAN-06)', () => {
     expect(axisDomain([{ ...result[0], interval: [-0.7, 0.1], distance: -0.3 }] as never)).toBe(
       0.75,
     )
+    // A small sample draws nothing, so its distance does not widen the scale.
+    expect(axisDomain([result[1], { ...result[2], distance: -1.8 }] as never)).toBe(0.5)
   })
 })
 

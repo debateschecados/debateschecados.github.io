@@ -284,10 +284,10 @@ export function detailHtml(row, ctx) {
 }
 
 // The axes reach a little past the largest point or interval end, in steps of 0.25, never
-// less than 0.5 on each side, so every bar fits.
+// less than 0.5 on each side, so every bar fits. Only agencies with an interval are drawn.
 /** @param {Lean} result */
 export function axisDomain(result) {
-  const values = result.flatMap((r) => [r.distance ?? 0, ...(r.interval ?? [])])
+  const values = result.flatMap((r) => (r.interval ? [r.distance ?? 0, ...r.interval] : []))
   const top = Math.max(...values.map(Math.abs), 0)
   return Math.max(0.5, Math.ceil((top + 0.05) * 4) / 4)
 }
@@ -304,7 +304,8 @@ const anchor = (/** @type {string} */ x) => {
 
 // One horizontal axis per agency in name order, from "mais dura com Lula" to "mais dura com
 // Flávio": the zero line over the interval bar, the point over both, no shaded zone around
-// zero; the sentence of the fixed rule, or "amostra pequena" (LEAN-03, LEAN-04, LEAN-06).
+// zero; the sentence of the fixed rule, or "amostra pequena" with an empty axis and the
+// numbers as text only (LEAN-03, LEAN-04, LEAN-06).
 /** @param {Context} ctx @param {Lean} result */
 export function leanHtml(ctx, result) {
   const domain = axisDomain(result)
@@ -361,7 +362,7 @@ export function leanHtml(ctx, result) {
           )
       }
       parts.push('<line class="zero" x1="50%" x2="50%" y1="18" y2="50"></line>')
-      if (distance !== null) {
+      if (r.interval && distance !== null) {
         const at = x(/** @type {number} */ (r.distance))
         parts.push(
           `<circle class="pt" cx="${at}" cy="34" r="7"></circle>`,
