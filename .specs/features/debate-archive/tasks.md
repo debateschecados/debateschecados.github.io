@@ -475,6 +475,8 @@ T22 → T24
 
 **Commit**: `test(adapters): Pin golden counts for the eight debate sources`
 
+**Status**: ✅ Complete
+
 ---
 
 ### Phase 4: Orchestration

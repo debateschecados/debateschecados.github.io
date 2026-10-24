@@ -1,0 +1,72 @@
+{
+  "g1-band-2026-10-18": [
+    {
+      "file": "g1-band-2026-10-18.html",
+      "url": "https://g1.globo.com/fato-ou-fake/eleicoes/noticia/2026/10/19/veja-o-que-e-fato-ou-fake-nas-falas-de-flavio-bolsonaro-e-lula-no-debate-da-band-no-2o-turno-das-eleicoes-2026.ghtml",
+      "from": "live fetch 2026-10-24",
+      "sha256": "9c29b7d0aedcf3b2f5352da9b7a9e96fa697be2fffc8d61ae8a986d58d4958bb"
+    }
+  ],
+  "g1-globo-2026-10-23": [
+    {
+      "file": "g1-globo-2026-10-23.html",
+      "url": "https://g1.globo.com/fato-ou-fake/eleicoes/noticia/2026/10/23/veja-o-que-e-fato-ou-fake-nas-falas-de-flavio-bolsonaro-e-lula-no-debate-da-globo-no-2o-turno-das-eleicoes-2026.ghtml",
+      "from": "live fetch 2026-10-24",
+      "sha256": "38732e609cbdd8177323e14ee8deee8a80d4ea6fdb402ad13662e3902b74aa6d"
+    }
+  ],
+  "lupa-band-2026-10-18": [
+    {
+      "file": "lupa-band-2026-10-18.html",
+      "url": "https://www.agencialupa.org/checagem/2026/10/18/ao-vivo-checagem-do-debate-entre-lula-e-flavio-bolsonaro-na-band/",
+      "from": "live fetch 2026-10-24",
+      "sha256": "e5e313a27084e0521d515e86c7d0541fb1f2790d67335464de7c7acb68abd14a"
+    }
+  ],
+  "lupa-globo-2026-10-23": [
+    {
+      "file": "lupa-globo-2026-10-23.html",
+      "url": "https://www.agencialupa.org/checagem/2026/10/23/ao-vivo-checagem-do-ultimo-debate-entre-lula-e-flavio-bolsonaro-no-segundo-turno/",
+      "from": "live fetch 2026-10-24",
+      "sha256": "b70732ff3562b303eefb06777725d69ca20f98194b27e380c7852f98171476bb"
+    }
+  ],
+  "estadao-band-2026-10-18": [
+    {
+      "file": "estadao-band-2026-10-18.html",
+      "url": "https://www.estadao.com.br/estadao-verifica/checamos-o-debate-entre-lula-e-flavio-na-band/",
+      "from": "live fetch 2026-10-24",
+      "sha256": "526866b3ed94b3c1b2f57d299f1d69bda35fbf2642a556d11b1fe180961cab63"
+    }
+  ],
+  "estadao-globo-2026-10-23": [
+    {
+      "file": "estadao-globo-2026-10-23.html",
+      "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
+      "from": "live fetch 2026-10-24",
+      "sha256": "0351eee4519cedc5fff92e082713a868334d1d2f00bf2abfe94f5256353eefbd"
+    }
+  ],
+  "aosfatos-band-2026-10-18": [
+    {
+      "file": "aosfatos-band-2026-10-18.html",
+      "url": "https://www.aosfatos.org/noticias/checamos-lula-flavio-bolsonaro-debate-band/",
+      "from": "live fetch 2026-10-24",
+      "sha256": "ed06c9f64d657f025267629ac2926f2deb52b565e311c2bcd211330afae3b7ff"
+    }
+  ],
+  "aosfatos-globo-2026-10-23": [
+    {
+      "file": "aosfatos-globo-2026-10-23.html",
+      "url": "https://www.aosfatos.org/noticias/checamos-flavio-bolsonaro-lula-debate-globo/",
+      "from": "live fetch 2026-10-24",
+      "sha256": "400147ccd2cab9dd3a484250f8af2675e42b4a36099dd6c734a074359bc30867"
+    },
+    {
+      "file": "aosfatos-globo-2026-10-23.json",
+      "url": "https://www.aosfatos.org/api/escriba/177500de-f763-4f91-894c-981086c9bbe3/",
+      "from": "live fetch 2026-10-24",
+      "sha256": "9b818d7a70dcce6ef74e5f236ce04663a534124a43c0192c1069140b65f123e7"
+    }
+  ]
+}
