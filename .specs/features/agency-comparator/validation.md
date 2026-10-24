@@ -2,7 +2,42 @@
 
 No validation.md was committed for phases 1 and 2, so this file starts with phase 3.
 
-## Validation: Phase 3 iteration 3b (closing check) - FAIL
+## Validation: Phase 3 iteration 3c (closing round) - PASS with known minor test gaps
+
+**Date**: 2026-10-24
+**Diff range**: `62b92cb..3281c7e` (`3281c7e` test(site): Count parent opacity in the interval bar contrast; test-only change, no `site/` or `src/` change since `75a4a40`)
+**Verifier**: independent sub-agent, fresh detached scratch worktree at `3281c7e`
+
+Final verdict for phase 3: PASS, with two known minor test gaps. The closing-round rule for this round (set by the orchestrator): a further surviving mutant of the same opacity or color class is recorded as a known minor gap, not a new round, unless the shipped page breaks an AC. The shipped page does not break one. By the skill's strict sensor rule alone, M23 and M24 would keep this at FAIL. The acceptance rests on the closing rule, and the user should know that.
+
+Every AC in scope is verified (iterations 1 to 3b). On the real-data build at `3281c7e`, at 1280 px and 360 px, every `rect.ci`:
+- is 8 px tall, equal to the 8 px point diameter;
+- has fill `rgb(142, 142, 147)`, 3.26:1 against `rgb(255, 255, 255)`;
+- has an effective opacity of 1 through every parent;
+- has no CSS `filter` on itself or any parent.
+
+| Mutation | File:line | Description | Test file | Killed? |
+| -------- | --------- | ----------- | --------- | ------- |
+| M22 | `site/style.css:1126` | `opacity: 0.3` on the `.track` svg | e2e/compare.test.ts | ✅ Killed (1.36 < 3) |
+| M20 | `site/style.css:1126` | `opacity: 0.3` on the bar | e2e/compare.test.ts | ✅ Killed (1.36 < 3) |
+| M20b | `site/style.css:1126` | `fill-opacity: 0.3` on the bar | e2e/compare.test.ts | ✅ Killed (1.36 < 3) |
+| M17 | `site/style.css:1126` | bar fill transparent | e2e/compare.test.ts | ✅ Killed (1 < 3) |
+| M23 | `site/style.css:1126` | `opacity: 0.3` on `.lean-row` | e2e/compare.test.ts | ⚠️ Survived, known minor gap |
+| M24 | `site/style.css:1126` | `filter: opacity(0.3)` on the bar | e2e/compare.test.ts | ⚠️ Survived, known minor gap |
+
+Sensor outcome: 4/6 killed; the 2 survivors are known minor gaps under the closing-round rule.
+
+Gate: `test/e2e/compare.test.ts` 11 passed at `3281c7e`. Scratch removed; `git status --porcelain` of the phase3 tree empty before and after.
+
+### Known minor gaps (not opened as a round)
+
+- M23: the probe `svg.track` is appended straight to `#balance` (`test/e2e/compare.test.ts:354`), not inside a `li.lean-row`, so a style on the row never reaches it.
+- M24: the probe multiplies `opacity` and `fill-opacity`, but a CSS `filter` (`opacity()`, `brightness()`, `contrast()`) also changes the drawn color and is not counted.
+- Suggested follow-up, if anyone touches this test again: give the e2e fixture one agency with 10 or more deviations per candidate, so the page draws a real bar. Then read the bar's drawn color from a screenshot pixel instead of from computed styles. That covers every way of fading the bar at once.
+
+---
+
+## Iteration 3b: Phase 3 closing check - FAIL
 
 **Date**: 2026-10-24
 **Diff range**: `be54f3a..5a02f49` (`5a02f49` test(site): Count opacity in the interval bar contrast; test-only change)
@@ -17,7 +52,7 @@ Final verdict for phase 3: FAIL, for a test gap only. Fix 5 works: M20 is killed
 | M17 | `site/style.css:1126` | bar fill transparent | e2e/compare.test.ts | ✅ Killed |
 | M22 | `site/style.css:1126` | `opacity: 0.3` on the `.track` svg that holds the bar | e2e/compare.test.ts | ❌ Survived |
 
-**Result**: 3/4 killed, 1 survived - FAIL
+**Sensor outcome (superseded)**: 3/4 killed, 1 survived - FAIL
 
 Gate: `test/e2e/compare.test.ts` 11 passed at `5a02f49`. Scratch removed; `git status --porcelain` of the phase3 tree empty before and after.
 
@@ -64,7 +99,7 @@ On screen the bar now reads as a solid grey band the width of the interval, with
 | M20 | `site/style.css:1126` | `opacity: 0.3` added to the bar (effective contrast about 1.3:1) | e2e/compare.test.ts | ❌ Survived |
 | M21 | `site/render.js:370` | point r 6, wider than the bar | render.test.ts | ✅ Killed (`expected 8 to be greater than or equal to 12`) |
 
-**Result**: 4/5 killed, 1 survived - FAIL
+**Sensor outcome (superseded)**: 4/5 killed, 1 survived - FAIL
 
 ### Gate, iteration 3
 
@@ -132,7 +167,7 @@ LEAN-06 does not say how "at least as visible" is measured, so neither the autho
 | M18 | `site/render.js:345` | interval bar height 0 | render.test.ts | ❌ Survived |
 | M19 | `site/render.js:345` | interval bar removed | render.test.ts | ✅ Killed |
 
-**Result**: 5/7 killed, 2 survived (both LEAN-06 visibility) - FAIL
+**Sensor outcome (superseded)**: 5/7 killed, 2 survived (both LEAN-06 visibility) - FAIL
 
 ### Gate, iteration 2
 
@@ -243,7 +278,7 @@ Scratch: detached worktree `verify3` at `00bc68e` with node_modules symlinked; e
 | M16 | `site/style.css:1258` | impreciso drawn as a circle, same shape as verdadeiro | e2e/compare.test.ts | ❌ Survived |
 
 **Sensor depth**: expanded (16 behavior mutants, 18 runs)
-**Result**: 13/16 killed, 3 survived - FAIL
+**Sensor outcome (superseded)**: 13/16 killed, 3 survived - FAIL
 
 ---
 

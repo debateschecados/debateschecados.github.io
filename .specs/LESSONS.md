@@ -134,6 +134,12 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: M22 site/style.css:1126, test/e2e/compare.test.ts:357 (validation.md iteration 3b) (site)
 - last seen: 2026-10-24T21:11:03Z
 
+### L-021 - Place a test probe where the real element lives, so every rule that styles the real element also styles the probe
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `site` · harmful: 0
+- features: agency-comparator
+- evidence: M23 site/style.css:1126, test/e2e/compare.test.ts:354 (validation.md iteration 3c) (site)
+- last seen: 2026-10-24T21:13:17Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

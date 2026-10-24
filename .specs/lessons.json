@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 21,
+  "next_id": 22,
   "lessons": [
     {
       "id": "L-001",
@@ -364,6 +364,24 @@
       ],
       "created": "2026-10-24T21:11:03Z",
       "last_seen": "2026-10-24T21:11:03Z"
+    },
+    {
+      "id": "L-021",
+      "key": "surviving_mutant::place a test probe where the real element lives so every rule that styles the real element also styles the probe",
+      "text": "Place a test probe where the real element lives, so every rule that styles the real element also styles the probe",
+      "signal": "surviving_mutant",
+      "scope": "site",
+      "status": "candidate",
+      "features": [
+        "agency-comparator"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M23 site/style.css:1126, test/e2e/compare.test.ts:354 (validation.md iteration 3c) (site)"
+      ],
+      "created": "2026-10-24T21:13:17Z",
+      "last_seen": "2026-10-24T21:13:17Z"
     }
   ]
 }
