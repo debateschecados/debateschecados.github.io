@@ -117,17 +117,19 @@ T6 → T8
 
 **Done when**:
 
-- [ ] Three identical groups → one settled group with three candidate claims
-- [ ] A chain A-B (3 votes) plus B-C (1 vote) → one disputed component {A, B, C} with each curator's proposal
-- [ ] Unknown ref, reused ref and repeated letter are dropped by `sanitize`
-- [ ] Two curator runs with `expected = 3` → nothing settled
-- [ ] Gate check passes: `pnpm vitest run test/unit/claims/consensus.test.ts`
-- [ ] Test count: at least 6 tests pass
+- [x] Three identical groups → one settled group with three candidate claims
+- [x] A chain A-B (3 votes) plus B-C (1 vote) → one disputed component {A, B, C} with each curator's proposal
+- [x] Unknown ref, reused ref and repeated letter are dropped by `sanitize`
+- [x] Two curator runs with `expected = 3` → nothing settled
+- [x] Gate check passes: `pnpm vitest run test/unit/claims/consensus.test.ts`
+- [x] Test count: at least 6 tests pass
 
 **Tests**: unit
 **Gate**: quick
 
 **Commit**: `feat(claims): Port the curator consensus to a tested module`
+
+**Status**: ✅ Complete
 
 ---
 

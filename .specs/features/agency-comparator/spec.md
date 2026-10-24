@@ -170,8 +170,8 @@ The archive shows each agency's checks side by side, but it cannot answer the qu
 | CLAIM-01 | P1: Claim groups | Tasks: T1 | Implemented |
 | CLAIM-02 | P1: Claim groups | Tasks: T1, T6 | In Progress (T1 done, T6 pending) |
 | CLAIM-03 | P1: Claim groups | Tasks: T2 | Implemented |
-| CLAIM-04 | P1: Claim groups | Tasks: T3, T4 | In Tasks |
-| CLAIM-05 | P1: Claim groups | Tasks: T3, T4 | In Tasks |
+| CLAIM-04 | P1: Claim groups | Tasks: T3, T4 | In Progress (T3 done, T4 pending) |
+| CLAIM-05 | P1: Claim groups | Tasks: T3, T4 | In Progress (T3 done, T4 pending) |
 | CLAIM-06 | P1: Claim groups | Tasks: T4 | In Tasks |
 | CMP-01 | P1: Compare agencies | Tasks: T6 | In Tasks |
 | CMP-02 | P1: Compare agencies | Tasks: T6 | In Tasks |
