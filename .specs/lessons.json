@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "promote_threshold": 2,
+  "window_days": 45,
+  "quarantine_threshold": 2,
+  "next_id": 7,
+  "lessons": [
+    {
+      "id": "L-001",
+      "key": "surviving_mutant::test name resolvers with near miss inputs that share a prefix with a known alias not only with unrelated names",
+      "text": "Test name resolvers with near-miss inputs that share a prefix with a known alias, not only with unrelated names",
+      "signal": "surviving_mutant",
+      "scope": "speaker-resolution",
+      "status": "candidate",
+      "features": [
+        "debate-archive"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M03 src/pipeline/normalize.ts:16 (speaker-resolution)"
+      ],
+      "created": "2026-10-24T08:53:06Z",
+      "last_seen": "2026-10-24T08:53:06Z"
+    },
+    {
+      "id": "L-002",
+      "key": "surviving_mutant::when a check compares several fields give each field its own test where only that field differs",
+      "text": "When a check compares several fields, give each field its own test where only that field differs",
+      "signal": "surviving_mutant",
+      "scope": "archive",
+      "status": "candidate",
+      "features": [
+        "debate-archive"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M12 M26 src/pipeline/archive.ts:56 (archive)"
+      ],
+      "created": "2026-10-24T08:53:06Z",
+      "last_seen": "2026-10-24T08:53:06Z"
+    },
+    {
+      "id": "L-003",
+      "key": "ac_gap::a test whose name lists several conditions must exercise each of them or be split",
+      "text": "A test whose name lists several conditions must exercise each of them, or be split",
+      "signal": "ac_gap",
+      "scope": "archive",
+      "status": "candidate",
+      "features": [
+        "debate-archive"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "test/unit/archive.test.ts:330 (archive)"
+      ],
+      "created": "2026-10-24T08:53:06Z",
+      "last_seen": "2026-10-24T08:53:06Z"
+    },
+    {
+      "id": "L-004",
+      "key": "surviving_mutant::test each tie break of a ranking with inputs that tie on every earlier and later key",
+      "text": "Test each tie-break of a ranking with inputs that tie on every earlier and later key",
+      "signal": "surviving_mutant",
+      "scope": "merge",
+      "status": "candidate",
+      "features": [
+        "debate-archive"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M07 src/pipeline/merge.ts:62 (merge)"
+      ],
+      "created": "2026-10-24T08:53:06Z",
+      "last_seen": "2026-10-24T08:53:06Z"
+    },
+    {
+      "id": "L-005",
+      "key": "surviving_mutant::pin every numeric limit the spec states with an assertion on the default value not only on overridden values",
+      "text": "Pin every numeric limit the spec states with an assertion on the default value, not only on overridden values",
+      "signal": "surviving_mutant",
+      "scope": "http",
+      "status": "candidate",
+      "features": [
+        "debate-archive"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M25 src/io/http.ts:18 (http)"
+      ],
+      "created": "2026-10-24T08:53:06Z",
+      "last_seen": "2026-10-24T08:53:06Z"
+    },
+    {
+      "id": "L-006",
+      "key": "spec_precision_gap::state in the ac itself any condition that narrows which items a matching rule applies to",
+      "text": "State in the AC itself any condition that narrows which items a matching rule applies to",
+      "signal": "spec_precision_gap",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "debate-archive"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "INGEST-04 spec.md:72 (spec)"
+      ],
+      "created": "2026-10-24T08:53:06Z",
+      "last_seen": "2026-10-24T08:53:06Z"
+    }
+  ]
+}
