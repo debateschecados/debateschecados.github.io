@@ -506,6 +506,8 @@ T22 → T24
 
 **Commit**: `feat(pipeline): Archive and verify evidence on the Wayback Machine`
 
+**Status**: ✅ Complete
+
 ---
 
 ### T15: Wire the ingest command

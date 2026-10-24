@@ -253,11 +253,11 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 | SCORE-04 | P1: Scoreboards | Tasks: T17 | Pending |
 | SCORE-05 | P1: Scoreboards | Tasks: T17 | Pending |
 | DATA-01 | P1: Open, auditable data | Tasks: T7, T20 | In Progress |
-| DATA-02 | P1: Open, auditable data | Tasks: T14 | Pending |
+| DATA-02 | P1: Open, auditable data | Tasks: T14 | Implemented |
 | DATA-03 | P1: Open, auditable data | Tasks: T3, T16, T20 | In Progress |
 | DATA-04 | P1: Open, auditable data | Tasks: T7, T13 | Implemented |
 | DATA-05 | P1: Open, auditable data | Tasks: T1, T20 | In Progress |
-| DATA-06 | P1: Open, auditable data | Tasks: T14 | Pending |
+| DATA-06 | P1: Open, auditable data | Tasks: T14 | Implemented |
 | DATA-07 | P1: Open, auditable data | Tasks: T20, T23 | Pending |
 | AUDIT-01 | P1: Visible impartiality and self-service audit | Tasks: T21 | Pending |
 | AUDIT-02 | P1: Visible impartiality and self-service audit | Tasks: T21 | Pending |
