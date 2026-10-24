@@ -92,16 +92,18 @@ T6 → T8
 
 **Done when**:
 
-- [ ] Each record in the output has exactly the keys `ref`, `src`, `quote`, `excerpt`; no agency name, URL, label or band appears anywhere in the serialized output
-- [ ] Letters follow sha256(debate + outlet) order, records follow sha256(id) order, removed records are absent
-- [ ] Given the 314 ids of `data/claim-curation/2026-10-24/input.json` and their records from `data/checks.json`, `blindInput` equals that file after JSON parse
-- [ ] Gate check passes: `pnpm vitest run test/unit/claims/blind.test.ts`
-- [ ] Test count: at least 4 tests pass
+- [x] Each record in the output has exactly the keys `ref`, `src`, `quote`, `excerpt`; no agency name, URL, label or band appears anywhere in the serialized output
+- [x] Letters follow sha256(debate + outlet) order, records follow sha256(id) order, removed records are absent
+- [x] Given the 314 ids of `data/claim-curation/2026-10-24/input.json` and their records from `data/checks.json`, `blindInput` equals that file after JSON parse
+- [x] Gate check passes: `pnpm vitest run test/unit/claims/blind.test.ts`
+- [x] Test count: at least 4 tests pass
 
 **Tests**: unit
 **Gate**: quick
 
 **Commit**: `feat(claims): Build the blind input for claim curation`
+
+**Status**: ✅ Complete
 
 ---
 
