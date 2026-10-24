@@ -146,20 +146,24 @@ async function collect(
   let httpStatus: number | null = null
   const adapter = options.registry.get(source.adapter)
 
+  // The report's httpStatus is the source page's answer (INGEST-09). A robots.txt or second doc
+  // failure leaves it null and says why in reason.
   const io = options.ioFor(source)
   const logged: Io = {
     async get(url) {
       const at = clock.now()
       try {
         const doc = await io.get(url)
-        httpStatus = options.offline ? null : 200
-        fetches.push({ url: doc.url, status: httpStatus, sha256: doc.sha256, ms: clock.now() - at })
+        const status = options.offline ? null : 200
+        if (url === source.url) httpStatus = status
+        fetches.push({ url: doc.url, status, sha256: doc.sha256, ms: clock.now() - at })
         return doc
       } catch (error) {
-        httpStatus = error instanceof HttpError ? error.status : null
+        const status = error instanceof HttpError && error.kind === 'status' ? error.status : null
+        if (url === source.url) httpStatus = status
         fetches.push({
           url,
-          status: httpStatus,
+          status,
           sha256: null,
           ms: clock.now() - at,
           error: (error as Error).message,

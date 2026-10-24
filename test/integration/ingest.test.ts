@@ -30,7 +30,19 @@ const fakePage: Adapter = {
     return page.items.map((item) => ({ ...item, doc: 0 }))
   },
 }
-const registry = new Map([[fakePage.kind, fakePage]])
+// A page plus a second doc at <page>/api, like Aos Fatos and its Escriba API.
+const fakeApi: Adapter = {
+  ...fakePage,
+  kind: 'fake-api',
+  async load(source, io) {
+    const page = await io.get(source.url ?? '')
+    return [page, await io.get(`${page.url}/api`)]
+  },
+}
+const registry = new Map([
+  [fakePage.kind, fakePage],
+  [fakeApi.kind, fakeApi],
+])
 
 const BAND = 'band-2026-10-18'
 const GLOBO = 'globo-2026-10-23'
@@ -122,7 +134,12 @@ const writePage = (sourceId: string, page: Page) =>
 
 const run = async (
   clock: Clock,
-  over: { ioFor?: IngestOptions['ioFor']; acceptDrop?: string[]; archive?: Archiver } = {},
+  over: {
+    ioFor?: IngestOptions['ioFor']
+    acceptDrop?: string[]
+    archive?: Archiver
+    offline?: boolean
+  } = {},
 ) =>
   ingest({
     config: await loadConfig(configDir, registry),
@@ -132,7 +149,7 @@ const run = async (
     clock,
     acceptDrop: new Set(over.acceptDrop ?? []),
     archive: over.archive ?? null,
-    offline: true,
+    offline: over.offline ?? true,
   })
 
 const files = async () =>
@@ -264,6 +281,57 @@ describe('ingest (INGEST-01, INGEST-02, INGEST-05, INGEST-09)', () => {
       items: 5,
     })
     expect(sources[`beta-${BAND}`].status).toBe('ok')
+  })
+
+  it('reports no page status when robots.txt fails, keeping the cause in reason', async () => {
+    const robots = 'https://alpha.test/robots.txt'
+    const offline = offlineIo(docsDir, fakeClock())
+    await run(fakeClock(), {
+      offline: false,
+      ioFor: (s) =>
+        s.id === `alpha-${BAND}`
+          ? {
+              get: async () => {
+                throw new HttpError('robots', robots, 'robots.txt unavailable', 503)
+              },
+              readFile: async () => {
+                throw new Error('unused')
+              },
+            }
+          : offline(s),
+    })
+    expect((await reported()).sources[`alpha-${BAND}`]).toMatchObject({
+      status: 'failed',
+      reason: `robots.txt unavailable: ${robots}`,
+      httpStatus: null,
+    })
+  })
+
+  it('reports the source page status, not the status of its second doc', async () => {
+    await writeConfig([
+      debate(BAND, '2026-10-18', [source(`alpha-${BAND}`, 'fake-api'), source(`beta-${BAND}`)]),
+    ])
+    const api = `${url(`alpha-${BAND}`)}/api`
+    const offline = offlineIo(docsDir, fakeClock())
+    await run(fakeClock(), {
+      offline: false,
+      ioFor: (s) => ({
+        get: async (u) => {
+          if (u === api) throw new HttpError('status', u, 'HTTP 404', 404)
+          return offline(s).get(u)
+        },
+        readFile: async () => {
+          throw new Error('unused')
+        },
+      }),
+    })
+    const { sources } = await reported()
+    expect(sources[`alpha-${BAND}`]).toMatchObject({
+      status: 'failed',
+      reason: `HTTP 404: ${api}`,
+      httpStatus: 200,
+    })
+    expect(sources[`beta-${BAND}`]).toMatchObject({ status: 'ok', httpStatus: 200 })
   })
 
   it('treats a source that shrinks by more than 20% as partial until the drop is accepted', async () => {
