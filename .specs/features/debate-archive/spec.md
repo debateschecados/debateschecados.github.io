@@ -234,9 +234,9 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 | INGEST-01 | P1: Collect the debate checks | Tasks: T15, T22 | Pending |
 | INGEST-02 | P1: Collect the debate checks | Tasks: T2, T9, T10, T11, T12, T15 | In Progress |
 | INGEST-03 | P1: Collect the debate checks | Tasks: T9, T10, T11, T12, T13 | Pending |
-| INGEST-04 | P1: Collect the debate checks | Tasks: T5, T6 | In Progress |
+| INGEST-04 | P1: Collect the debate checks | Tasks: T5, T6 | Implemented |
 | INGEST-05 | P1: Collect the debate checks | Tasks: T4, T15 | In Progress |
-| INGEST-06 | P1: Collect the debate checks | Tasks: T6, T15 | Pending |
+| INGEST-06 | P1: Collect the debate checks | Tasks: T6, T15 | In Progress |
 | INGEST-07 | P1: Collect the debate checks | Tasks: T8 | Pending |
 | INGEST-08 | P1: Collect the debate checks | Tasks: T8 | Pending |
 | INGEST-09 | P1: Collect the debate checks | Tasks: T7, T15 | Pending |
@@ -267,8 +267,8 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 | AUDIT-06 | P1: Visible impartiality and self-service audit | Tasks: T19 | Pending |
 | AUDIT-07 | P1: Visible impartiality and self-service audit | Tasks: T21 | Pending |
 | AUDIT-08 | P1: Visible impartiality and self-service audit | Tasks: T19, T20 | Pending |
-| HIST-01 | P2: Re-runs keep history | Tasks: T6 | Pending |
-| HIST-02 | P2: Re-runs keep history | Tasks: T6, T17, T21 | Pending |
+| HIST-01 | P2: Re-runs keep history | Tasks: T6 | Implemented |
+| HIST-02 | P2: Re-runs keep history | Tasks: T6, T17, T21 | In Progress |
 | SHARE-01 | P2: Shareable filters | Tasks: T17 | Pending |
 | SHARE-02 | P2: Shareable filters | Tasks: T17 | Pending |
 | CONF-01 | P2: New debate by configuration | Tasks: T3, T15 | In Progress |

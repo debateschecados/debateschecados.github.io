@@ -271,6 +271,8 @@ T22 → T24
 
 **Commit**: `feat(pipeline): Merge runs with history, missing items and drop guard`
 
+**Status**: ✅ Complete
+
 ---
 
 ### T7: Write the dataset files
