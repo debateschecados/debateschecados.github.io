@@ -1,7 +1,7 @@
 // String templates shared by the build (pre-rendered page) and the browser.
 
 import { isSmall, visibleRows } from './compare.js'
-import { BANDS, optionCount, removedCount } from './core.js'
+import { BANDS, hasRemoved, liveCount, optionCount, removedCount } from './core.js'
 import { direction, previousBand, versions, wordDiff } from './drift.js'
 import { MIN_N, sentence, signed } from './lean.js'
 
@@ -101,24 +101,53 @@ export function debatesHtml(ctx) {
   return `<span class="seg-thumb"></span>${buttons.join('')}`
 }
 
+// Popup button in the site's style instead of the native select (site/combo.js runs it).
+// Every label sits in the button, stacked, so its width fits the longest one and never jumps.
 /** @param {Context} ctx @param {State} state @param {string} key @param {string} label @param {string} all @param {[string, string][]} values */
 const select = (ctx, state, key, label, all, values) => {
-  const opts = values
+  const current = state[/** @type {'outlet'} */ (key)] ?? ''
+  const options = [
+    ['', all, ''],
+    ...values.map(([v, t]) => [v, t, String(optionCount(ctx, state, key, v))]),
+  ]
+  const faces = options
     .map(
-      ([v, t]) =>
-        `<option value="${esc(v)}"${state[/** @type {'outlet'} */ (key)] === v ? ' selected' : ''}>${esc(t)} (${optionCount(ctx, state, key, v)})</option>`,
+      ([v, t, n]) =>
+        `<span${v === current ? ` id="f-${key}-v"` : ' aria-hidden="true"'}>${esc(t)}${n ? ` <span class="n">(${n})</span>` : ''}</span>`,
     )
     .join('')
-  return `<label>${label}<select data-key="${key}"><option value="">${all}</option>${opts}</select></label>`
+  const items = options
+    .map(
+      ([v, t, n], i) =>
+        `<li role="option" id="f-${key}-${i}" data-value="${esc(v)}" aria-selected="${v === current}">${esc(t)}${n ? `<span class="n">${n}</span>` : ''}</li>`,
+    )
+    .join('')
+  return (
+    `<div class="combo"><span class="combo-label" id="f-${key}">${label}</span>` +
+    `<button type="button" class="combo-btn" data-key="${key}" data-value="${esc(current)}" aria-haspopup="listbox" aria-expanded="false" aria-controls="f-${key}-list" aria-labelledby="f-${key} f-${key}-v">${faces}</button>` +
+    `<ul class="combo-list" id="f-${key}-list" role="listbox" tabindex="-1" aria-labelledby="f-${key}">${items}</ul></div>`
+  )
 }
 
-// Filter bar. The removed toggle shows only when some removed record matches (HIST-02).
+// Tabs: live checks, and the ones the agencies took down (HIST-02). Counts follow the filters.
+/** @param {Context} ctx @param {State} state */
+export function tabsHtml(ctx, state) {
+  if (!hasRemoved(ctx)) return ''
+  const tab = (
+    /** @type {boolean} */ removed,
+    /** @type {string} */ name,
+    /** @type {number} */ n,
+  ) =>
+    `<button type="button" data-tab="${removed ? 'removed' : 'live'}" aria-pressed="${state.removed === removed}">${name} <span>${n}</span></button>`
+  return (
+    tab(false, 'Checagens', liveCount(ctx, state)) +
+    tab(true, 'Removidas', removedCount(ctx, state))
+  )
+}
+
+// Filter bar. The search box lives outside it so typing never loses focus.
 /** @param {Context} ctx @param {State} state @param {number} shown */
 export function filtersHtml(ctx, state, shown) {
-  const removed = removedCount(ctx, state)
-  const toggle = removed
-    ? `<label class="toggle"><input type="checkbox" data-removed${state.removed ? ' checked' : ''}>Mostrar removidos (${removed})</label>`
-    : ''
   return (
     select(
       ctx,
@@ -144,7 +173,6 @@ export function filtersHtml(ctx, state, shown) {
       'Todos',
       BANDS.map((b) => [b.id, b.name]),
     ) +
-    toggle +
     `<span class="count"><span class="n">${shown}</span> checagens</span>`
   )
 }

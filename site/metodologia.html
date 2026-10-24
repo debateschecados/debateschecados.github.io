@@ -3,15 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Como funciona · Debates checados</title>
+<title>Metodologia · Debates checados</title>
+<link rel="describedby" href="llms.txt" type="text/markdown">
+<link rel="alternate" type="text/markdown" href="metodologia.md" title="Markdown">
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="style.css">
+<script data-goatcounter="https://debateschecados.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
+<!--topbar-->
 <main class="wrap doc">
-  <a class="back" href="./">← Voltar para as checagens</a>
-  <h1>Como funciona</h1>
-  <p>Este site reúne, sem alterar, as checagens que quatro agências publicaram sobre os debates do 2º turno de 2026. Esta página explica de onde vêm os dados, como eles são lidos e como os números são contados.</p>
+  <h1>Metodologia</h1>
+  <p>Este site reúne, sem alterar, as checagens que quatro agências publicaram sobre os debates do 2º turno de 2026. Esta página explica de onde vêm os dados, como eles são lidos e como os números são contados. Para a versão curta, veja <a href="como-funciona">Como funciona</a>.</p>
 
   <h2>Fontes e leitores</h2>
   <p>Entra tudo o que cada agência publicou dentro da sua página de cobertura de cada debate, inclusive as falas verdadeiras. Cada formato de página tem um leitor próprio (o código em <code>src/adapters</code>), e o mesmo leitor vale para os dois candidatos. A versão do leitor fica gravada em cada registro.</p>
@@ -32,7 +35,7 @@
   <p>Com uma agência escolhida, o placar conta só as checagens dela. Sem agência escolhida, o placar soma as checagens de todas. Cada agência escolhe o que checar, e a mesma fala pode aparecer uma vez por agência, então o placar geral soma checagens, não falas.</p>
 
   <h2>Comparação entre agências</h2>
-  <p>A página <a href="comparar.html">Comparar agências</a> mostra, fala por fala, o veredito de cada agência quando duas ou mais checaram a mesma fala de um candidato no mesmo debate. Também conta, por agência e candidato, quantas dessas falas a agência checou e como o veredito dela se compara com o das outras. Os números mostram diferenças, não provam favorecimento: cada agência escolhe o que checar.</p>
+  <p>A página <a href="comparar">Comparar agências</a> mostra, fala por fala, o veredito de cada agência quando duas ou mais checaram a mesma fala de um candidato no mesmo debate. Também conta, por agência e candidato, quantas dessas falas a agência checou e como o veredito dela se compara com o das outras. Os números mostram diferenças, não provam favorecimento: cada agência escolhe o que checar.</p>
   <p>A IA só agrupa checagens da mesma alegação, sem saber a agência nem o veredito. Ela nunca define veredito. Os grupos são feitos assim:</p>
   <ol>
     <li>Os agentes recebem só a fala e o trecho de cada checagem, com a agência trocada por uma letra.</li>
@@ -65,7 +68,7 @@
 
   <h2>Vereditos que mudaram</h2>
   <p>A cada coleta, o site compara o que a agência publica com a versão guardada. Quando o rótulo, a citação ou o identificador interno de uma checagem muda, a versão anterior fica no histórico do registro com a data em que a coleta percebeu a mudança, que pode ser posterior à edição da agência.</p>
-  <p>A página <a href="comparar.html#mudancas">Comparar agências</a> mostra cada checagem que mudou como uma linha do tempo, da primeira versão à atual. A faixa de um rótulo antigo é a que ele tem hoje na tabela de faixas. Uma citação editada mostra as palavras tiradas e as acrescentadas. A tabela conta, por agência e candidato, as mudanças de faixa na ordem verdadeiro &lt; impreciso &lt; falso: mais dura, mais branda, ganhou faixa (saiu de “Sem faixa”) ou perdeu a faixa. Na matriz, o ponto de uma checagem cuja faixa mudou ganha um anel, e o detalhe da fala mostra a faixa anterior. Checagens que sumiram da página da agência ficam de fora.</p>
+  <p>A página <a href="comparar#mudancas">Comparar agências</a> mostra cada checagem que mudou como uma linha do tempo, da primeira versão à atual. A faixa de um rótulo antigo é a que ele tem hoje na tabela de faixas. Uma citação editada mostra as palavras tiradas e as acrescentadas. A tabela conta, por agência e candidato, as mudanças de faixa na ordem verdadeiro &lt; impreciso &lt; falso: mais dura, mais branda, ganhou faixa (saiu de “Sem faixa”) ou perdeu a faixa. Na matriz, o ponto de uma checagem cuja faixa mudou ganha um anel, e o detalhe da fala mostra a faixa anterior. Checagens que sumiram da página da agência ficam de fora.</p>
   <p>Em 24/10/2026 a coleta do Estadão Verifica sobre o debate da Globo gravou parte das checagens como novas, porque as regras daquela coleta confiavam no identificador interno da agência, que tinha mudado. Um script refez a coleta com as regras atuais e juntou cada uma à versão anterior, e o <a href="{{repo}}/blob/main/data/repairs/2026-10-24-estadao.json">relatório do reparo</a> lista cada identificador juntado.</p>
 
   <h2>Dados abertos</h2>
@@ -85,7 +88,7 @@
 </main>
 <footer class="foot">
   <div class="wrap">
-    <nav><a href="checks.csv">Baixar os dados</a><a href="./">Checagens</a><a href="comparar.html">Comparar agências</a><a href="{{repo}}">Código no GitHub</a></nav>
+    <nav><a href="checks.csv">Baixar os dados</a><a href="./">Checagens</a><a href="comparar">Comparar agências</a><a href="como-funciona">Como funciona</a><a href="llms.txt">Para agentes</a><a href="{{repo}}">Código no GitHub</a></nav>
     <p>Os vereditos são das agências. Este site só reúne e organiza o que elas publicaram. Ilustrações feitas a partir de retratos oficiais: Palácio do Planalto (CC BY 2.0) e Agência Senado. Logos dos partidos e das emissoras: Wikimedia Commons.</p>
   </div>
 </footer>

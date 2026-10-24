@@ -10,6 +10,8 @@ import { createContext, emptyState, listed } from '../../../site/core.js'
 import { B, deviations, headline, lean, MIN_N, sentence } from '../../../site/lean.js'
 import { leanHtml } from '../../../site/render.js'
 import { type Config, loadConfig } from '../../../src/config.ts'
+import { CSV_COLUMNS } from '../../../src/pipeline/write.ts'
+import { AGENT_FILES, auditPrompt } from '../../../src/site/agents.ts'
 import type { CheckRecord } from '../../../src/types.ts'
 import {
   buildFixture,
@@ -23,6 +25,7 @@ import {
 
 const ROOT = join(import.meta.dirname, '../../..')
 const REPO = pkg.repository
+const ORIGIN = pkg.homepage.replace(/\/$/, '')
 
 let tmp: string
 let outDir: string
@@ -32,6 +35,7 @@ let config: Config
 let index: CheerioAPI
 let method: CheerioAPI
 let compare: CheerioAPI
+let how: CheerioAPI
 let indexHtml: string
 
 beforeAll(async () => {
@@ -42,6 +46,7 @@ beforeAll(async () => {
   index = load(indexHtml)
   method = load(await readFile(join(outDir, 'metodologia.html'), 'utf8'))
   compare = load(await readFile(join(outDir, 'comparar.html'), 'utf8'))
+  how = load(await readFile(join(outDir, 'como-funciona.html'), 'utf8'))
 })
 afterAll(() => rm(tmp, { recursive: true, force: true }))
 
@@ -70,15 +75,25 @@ describe('index.html (SITE-01)', () => {
     )
   })
 
+  it('pre-renders the tabs with both counts and an empty search box', () => {
+    const tabs = index('#tabs button')
+    expect(tabs.map((_, b) => index(b).text().replace(/\s+/g, ' ')).get()).toEqual([
+      `Checagens ${found().length}`,
+      `Removidas ${records.length - found().length}`,
+    ])
+    expect(index('#tabs button[aria-pressed="true"]').attr('data-tab')).toBe('live')
+    expect(index('input#q[type="search"]').attr('value')).toBeUndefined()
+  })
+
   it('inlines records and config as JSON that a quote cannot break out of', () => {
     const data = JSON.parse(index('script#data[type="application/json"]').text())
     expect(data.records).toEqual(records)
     expect(data.candidates).toEqual(config.candidates)
     expect(data.outlets).toEqual(config.outlets)
     expect(data.debates.map((d: { id: string }) => d.id)).toEqual(config.debates.map((d) => d.id))
-    // Only the data script and app.js close a script; the quote's "</script>" stays inert.
-    expect(indexHtml.match(/<\/script>/g)).toHaveLength(2)
-    expect(index('script')).toHaveLength(2)
+    // The data script, the dataset JSON-LD, GoatCounter and app.js close a script. The quote's "</script>" stays inert.
+    expect(indexHtml.match(/<\/script>/g)).toHaveLength(4)
+    expect(index('script')).toHaveLength(4)
   })
 
   it('pre-renders the general scoreboard, notice and both sprites in ballot order', () => {
@@ -114,19 +129,46 @@ describe('index.html (SITE-01)', () => {
       `${REPO}/commits/main`,
     ])
     const prompt = index('#prompt').text()
+    expect(prompt).toBe(auditPrompt(REPO, ORIGIN))
     expect(prompt).toContain(`Código e dados: ${REPO}\n`)
-    expect(prompt).toContain(`Todas as checagens: ${REPO}/blob/main/data/checks.csv\n`)
     expect(prompt.match(/^\d\. /gm)).toEqual(['1. ', '2. ', '3. ', '4. ', '5. '])
     expect(indexHtml).not.toMatch(/\{\{|<!--[a-z]+-->/)
     expect(index('footer a[href="checks.csv"]')).toHaveLength(1)
-    expect(index('footer a[href="metodologia.html"]')).toHaveLength(1)
+    expect(index('footer a[href="metodologia"]')).toHaveLength(1)
+    expect(index('footer a[href="como-funciona"]')).toHaveLength(1)
+  })
+
+  it('gives the audit prompt URLs an AI can fetch: raw CSV, commits API and the site', () => {
+    const [owner, name] = new URL(REPO).pathname.slice(1).split('/')
+    const prompt = index('#prompt').text()
+    expect(prompt).toContain(`Código e dados: ${REPO}\n`)
+    expect(prompt).toContain(
+      `Todas as checagens, em CSV bruto: https://raw.githubusercontent.com/${owner}/${name}/main/data/checks.csv\n`,
+    )
+    expect(prompt).toContain(
+      `https://api.github.com/repos/${owner}/${name}/commits?path=data/checks.csv&per_page=100\n`,
+    )
+    expect(prompt).toContain(`${REPO}/commit/<sha>.diff`)
+    expect(prompt).toContain(`site Debates Checados (https://${owner}.github.io/`)
+    expect(prompt.match(/^\d\. /gm)).toEqual(['1. ', '2. ', '3. ', '4. ', '5. '])
+  })
+
+  it('states what the site does not promise, with the archive status from the data and no counts (AUDIT-09)', () => {
+    const limits = index('dialog#audit #limits li')
+    expect(limits).toHaveLength(5)
+    const allArchived = records.every((r) => r.evidence.archiveUrl)
+    const last = limits.last().text()
+    expect(last).toContain(
+      allArchived ? 'Toda checagem tem cópia arquivada.' : 'A cópia arquivada ainda está chegando.',
+    )
+    expect(last).not.toMatch(/\d/)
   })
 
   it('puts the trust line and the audit control right below the subtitle (AUDIT-01)', () => {
     const trust = index('.hero > h1 + p + p.trust')
     expect(trust).toHaveLength(1)
     expect(trust.text().replace(/\s+/g, ' ').trim()).toBe(
-      'O veredito é sempre da agência. Código e dados são abertos. Veja como auditar',
+      'Nenhuma IA decide veredito. Código e dados são abertos. Veja como auditar',
     )
     expect(trust.children().last().is('button[data-open-audit]')).toBe(true)
   })
@@ -343,7 +385,7 @@ describe('metodologia.html, distance and changed verdicts (LEAN-08)', () => {
       .find('a')
       .map((_, a) => a.attribs.href)
       .get()
-    expect(links).toEqual(['comparar.html#mudancas', `${REPO}/blob/main/${report}`])
+    expect(links).toEqual(['comparar#mudancas', `${REPO}/blob/main/${report}`])
     expect(compare('section#mudancas')).toHaveLength(1)
     expect(existsSync(join(ROOT, report))).toBe(true)
 
@@ -409,9 +451,11 @@ describe('dist layout (DATA-01, DATA-05)', () => {
         'run-report.json',
         'bands.json',
         'claim-groups.json',
+        ...AGENT_FILES,
       ].sort(),
     )
     expect(dist.filter((f) => f.endsWith('.html')).sort()).toEqual([
+      'como-funciona.html',
       'comparar.html',
       'index.html',
       'metodologia.html',
@@ -616,8 +660,9 @@ describe('comparar.html (CMP-01, CMP-06, CMP-08, LEAN-06, DRIFT-03)', () => {
       const built = await buildFixture(dir, recs, groups)
       const html = await readFile(join(built.outDir, 'comparar.html'), 'utf8')
       const $ = load(html)
-      expect(html.split('</script>')).toHaveLength(3)
-      expect($('script')).toHaveLength(2)
+      // GoatCounter, the inlined data and the page script.
+      expect(html.split('</script>')).toHaveLength(4)
+      expect($('script')).toHaveLength(3)
       expect($('main script, #matrix b, #changes b')).toHaveLength(0)
       const button = $(`#matrix button[data-id="${fixtureGroupId('A')}"]`)
       expect(button.find('.txt').text()).toBe(CLAIM)
@@ -678,10 +723,11 @@ describe('comparar.html (CMP-01, CMP-06, CMP-08, LEAN-06, DRIFT-03)', () => {
   })
 
   it('is linked from the main page and the methodology page', () => {
-    expect(index('a[href="comparar.html"]')).toHaveLength(2)
-    expect(index('#notice + p a[href="comparar.html"]')).toHaveLength(1)
-    expect(index('footer a[href="comparar.html"]')).toHaveLength(1)
-    expect(method('a[href="comparar.html"]').length).toBeGreaterThan(0)
+    expect(index('a[href="comparar"]')).toHaveLength(3)
+    expect(index('header.topbar a[href="comparar"]')).toHaveLength(1)
+    expect(index('#notice + p a[href="comparar"]')).toHaveLength(1)
+    expect(index('footer a[href="comparar"]')).toHaveLength(1)
+    expect(method('a[href="comparar"]').length).toBeGreaterThan(0)
   })
 
   it('inlines the groups and the curated record ids for the browser', () => {
@@ -713,14 +759,112 @@ describe('comparar.html (CMP-01, CMP-06, CMP-08, LEAN-06, DRIFT-03)', () => {
   })
 })
 
+describe('agent files', () => {
+  const read = (file: string) => readFile(join(outDir, file), 'utf8')
+
+  it('publishes an llms.txt index whose links resolve, and the same audit prompt', async () => {
+    const llms = await read('llms.txt')
+    expect(llms.startsWith('# Debates checados\n')).toBe(true)
+    expect(llms.split('\n')[2]).toMatch(/^> /)
+    const sections = llms.split(/^## /m).slice(1)
+    expect(sections.length).toBeGreaterThan(0)
+    for (const section of sections) {
+      const body = section
+        .split('\n')
+        .slice(1)
+        .filter((line) => line.trim())
+      expect(body.every((line) => line.startsWith('- ['))).toBe(true)
+    }
+    const links = [...llms.matchAll(/\]\(([^)]+)\)/g)].map((match) => match[1])
+    const local = links.filter((href) => href.startsWith(`${ORIGIN}/`))
+    expect(local.length).toBeGreaterThan(0)
+    for (const href of local) {
+      expect(await read(href.slice(ORIGIN.length + 1)), href).not.toMatch(/\{\{/)
+    }
+    expect(await read('auditoria.md')).toContain(index('#prompt').text())
+    expect(await read('llms-full.txt')).toContain(index('#prompt').text())
+    expect(await read('index.html.md')).toBe(await read('index.md'))
+    expect(index('link[rel="describedby"]').attr('href')).toBe('llms.txt')
+    expect(index('link[rel="alternate"][type="text/markdown"]').attr('href')).toBe('index.md')
+    expect(how('link[rel="alternate"][type="text/markdown"]').attr('href')).toBe('como-funciona.md')
+    expect(await read('como-funciona.html.md')).toBe(await read('como-funciona.md'))
+    expect(method('link[rel="alternate"][type="text/markdown"]').attr('href')).toBe(
+      'metodologia.md',
+    )
+    expect(index('footer a[href="llms.txt"]')).toHaveLength(1)
+  })
+
+  it('lets an agent read the site and refuses training', async () => {
+    const robots = await read('robots.txt')
+    expect(robots).toContain('Allow: /')
+    expect(robots).toContain('Content-Signal: search=yes, ai-input=yes, ai-train=no')
+    expect(robots).toContain(`Sitemap: ${ORIGIN}/sitemap.xml`)
+    expect(robots).not.toMatch(/^Disallow:/m)
+    const sitemap = await read('sitemap.xml')
+    expect(sitemap).toContain(`${ORIGIN}/llms.txt`)
+    expect(sitemap).toContain(`${ORIGIN}/checks.csv`)
+    expect(sitemap).toContain(`${ORIGIN}/auditoria.md`)
+  })
+
+  it('describes every csv column and the dataset', async () => {
+    const meta = JSON.parse(await read('checks.csv-metadata.json')) as {
+      tableSchema: { columns: { name: string }[] }
+    }
+    expect(meta.tableSchema.columns.map((column) => column.name)).toEqual([...CSV_COLUMNS])
+    const ld = JSON.parse(index('script[type="application/ld+json"]').text()) as {
+      '@graph': { '@type': string }[]
+    }
+    expect(ld['@graph'].map((node) => node['@type'])).toEqual(['WebSite', 'Dataset'])
+    expect(JSON.parse(await read('dataset.json'))).toEqual(ld)
+    expect(await read('metodologia.md')).toContain(config.outlets.lupa.name)
+  })
+})
+
+describe('top bar (AUDIT-02)', () => {
+  const pages = () => ({
+    'index.html': index,
+    'comparar.html': compare,
+    'como-funciona.html': how,
+    'metodologia.html': method,
+  })
+
+  it('links the same pages from every page and marks the current one', () => {
+    for (const [file, $] of Object.entries(pages())) {
+      const bar = $('header.topbar')
+      expect(bar, file).toHaveLength(1)
+      expect(
+        bar
+          .find('nav a:not(.audit-btn)')
+          .map((_, a) => a.attribs.href)
+          .get(),
+        file,
+      ).toEqual(['comparar', 'como-funciona'])
+      const current = bar.find('[aria-current="page"]').attr('href')
+      const expected: Record<string, string | undefined> = {
+        'index.html': './',
+        'comparar.html': 'comparar',
+        'como-funciona.html': 'como-funciona',
+      }
+      expect(current, file).toBe(expected[file])
+    }
+  })
+
+  it('opens the audit panel in place on the home page and links to it elsewhere', () => {
+    expect(index('header.topbar button.audit-btn[data-open-audit]').text()).toBe('Como auditar')
+    for (const $ of [compare, how, method]) {
+      expect($('header.topbar a.audit-btn').attr('href')).toBe('./#auditar')
+    }
+  })
+})
+
 describe('AI disclosure (DISC-01, DISC-02, DISC-04)', () => {
   const DISC =
     'A IA só agrupa checagens da mesma alegação, sem saber a agência nem o veredito. Ela nunca define veredito.'
   const text = ($: CheerioAPI) => $('body').text().replace(/\s+/g, ' ')
 
   it('states the new rule in the audit panel, and no page keeps the old one (DISC-01)', () => {
-    const rules = index('dialog#audit .rules li')
-    expect(rules).toHaveLength(5)
+    const rules = index('dialog#audit #rules li')
+    expect(rules).toHaveLength(4)
     const ai = rules.filter((_, li) => index(li).text().includes('IA'))
     expect(ai).toHaveLength(1)
     expect(ai.text().replace(/\s+/g, ' ')).toContain(DISC)
@@ -749,12 +893,42 @@ describe('AI disclosure (DISC-01, DISC-02, DISC-04)', () => {
         .find('a')
         .map((_, a) => a.attribs.href)
         .get(),
-    ).toEqual(['comparar.html', 'claim-groups.json', `${REPO}/tree/main/data/claim-curation`])
+    ).toEqual(['comparar', 'claim-groups.json', `${REPO}/tree/main/data/claim-curation`])
   })
 
   it('puts the same sentence in the README impartiality rules (DISC-04)', async () => {
     const readme = await readFile(join(ROOT, 'README.md'), 'utf8')
     expect(readme).toContain(`- ${DISC}`)
     expect(readme).not.toContain('Nenhum texto das agências passa por IA')
+  })
+})
+
+describe('como-funciona.html (HOW-01, HOW-02)', () => {
+  const clean = (s: string) => s.replace(/\s+/g, ' ').trim()
+
+  it('drops every label into the bin of its band, as config/bands.json says', () => {
+    for (const [outlet, entries] of Object.entries(config.bands)) {
+      for (const e of entries) {
+        const chips = how(`.sorter .bin li`).filter(
+          (_, li) =>
+            how(li).contents().first().text() === e.label &&
+            how(li).find('small').text() === config.outlets[outlet].name,
+        )
+        expect(chips, `${outlet} ${e.label}`).toHaveLength(1)
+        expect(chips.closest('.bin').find('h3').text().toLowerCase()).toBe(e.band)
+      }
+    }
+  })
+
+  it('shows one copied record per candidate, in ballot order', () => {
+    const who = how('.records dl')
+      .map((_, dl) => clean(how(dl).find('dd').eq(2).text()))
+      .get()
+    expect(who).toEqual(config.candidates.map((c) => c.name))
+  })
+
+  it('walks through five steps and fills every slot', () => {
+    expect(how('.trail > li')).toHaveLength(5)
+    expect(how.html()).not.toMatch(/\{\{|<!--[a-zA-Z]+-->/)
   })
 })

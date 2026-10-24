@@ -27,12 +27,14 @@ import {
   leanHtml,
   matrixHtml,
   pendingText,
+  tabsHtml,
 } from '../../site/render.js'
 import type { BlindDebate } from '../claims/blind.ts'
 import { GROUPS_FILE, loadGroups } from '../claims/groups.ts'
 import { type Config, loadConfig } from '../config.ts'
 import { labelKey } from '../pipeline/normalize.ts'
 import type { CheckRecord } from '../types.ts'
+import { agentBundle } from './agents.ts'
 
 const ROOT = join(import.meta.dirname, '../..')
 const DATA_FILES = ['checks.json', 'checks.csv', 'run-report.json']
@@ -154,6 +156,79 @@ async function curatedIds(dataDir: string, run: string | null) {
   return input.flatMap((d) => d.partitions.flatMap((p) => p.records.map((r) => r.ref)))
 }
 
+const SHIELD =
+  '<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><path d="M10 2l6 2.5v4.6c0 4-2.6 7.4-6 8.9-3.4-1.5-6-4.9-6-8.9V4.5L10 2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 10l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+
+const NAV = [
+  { href: 'comparar', name: 'Comparar' },
+  { href: 'como-funciona', name: 'Como funciona' },
+]
+
+// The same bar on every page. On the home page "Como auditar" opens the panel in place;
+// elsewhere it links there, and app.js opens the panel from the #auditar hash.
+function topbarHtml(page: string) {
+  const current = (href: string) => (href === page ? ' aria-current="page"' : '')
+  const audit =
+    page === 'index.html'
+      ? `<button type="button" class="audit-btn" data-open-audit aria-haspopup="dialog">${SHIELD}<span class="t">Como auditar</span></button>`
+      : `<a class="audit-btn" href="./#auditar">${SHIELD}<span class="t">Como auditar</span></a>`
+  return `<header class="topbar"><div class="wrap"><a class="brand" href="./"${current('index.html')}>Debates checados</a><nav aria-label="Páginas">${NAV.map((n) => `<a href="${n.href}"${current(n.href)}>${n.name}</a>`).join('')}${audit}</nav></div></header>`
+}
+
+function archiveText(records: CheckRecord[]) {
+  if (records.every((r) => r.evidence.archiveUrl))
+    return '<strong>Toda checagem tem cópia arquivada.</strong> Todas têm cópia conferida na Wayback Machine.'
+  return '<strong>A cópia arquivada ainda está chegando.</strong> Parte das checagens já tem cópia conferida na Wayback Machine. As outras esperam a próxima tentativa, e até lá a prova é o link da agência.'
+}
+
+// One stamp per agency with the label it uses for "impreciso": four ways to say the same thing.
+function stampsHtml(config: Config, ctx: Context) {
+  return ctx.outletIds
+    .flatMap((outlet) => {
+      const entry = (config.bands[outlet] ?? []).find((e) => e.band === 'impreciso')
+      return entry
+        ? [
+            `<li><span class="stamp">${esc(entry.label)}</span><small>${esc(config.outlets[outlet].name)}</small></li>`,
+          ]
+        : []
+    })
+    .join('')
+}
+
+function recordHtml(r: CheckRecord, config: Config, ctx: Context) {
+  const debate = ctx.debates.find((d) => d.id === r.debate)
+  const rows = [
+    ['Agência', esc(config.outlets[r.outlet]?.name ?? r.outlet)],
+    [
+      'Debate',
+      debate ? `${esc(debate.broadcaster.name)}, ${fullDate(debate.date)}` : esc(r.debate),
+    ],
+    ['Quem falou', esc(ctx.candidates.find((c) => c.id === r.speaker)?.name ?? r.speaker)],
+    ['Fala', `“${esc(r.quote)}”`],
+    ['Rótulo da agência', `<strong>${esc(r.label)}</strong>`],
+    ['Link', `<a href="${esc(r.url)}">página da agência</a>`],
+    ['Coletado em', fullDate(r.evidence.fetchedAt)],
+  ]
+  return `<dl class="record">${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>`
+}
+
+// Every label in its band's bin, unmapped ones found in the data included, as on the
+// methodology page. --i staggers the drop when the bins scroll into view.
+function sorterHtml(config: Config, ctx: Context) {
+  const rows = labelRows(config, ctx)
+  let i = 0
+  return BANDS.map((band) => {
+    const chips = rows
+      .filter((r) => r.band === band.id)
+      .map(
+        (r) =>
+          `<li style="--i:${i++}">${esc(r.label)}<small>${esc(config.outlets[r.outlet].name)}</small></li>`,
+      )
+      .join('')
+    return `<section class="bin ${bandClass(band.id)}"><h3 class="bin-name">${esc(band.name)}</h3><ul>${chips}</ul></section>`
+  }).join('')
+}
+
 async function duelHtml(siteDir: string, ctx: Context) {
   const fighters = await Promise.all(
     ctx.candidates.map(async (c, i) => {
@@ -173,6 +248,7 @@ export async function build({ siteDir, dataDir, configDir, outDir, repo }: Build
   const groups = await loadGroups(dataDir, records)
   const curated = await curatedIds(dataDir, groups.run)
   const comparison = createComparison(ctx, groups, curated)
+  const agents = agentBundle({ origin: pkg.homepage.replace(/\/$/, ''), repo, config, ctx })
   const state = emptyState()
   const items = listed(ctx, state)
   const repoSlots = { repo: esc(repo), repoLabel: esc(repo.replace(/^https?:\/\//, '')) }
@@ -186,15 +262,21 @@ export async function build({ siteDir, dataDir, configDir, outDir, repo }: Build
     writeFile(join(outDir, GROUPS_FILE), `${JSON.stringify(groups, null, 2)}\n`),
   )
 
+  const duel = await duelHtml(siteDir, ctx)
   const index = fill(await readFile(join(siteDir, 'index.html'), 'utf8'), {
     ...repoSlots,
-    duel: await duelHtml(siteDir, ctx),
+    topbar: topbarHtml('index.html'),
+    archive: archiveText(records),
+    duel,
     debates: debatesHtml(ctx),
     board: boardHtml(scoreboard(ctx, items), state, ctx),
     notice: esc(notice(ctx, state)),
+    tabs: tabsHtml(ctx, state),
     filters: filtersHtml(ctx, state, items.length),
-    // Every record, removed ones included; CSS hides those until the toggle is on.
+    // Every record, removed ones included; CSS hides the removed ones until the browser takes over.
     list: ctx.records.map((r) => itemHtml(r, ctx)).join('\n'),
+    auditPrompt: esc(agents.auditPrompt),
+    jsonLd: agents.jsonLd.replaceAll('<', '\\u003c'),
     data: jsonScript('data', {
       records,
       candidates: config.candidates,
@@ -206,6 +288,7 @@ export async function build({ siteDir, dataDir, configDir, outDir, repo }: Build
 
   const method = fill(await readFile(join(siteDir, 'metodologia.html'), 'utf8'), {
     ...repoSlots,
+    topbar: topbarHtml('metodologia'),
     sources: sourcesTable(config, ctx),
     bands: bandsTable(config, ctx),
     counts: countsTable(config, ctx),
@@ -217,6 +300,7 @@ export async function build({ siteDir, dataDir, configDir, outDir, repo }: Build
   const distances = lean(ctx, inDebate(comparison.rows, compareState.debate))
   const compare = fill(await readFile(join(siteDir, 'comparar.html'), 'utf8'), {
     ...repoSlots,
+    topbar: topbarHtml('comparar'),
     debates: debatesHtml(ctx),
     answer: esc(headline(distances, ctx)),
     balance: leanHtml(ctx, distances),
@@ -253,6 +337,20 @@ export async function build({ siteDir, dataDir, configDir, outDir, repo }: Build
     }),
   })
   await writeFile(join(outDir, 'comparar.html'), compare)
+  const how = fill(await readFile(join(siteDir, 'como-funciona.html'), 'utf8'), {
+    repo: repoSlots.repo,
+    topbar: topbarHtml('como-funciona'),
+    duel,
+    stamps: stampsHtml(config, ctx),
+    // One per candidate, the first of each in the home page list, so neither stands alone.
+    records: ctx.candidates
+      .flatMap((c) => items.find((r) => r.speaker === c.id) ?? [])
+      .map((r) => recordHtml(r, config, ctx))
+      .join(''),
+    sorter: sorterHtml(config, ctx),
+  })
+  await writeFile(join(outDir, 'como-funciona.html'), how)
+  for (const [name, body] of Object.entries(agents.files)) await writeFile(join(outDir, name), body)
 }
 
 if (import.meta.main) {

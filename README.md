@@ -2,7 +2,7 @@
 
 Arquivo público das checagens que quatro agências (Aos Fatos, Estadão Verifica, g1 Fato ou Fake e Lupa) publicaram sobre os debates do 2º turno de 2026 entre Lula e Flávio Bolsonaro, na Band (18/10) e na Globo (23/10).
 
-Um script lê a página de cobertura de cada agência a cada seis horas, grava as checagens em `data/` e publica um site estático no GitHub Pages. Não há servidor nem banco de dados. O histórico do git é o registro de tudo o que mudou.
+Um script lê a página de cobertura de cada agência a cada duas horas, grava as checagens em `data/` e publica um site estático no GitHub Pages. Não há servidor nem banco de dados. O histórico do git é o registro de tudo o que mudou.
 
 ## O que é e o que não é
 
@@ -71,12 +71,14 @@ Rode os testes um arquivo por vez, como acima. Os testes golden usam as páginas
 
 ## Como auditar
 
-São os mesmos cinco passos do roteiro que o site oferece para colar numa IA, no botão "Como auditar". Dá para fazer à mão.
-1. Leia os parsers em `src/adapters` e veja se algum trata Lula e Flávio Bolsonaro de forma diferente. O nome de quem falou só vira um candidato em `src/pipeline/normalize.ts`, pela lista de apelidos de `config/candidates.json`.
-2. Sorteie 10 checagens de `data/checks.csv`. Para cada uma, abra o link da agência (`url`) ou a cópia na Wayback Machine (`archive_url`) e confira se a fala, o candidato e o rótulo batem.
-3. Confira se a tabela de faixas (`config/bands.json`) classifica cada rótulo sem depender de quem falou. A página "Como funciona" do site mostra, ao lado da tabela, quantas vezes cada rótulo aparece para cada candidato.
-4. Recalcule o placar de cada candidato a partir do CSV e compare com o que o site mostra. Deixe de fora as linhas com `missing_since` preenchido, que são checagens que sumiram da página da agência.
-5. Procure no histórico de commits mudanças de rótulo ou remoções e veja se cada uma tem justificativa registrada. Mudanças de rótulo, fala ou candidato também ficam na coluna `history` do CSV, com a data em que foram detectadas.
+São os mesmos cinco passos do roteiro que o site oferece para colar numa IA, no botão "Como auditar". Dá para fazer à mão. O site também publica esse roteiro para um agente que receber só o endereço. `/llms.txt` é o índice, no formato proposto em https://llmstxt.org/. `/auditoria.md` repete os passos abaixo. `/robots.txt` deixa ler e recusa treino de modelo, porque as falas e os rótulos são das agências.
+1. Leia os leitores em `src/adapters` e veja se algum trata Lula e Flávio Bolsonaro de forma diferente. O nome de quem falou só vira um candidato em `src/pipeline/normalize.ts`, pela lista de apelidos de `config/candidates.json`.
+2. Confira se a tabela de faixas (`config/bands.json`) define a faixa só pela agência e pelo rótulo, e se alguma linha de `data/checks.csv` tem uma `band` diferente da que a tabela manda. A página "Metodologia" do site mostra, ao lado da tabela, quantas vezes cada rótulo aparece para cada candidato.
+3. Recalcule com código o placar de cada candidato a partir do CSV e compare com o que o site mostra. Deixe de fora as linhas com `missing_since` preenchido, que são checagens que sumiram da página da agência.
+4. Sorteie 12 checagens, com pelo menos 3 de cada agência e 6 de cada candidato. Para cada uma, abra o link da agência (`url`) e confira se a fala, o candidato e o rótulo batem. Se a agência bloquear o acesso, use `archive_url` ou `https://web.archive.org/web/<url>`.
+5. Procure no histórico de commits mudanças de rótulo, faixa ou candidato e remoções, e veja se cada uma tem explicação. Essas mudanças também ficam nas colunas `history` e `missing_since` do CSV, com a data em que foram detectadas.
+
+Uma IA que não consegue clonar o repositório pode usar endereços que devolvem texto puro: o CSV bruto em `https://raw.githubusercontent.com/<dono>/<repo>/main/data/checks.csv`, o histórico em `https://api.github.com/repos/<dono>/<repo>/commits?path=data/checks.csv` e o diff de cada commit em `<repo>/commit/<sha>.diff`. O roteiro do site já vem com esses endereços preenchidos.
 
 O `sha256` de cada registro é o hash da cópia arquivada, não da página ao vivo (g1 e Estadão mudam bytes a cada acesso, por causa de anúncios). O `archive_url` já é o endereço `id_` da Wayback Machine, que devolve os bytes originais da página. A Wayback Machine entrega esse arquivo comprimido em gzip, e o hash é do conteúdo já descomprimido. Para conferir:
 
@@ -162,7 +164,7 @@ Um rótulo que não está em `config/bands.json` é publicado como "sem faixa", 
 
 ## Configuração no GitHub
 
-O workflow `.github/workflows/update.yml` roda a cada seis horas (minuto 17), a cada push em `main` e quando alguém dispara pela aba Actions. Ele testa, coleta, faz commit de `data/` só quando algo mudou, monta o site e publica no Pages, tudo no mesmo job. Antes da primeira execução:
+O workflow `.github/workflows/update.yml` roda a cada duas horas (minuto 17), a cada push em `main` e quando alguém dispara pela aba Actions. Ele testa, coleta, faz commit de `data/` só quando algo mudou, monta o site e publica no Pages, tudo no mesmo job. Antes da primeira execução:
 - [ ] Repositório público, com o código em `main`.
 - [ ] Em Settings > Pages, Source em "GitHub Actions".
 - [ ] Uma conta gratuita no archive.org. As chaves ficam em https://archive.org/account/s3.php.

@@ -74,6 +74,6 @@
 - **Completed**: all tasks, reviewer and fix rounds per batch, first live dataset in `data/` (314 records, 8 sources ok), Verifier gaps 1 and 2 of iteration 3 closed by `076d2ef` and `7e97dfb`
 - **In-progress** (file:line): none
 - **Next step**: needs the user's go-ahead for outward actions: create the GitHub repo `debates-checados/debates-checados`, rename `master` to `main`, push, set secrets `IA_S3_ACCESS`/`IA_S3_SECRET` (rotated keys), Pages source "GitHub Actions", run the `update` workflow once
-- **Open items**: 83 records await a Wayback snapshot (g1 Band, Aos Fatos Globo Escriba API); web.archive.org refused IPv4 connections from the dev machine after the first run, CI retries every 6 h. Iteration-3 minor gap: `fetchedAt` on silent changes is untested and unspecified (R04)
+- **Open items**: 83 records await a Wayback snapshot (g1 Band, Aos Fatos Globo Escriba API); web.archive.org refused IPv4 connections from the dev machine after the first run, CI retries every 2 h. Iteration-3 minor gap: `fetchedAt` on silent changes is untested and unspecified (R04)
 - **Uncommitted files**: none
 - **Branch**: `master` (local only, workflow and site links expect `main`)

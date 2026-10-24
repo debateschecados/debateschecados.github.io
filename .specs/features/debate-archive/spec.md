@@ -94,7 +94,7 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 4. The system SHALL order records by debate newest first, then agency alphabetically, then their order on the agency page. (SITE-04)
 5. IF a filter combination matches no record THEN the system SHALL show the message "Nenhuma checagem com esses filtros." and a control that clears all filters. (SITE-05)
 6. The system SHALL render without horizontal scrolling at a 360 px viewport width. (SITE-06)
-7. The system SHALL NOT set tracking cookies, load third-party analytics, or load fonts, scripts or images from another origin. (SITE-07)
+7. The system SHALL NOT set tracking cookies or load fonts, scripts or images from another origin. The one exception is the cookieless GoatCounter page view script (`gc.zgo.at/count.js`). (SITE-07)
 
 **Independent Test**: Load the site with the fixture dataset, apply each filter alone and combined, and compare counts with the dataset.
 
@@ -147,15 +147,31 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 **Acceptance Criteria**:
 
 1. The system SHALL show, in the first screen below the subtitle, the sentence "O veredito é sempre da agência. Código e dados são abertos." followed by a control that opens the audit panel. (AUDIT-01)
-2. The system SHALL show a fixed "Como auditar" button on every viewport that opens the audit panel. (AUDIT-02)
-3. WHEN the audit panel opens THEN the system SHALL list the impartiality rules (agency verdict unchanged, same code for both candidates, no AI on agency text, proof of origin per record, illustrations with equal weight) and links to the repository, the dataset files, the band mapping file and the commit history. (AUDIT-03)
-4. WHEN the visitor activates "Copiar prompt" THEN the system SHALL copy to the clipboard an audit prompt containing the repository URL, the dataset URL and the five audit steps, and SHALL show "Prompt copiado". (AUDIT-04)
+2. The system SHALL show on every page a top bar that stays on screen while scrolling, with a link to "Como funciona" and a "Como auditar" control. On the home page the control opens the audit panel; on other pages it opens the home page with the panel open (`./#auditar`). (AUDIT-02)
+3. WHEN the audit panel opens THEN the system SHALL list the impartiality rules (agency verdict unchanged, same code for both candidates, no AI on agency text, proof of origin per record, illustrations with equal weight) and links to the repository, the dataset files, the band mapping file and the commit history. The proof-of-origin rule SHALL say the archived copy exists only once verified. (AUDIT-03)
+4. WHEN the visitor activates "Copiar prompt" THEN the system SHALL copy to the clipboard an audit prompt containing the site URL, the repository URL, the raw CSV URL, the commits API URL for the CSV, how to read the CSV columns and the five audit steps (parsers and aliases, bands, recount, stratified sample, change history), and SHALL show "Prompt copiado". (AUDIT-04)
 5. IF the clipboard API is unavailable THEN the system SHALL select the prompt text and show "Texto selecionado. Use Ctrl+C para copiar.". (AUDIT-05)
 6. The system SHALL render both candidate illustrations from the same body template, at the same size and pose, mirrored so they face each other, with talk animations of equal length and an equal number of mouth frames. (AUDIT-06)
 7. The system SHALL NOT change a candidate illustration based on any verdict or count. (AUDIT-07)
 8. The system SHALL credit the official portraits used as drawing references (Palácio do Planalto, CC BY 2.0; Agência Senado) and the source of the party and broadcaster logos (Wikimedia Commons) in the footer and on the methodology page. (AUDIT-08)
+9. WHEN the audit panel opens THEN the system SHALL list what the site does not promise: the scoreboard counts checks, not false statements; agencies can disagree; four bands simplify; a parser can fail; and whether every record has a verified archived copy, read from the data and worded without counts. (AUDIT-09)
 
 **Independent Test**: Open the site, open the panel from both entry points, copy the prompt, paste it into a text editor and check the URLs and steps; diff the two sprite grids and confirm only head rows and mouth frames differ, with the same frame count and animation length.
+
+---
+
+### P2: How it works, in plain words
+
+**User Story**: As a visitor who never heard of fact-check aggregators, I want a short, visual walk-through of how a check gets from the debate to the site so that I understand what the numbers mean before I trust them.
+
+**Why P2**: The methodology page is complete but technical; most visitors need the idea, not the tables.
+
+**Acceptance Criteria**:
+
+1. The system SHALL publish `como-funciona.html`, linked from the top bar, with five numbered steps: agencies check, a program copies, labels fall into bands, the scoreboard counts checks (and agencies can disagree), nothing disappears without a trace. (HOW-01)
+2. The page SHALL build every example from the data: one label per agency for "impreciso", the first record of each candidate in the home page list, and every label of `config/bands.json` in the bin of its band. (HOW-02)
+
+**Independent Test**: Build the site, open `como-funciona.html` and compare each label bin with `config/bands.json` and each record with the first one of its candidate on the home page.
 
 ---
 
@@ -267,6 +283,9 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 | AUDIT-06 | P1: Visible impartiality and self-service audit | Tasks: T19 | Implemented |
 | AUDIT-07 | P1: Visible impartiality and self-service audit | Tasks: T21 | Implemented |
 | AUDIT-08 | P1: Visible impartiality and self-service audit | Tasks: T19, T20 | Implemented |
+| AUDIT-09 | P1: Visible impartiality and self-service audit | Branch feat/how-it-works-main | Implemented |
+| HOW-01 | P2: How it works, in plain words | Branch feat/how-it-works-main | Implemented |
+| HOW-02 | P2: How it works, in plain words | Branch feat/how-it-works-main | Implemented |
 | HIST-01 | P2: Re-runs keep history | Tasks: T6 | Implemented |
 | HIST-02 | P2: Re-runs keep history | Tasks: T6, T17, T21 | Implemented |
 | SHARE-01 | P2: Shareable filters | Tasks: T17 | Implemented |

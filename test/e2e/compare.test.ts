@@ -102,6 +102,10 @@ async function open(path = '/comparar.html', options: BrowserContextOptions = {}
   })
   page.on('pageerror', (e) => errors.push(e.message))
   page.on('request', (r) => requests.push(r.url()))
+  // Keep the tests off the network and out of the real page view count.
+  await page.route('**/gc.zgo.at/count.js', (route) =>
+    route.fulfill({ contentType: 'text/javascript', body: '' }),
+  )
   await page.goto(`${origin}${path}`)
   return page
 }
@@ -356,15 +360,15 @@ describe('verdict shapes (CMP-08)', () => {
 })
 
 describe('privacy (SITE-07)', () => {
-  it('requests nothing from another origin', async () => {
+  it('requests nothing from another origin but GoatCounter', async () => {
     const page = await open()
     await page.click('#debates [data-debate="globo-2026-10-23"]')
     await page.check('[data-div]')
     await page.click('#matrix button.claim >> visible=true')
     await page.evaluate(() => document.fonts.ready)
     expect(requests.length).toBeGreaterThan(3)
-    expect(requests.filter((u) => !u.startsWith(`${origin}/`) && !u.startsWith('data:'))).toEqual(
-      [],
-    )
+    expect(requests.filter((u) => !u.startsWith(`${origin}/`) && !u.startsWith('data:'))).toEqual([
+      'http://gc.zgo.at/count.js',
+    ])
   })
 })

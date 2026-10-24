@@ -33,7 +33,9 @@ let removed: CheckRecord[]
 function serve(root: string) {
   return createServer(async (req, res) => {
     const path = new URL(req.url ?? '/', 'http://x').pathname
-    const file = normalize(join(root, path.endsWith('/') ? `${path}index.html` : path))
+    // Like GitHub Pages: /page serves page.html when no file has that exact name.
+    const clean = extname(path) ? path : `${path}.html`
+    const file = normalize(join(root, path.endsWith('/') ? `${path}index.html` : clean))
     try {
       if (!file.startsWith(root)) throw new Error('outside root')
       const body = await readFile(file)
@@ -83,6 +85,10 @@ async function open(path = '/', options: BrowserContextOptions = {}, init?: () =
   })
   page.on('pageerror', (e) => errors.push(e.message))
   page.on('request', (r) => requests.push(r.url()))
+  // Keep the tests off the network and out of the real page view count.
+  await page.route('**/gc.zgo.at/count.js', (route) =>
+    route.fulfill({ contentType: 'text/javascript', body: '' }),
+  )
   await page.goto(`${origin}${path}`)
   await settle(page)
   return page
@@ -95,6 +101,10 @@ const settle = (page: Page) =>
       .getAnimations()
       .every((a) => a.constructor.name !== 'Animation' || a.playState === 'finished'),
   )
+
+// Search is debounced, so the view changes once the query reaches the URL.
+const searched = (page: Page, q: string) =>
+  page.waitForFunction((want) => new URLSearchParams(location.search).get('q') === want, q)
 
 const listedIds = (page: Page) =>
   page.$$eval('#list > li.item', (lis) => lis.map((li) => (li as HTMLElement).dataset.id))
@@ -145,21 +155,30 @@ const expectedBoard = (keep: (r: CheckRecord) => boolean) =>
   )
 
 async function choose(page: Page, key: string, value: string) {
-  await page.selectOption(`select[data-key="${key}"]`, value)
+  await page.click(`button[data-key="${key}"]`)
+  await page.click(`#f-${key}-list [data-value="${value}"]`)
   await settle(page)
 }
+
+const chosen = (page: Page, key: string) => page.getAttribute(`[data-key="${key}"]`, 'data-value')
 
 describe('layout (SITE-06)', () => {
   it('has no horizontal scroll at 360 px, with removed items and the panel open', async () => {
     const page = await open('/', { viewport: { width: 360, height: 740 } })
     const overflow = () => page.evaluate(() => document.documentElement.scrollWidth - innerWidth)
     expect(await overflow()).toBeLessThanOrEqual(0)
-    await page.check('[data-removed]')
+    await page.click('[data-tab="removed"]')
     await settle(page)
     expect(await overflow()).toBeLessThanOrEqual(0)
-    await page.click('.audit-fab')
+    await page.fill('#q', 'teste')
+    await searched(page, 'teste')
+    await settle(page)
     expect(await overflow()).toBeLessThanOrEqual(0)
-    const method = await open('/metodologia.html', { viewport: { width: 360, height: 740 } })
+    await page.click('.topbar .audit-btn')
+    expect(await overflow()).toBeLessThanOrEqual(0)
+    const how = await open('/como-funciona', { viewport: { width: 360, height: 740 } })
+    expect(await how.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBe(0)
+    const method = await open('/metodologia', { viewport: { width: 360, height: 740 } })
     expect(await method.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBe(0)
     // Both candidate columns stay on screen, none hidden behind a horizontal scroll.
     const tables = await method.$$eval('.table-wrap', (els) =>
@@ -199,7 +218,8 @@ describe('list, filters and URL (SITE-01, SITE-03, SHARE-01, SHARE-02)', () => {
     expect(await shared.getAttribute('[data-debate="band-2026-10-18"]', 'aria-pressed')).toBe(
       'true',
     )
-    expect(await shared.inputValue('select[data-key="outlet"]')).toBe('lupa')
+    expect(await chosen(shared, 'outlet')).toBe('lupa')
+    expect(await shared.textContent('#f-outlet-v')).toMatch(/^Lupa \(\d+\)$/)
   })
 
   it('shows items again at full opacity when a filter brings them back', async () => {
@@ -226,7 +246,7 @@ describe('list, filters and URL (SITE-01, SITE-03, SHARE-01, SHARE-02)', () => {
     await settle(page)
     expect(await listedIds(page)).toHaveLength(records.length - removed.length)
     expect(new URL(page.url()).search).toBe('')
-    expect(await page.inputValue('select[data-key="outlet"]')).toBe('')
+    expect(await chosen(page, 'outlet')).toBe('')
   })
 
   it('keeps keyboard focus on the control in use while the filters re-render', async () => {
@@ -234,29 +254,54 @@ describe('list, filters and URL (SITE-01, SITE-03, SHARE-01, SHARE-02)', () => {
     const focused = () =>
       page.evaluate(() => {
         const el = document.activeElement as HTMLElement
-        return el.dataset.key ?? (el.matches('[data-removed]') ? 'removed' : el.tagName)
+        return el.dataset.key ?? el.dataset.tab ?? el.tagName
       })
-    const outlets = await page.$$eval('select[data-key="outlet"] option', (os) =>
-      os.map((o) => (o as HTMLOptionElement).value),
+    const outlets = await page.$$eval('#f-outlet-list [role="option"]', (os) =>
+      os.map((o) => (o as HTMLElement).dataset.value),
     )
-    await page.focus('select[data-key="outlet"]')
+    // Arrow opens the list on the current value, arrow moves, Enter picks and closes.
+    await page.focus('[data-key="outlet"]')
     await page.keyboard.press('ArrowDown')
+    expect(await page.getAttribute('[data-key="outlet"]', 'aria-expanded')).toBe('true')
+    await page.keyboard.press('ArrowDown')
+    await page.keyboard.press('Enter')
     await settle(page)
     expect(new URL(page.url()).searchParams.get('outlet')).toBe(outlets[1])
+    expect(await page.getAttribute('[data-key="outlet"]', 'aria-expanded')).toBe('false')
     expect(await focused()).toBe('outlet')
     await page.keyboard.press('ArrowDown')
+    await page.keyboard.press('ArrowDown')
+    await page.keyboard.press('Enter')
     await settle(page)
     expect(new URL(page.url()).searchParams.get('outlet')).toBe(outlets[2])
     expect(await focused()).toBe('outlet')
+    // Escape closes without picking and gives focus back to the button.
+    await page.keyboard.press('ArrowDown')
+    await page.keyboard.press('ArrowDown')
+    await page.keyboard.press('Escape')
+    expect(new URL(page.url()).searchParams.get('outlet')).toBe(outlets[2])
+    expect(await page.getAttribute('[data-key="outlet"]', 'aria-expanded')).toBe('false')
+    expect(await focused()).toBe('outlet')
 
     const all = await open()
-    await all.focus('[data-removed]')
+    await all.focus('[data-tab="removed"]')
     await all.keyboard.press('Space')
     await settle(all)
     expect(new URL(all.url()).searchParams.get('removed')).toBe('1')
     expect(
-      await all.evaluate(() => (document.activeElement as HTMLElement).matches('[data-removed]')),
+      await all.evaluate(() =>
+        (document.activeElement as HTMLElement).matches('[data-tab="removed"]'),
+      ),
     ).toBe(true)
+
+    // Typing in the search box keeps the caret and the focus while the list re-renders.
+    const typing = await open()
+    await typing.focus('#q')
+    await typing.keyboard.type('numero 12,')
+    await searched(typing, 'numero 12,')
+    await settle(typing)
+    expect(await typing.inputValue('#q')).toBe('numero 12,')
+    expect(await typing.evaluate(() => document.activeElement?.id)).toBe('q')
 
     // The clear button leaves with the empty state; focus moves to the first filter.
     const empty = await open('/?outlet=g1&band=sem+faixa')
@@ -293,29 +338,64 @@ describe('scoreboard numbers (SCORE-01, SCORE-02, SCORE-04)', () => {
 })
 
 describe('removed records (HIST-02)', () => {
-  it('shows tagged removed items behind the toggle, outside the scoreboard', async () => {
+  it('shows tagged removed items on their own tab, outside the scoreboard', async () => {
     const page = await open()
     const before = await totals(page)
-    const toggle = page.locator('label.toggle')
-    expect(await toggle.textContent()).toBe(`Mostrar removidos (${removed.length})`)
-    await page.check('[data-removed]')
+    expect(await page.textContent('[data-tab="removed"]')).toBe(`Removidas ${removed.length}`)
+    await page.click('[data-tab="removed"]')
     await settle(page)
     const ids = await listedIds(page)
-    expect(ids).toHaveLength(records.length)
+    expect(ids.sort()).toEqual(removed.map((r) => r.id).sort())
     const first = removed.find((r) => r.missingSince === '2026-10-25') as CheckRecord
     expect(await page.textContent(`#list li[data-id="${first.id}"] .gone`)).toBe(
       'não encontrado na fonte desde 25/10/2026',
     )
-    expect(await totals(page)).toEqual(before)
+    expect(await page.isHidden('#board')).toBe(true)
+    expect(await page.textContent('#notice')).toContain('tiraram do ar')
     expect(new URL(page.url()).searchParams.get('removed')).toBe('1')
     const shared = await open('/?removed=1')
-    expect(await listedIds(shared)).toEqual(ids)
-    expect(await shared.isChecked('[data-removed]')).toBe(true)
+    expect((await listedIds(shared)).sort()).toEqual(ids)
+    expect(await shared.getAttribute('[data-tab="removed"]', 'aria-pressed')).toBe('true')
+    await shared.click('[data-tab="live"]')
+    await settle(shared)
+    expect(await totals(shared)).toEqual(before)
+    expect(await shared.isVisible('#board')).toBe(true)
   })
 
-  it('hides the toggle when no removed record matches the filters', async () => {
+  it('keeps the removed tab, with zero, when the filters match none', async () => {
     const page = await open('/?outlet=aosfatos')
-    expect(await page.locator('[data-removed]').count()).toBe(0)
+    expect(await page.locator('[data-tab="removed"]').textContent()).toBe('Removidas 0')
+  })
+})
+
+describe('search', () => {
+  it('filters the list and the scoreboard as you type, and lives in the URL', async () => {
+    const page = await open()
+    await page.fill('#q', 'NUMERO 12,')
+    await searched(page, 'NUMERO 12,')
+    await settle(page)
+    expect(await listedIds(page)).toEqual(['00000000000c'])
+    expect(new URL(page.url()).searchParams.get('q')).toBe('NUMERO 12,')
+    const shared = await open('/?q=n%C3%BAmero+12%2C')
+    expect(await shared.inputValue('#q')).toBe('número 12,')
+    expect(await listedIds(shared)).toEqual(['00000000000c'])
+  })
+
+  it('waits for a pause in typing before filtering', async () => {
+    const page = await open()
+    await page.focus('#q')
+    await page.keyboard.type('numero', { delay: 20 })
+    expect(new URL(page.url()).searchParams.get('q')).toBeNull()
+    await searched(page, 'numero')
+  })
+
+  it('shows the empty state and clears the box with the filters', async () => {
+    const page = await open('/?q=zzzz')
+    expect(await page.locator('#list .empty').count()).toBe(1)
+    await page.click('#list .empty [data-clear]')
+    await settle(page)
+    expect(await page.inputValue('#q')).toBe('')
+    expect(await listedIds(page)).toHaveLength(records.length - removed.length)
   })
 })
 
@@ -324,14 +404,14 @@ describe('audit panel (AUDIT-01, AUDIT-02, AUDIT-04, AUDIT-05)', () => {
     const page = await open()
     const trust = page.locator('.hero .trust')
     expect(await trust.textContent()).toContain(
-      'O veredito é sempre da agência. Código e dados são abertos.',
+      'Nenhuma IA decide veredito. Código e dados são abertos.',
     )
     await trust.getByRole('button', { name: 'Veja como auditar' }).click()
     expect(await page.locator('dialog#audit').evaluate((d) => (d as HTMLDialogElement).open)).toBe(
       true,
     )
     expect(await page.evaluate(() => Boolean(document.activeElement?.closest('dialog')))).toBe(true)
-    expect(await page.locator('.rules li').count()).toBe(5)
+    expect(await page.locator('#rules li').count()).toBe(5)
     await page.click('[data-close-audit]')
     expect(await page.evaluate(() => document.activeElement?.textContent)).toBe('Veja como auditar')
   })
@@ -346,13 +426,14 @@ describe('audit panel (AUDIT-01, AUDIT-02, AUDIT-04, AUDIT-05)', () => {
     }
   })
 
-  it('opens from the fixed "Como auditar" button on mobile and desktop', async () => {
+  it('opens from the "Como auditar" button in the top bar, which stays on screen', async () => {
     for (const width of [360, 1280]) {
       const page = await open('/', { viewport: { width, height: 740 } })
       await page.evaluate(() => scrollTo(0, document.body.scrollHeight))
-      const fab = page.getByRole('button', { name: 'Como auditar', exact: true })
-      expect(await fab.evaluate((b) => getComputedStyle(b).position)).toBe('fixed')
-      await fab.click()
+      const button = page.getByRole('button', { name: 'Como auditar', exact: true })
+      expect(await button.evaluate((b) => b.getBoundingClientRect().top)).toBeGreaterThanOrEqual(0)
+      expect(await button.evaluate((b) => b.getBoundingClientRect().bottom)).toBeLessThan(80)
+      await button.click()
       expect(
         await page.locator('dialog#audit').evaluate((d) => (d as HTMLDialogElement).open),
       ).toBe(true)
@@ -363,15 +444,27 @@ describe('audit panel (AUDIT-01, AUDIT-02, AUDIT-04, AUDIT-05)', () => {
     }
   })
 
+  it('opens the panel on the home page from "Como auditar" on any other page', async () => {
+    for (const path of ['/como-funciona', '/metodologia']) {
+      const page = await open(path, { viewport: { width: 360, height: 740 } })
+      await page.getByRole('link', { name: 'Como auditar', exact: true }).first().click()
+      await page.waitForURL(/#auditar$/)
+      expect(
+        await page.locator('dialog#audit').evaluate((d) => (d as HTMLDialogElement).open),
+        path,
+      ).toBe(true)
+    }
+  })
+
   it('copies the audit prompt to the clipboard', async () => {
     const page = await open('/', { permissions: ['clipboard-read', 'clipboard-write'] })
-    await page.click('.audit-fab')
+    await page.click('.topbar .audit-btn')
     await page.click('#copy')
     await page.waitForFunction(() => document.getElementById('copied')?.textContent !== '')
     expect(await page.textContent('#copied')).toBe('Prompt copiado')
     const text = await page.evaluate(() => navigator.clipboard.readText())
     expect(text).toContain(`Código e dados: ${REPO}`)
-    expect(text).toContain(`Todas as checagens: ${REPO}/blob/main/data/checks.csv`)
+    expect(text).toContain('/main/data/checks.csv')
     expect(text.match(/^\d\. /gm)).toEqual(['1. ', '2. ', '3. ', '4. ', '5. '])
   })
 
@@ -379,7 +472,7 @@ describe('audit panel (AUDIT-01, AUDIT-02, AUDIT-04, AUDIT-05)', () => {
     const page = await open('/', {}, () => {
       Object.defineProperty(Navigator.prototype, 'clipboard', { get: () => undefined })
     })
-    await page.click('.audit-fab')
+    await page.click('.topbar .audit-btn')
     await page.click('#copy')
     expect(await page.textContent('#copied')).toBe('Texto selecionado. Use Ctrl+C para copiar.')
     const selection = await page.evaluate(() => {
@@ -431,16 +524,16 @@ describe('illustrations (AUDIT-06, AUDIT-07)', () => {
 })
 
 describe('privacy (SITE-07)', () => {
-  it('requests nothing from another origin and uses the self-hosted fonts', async () => {
+  it('requests nothing from another origin but GoatCounter and uses the self-hosted fonts', async () => {
     const page = await open()
     await page.click('[data-debate="band-2026-10-18"]')
     await choose(page, 'outlet', 'g1')
-    await page.click('.audit-fab')
+    await page.click('.topbar .audit-btn')
     await page.evaluate(() => document.fonts.ready)
     expect(requests.length).toBeGreaterThan(5)
-    expect(requests.filter((u) => !u.startsWith(`${origin}/`) && !u.startsWith('data:'))).toEqual(
-      [],
-    )
+    expect(requests.filter((u) => !u.startsWith(`${origin}/`) && !u.startsWith('data:'))).toEqual([
+      'http://gc.zgo.at/count.js',
+    ])
     expect(requests.some((u) => u.endsWith('.woff2'))).toBe(true)
     expect(await page.evaluate(() => document.fonts.check('600 24px "Inter Tight"'))).toBe(true)
     expect(await page.evaluate(() => document.cookie)).toBe('')
