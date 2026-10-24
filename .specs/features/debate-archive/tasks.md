@@ -243,6 +243,8 @@ T22 → T24
 
 **Commit**: `feat(pipeline): Assign stable record ids from source keys`
 
+**Status**: ✅ Complete
+
 ---
 
 ### T6: Merge fresh items with published records
