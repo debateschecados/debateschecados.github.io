@@ -133,6 +133,18 @@ Mudança à mão vai em `data/claim-curation/<data>/manual.json`, nunca direto n
 
 `from` lista as checagens do grupo que sai (`null` para só criar um grupo), `to` traz as checagens e a frase do grupo que entra (`null` para só remover) e `reason` é obrigatório. As edições valem na ordem do arquivo, e o grupo criado assim fica com origem `manual`. Um `from` que não bate com nenhum grupo faz o `claims:assemble` falhar.
 
+## Comparador
+
+A página "Comparar agências" mostra, para cada agência, a distância dos vereditos dela para os das outras nas falas que duas ou mais checaram, e as checagens cujo rótulo, citação ou identificador mudou depois de publicadas. A conta está explicada em "Distância das outras agências", na página de metodologia.
+
+```sh
+pnpm lean
+```
+
+O comando lê `data/` e imprime, por agência, os mesmos números, intervalos e frases que a página mostra sem filtro de debate, e a frase do topo.
+
+A coleta de 24/10/2026 gravou como novas parte das checagens do Estadão Verifica sobre o debate da Globo. O script `src/repair/estadao-2026-10-24.ts` refez essa coleta com as regras atuais, e o relatório `data/repairs/2026-10-24-estadao.json` lista cada id juntado a um id mais antigo (`merged`), os que ficaram novos (`new`) e os que sumiram (`missing`).
+
 ## Como adicionar um debate
 
 Se as agências usam um formato de página que já tem leitor, não precisa mexer em código.

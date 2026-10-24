@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs'
 import { mkdtemp, readdir, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -6,7 +7,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import pkg from '../../../package.json' with { type: 'json' }
 import { createComparison } from '../../../site/compare.js'
 import { createContext, emptyState, listed } from '../../../site/core.js'
-import { headline, lean } from '../../../site/lean.js'
+import { B, deviations, headline, lean, MIN_N, sentence } from '../../../site/lean.js'
 import { leanHtml } from '../../../site/render.js'
 import { type Config, loadConfig } from '../../../src/config.ts'
 import type { CheckRecord } from '../../../src/types.ts'
@@ -256,6 +257,91 @@ describe('metodologia.html (DATA-03, DATA-07, AUDIT-08)', () => {
         .map((_, td) => method(td).text())
         .get(),
     ).toEqual(['Globo, 23/10/2026', 'Aos Fatos', 'página da agência', 'aosfatos'])
+  })
+})
+
+describe('metodologia.html, distance and changed verdicts (LEAN-08)', () => {
+  // The text from an h2 up to the next one, with whitespace collapsed.
+  const section = (title: string) => {
+    const h2 = method('h2').filter((_, h) => method(h).text() === title)
+    expect(h2).toHaveLength(1)
+    const body = h2.nextUntil('h2')
+    return { h2, body, text: body.text().replace(/\s+/g, ' ') }
+  }
+
+  it('explains the formula, scale, interval, sentence rule and limits, and links the spec', () => {
+    const { h2, body, text } = section('Distância das outras agências')
+    // The comparison page's method note points here.
+    expect(h2.attr('id')).toBe('distancia')
+    expect(compare('#method-note a').attr('href')).toBe(`metodologia.html#${h2.attr('id')}`)
+    expect(text).toContain('verdadeiro 0, impreciso 1, falso 2')
+    expect(text).toContain('Checagens em “Sem faixa” ficam de fora.')
+    expect(text).toContain('o número dela menos a média do número das outras')
+    // The worked example gives what lean.js computes for falso, verdadeiro, impreciso.
+    expect(text).toContain('o desvio da Lupa é 2 − 0,5 = +1,5')
+    const [lupa] = deviations([
+      {
+        speaker: 'lula',
+        cells: [
+          { outlet: 'lupa', band: 'falso' },
+          { outlet: 'g1', band: 'verdadeiro' },
+          { outlet: 'estadao', band: 'impreciso' },
+        ],
+      },
+    ] as never)
+    expect(lupa.value).toBe(1.5)
+    expect(text).toContain(
+      'A distância é a média nas falas de Flávio Bolsonaro menos a média nas falas de Lula.',
+    )
+    expect(text).toContain(`recalcula a distância ${B} vezes`)
+    expect(text).toContain('entre o 5º e o 95º percentil')
+    expect(text).toContain('gerador fixo, então os mesmos dados dão sempre os mesmos números')
+    const ctx = createContext({ ...config, records: [] })
+    for (const [rule, verdict] of [
+      ['intervalo que contém o zero', 'none'],
+      ['intervalo todo acima de zero', 'c2'],
+      ['intervalo todo abaixo de zero', 'c1'],
+    ] as const) {
+      expect(text).toContain(`${rule}: “${sentence(verdict, ctx)}”`)
+    }
+    expect(text).toContain(`menos de ${MIN_N} desvios para algum dos candidatos: “amostra pequena”`)
+    expect(sentence('small', ctx)).toBe('amostra pequena')
+    for (const limit of [
+      'a conta só usa falas que duas ou mais agências checaram',
+      'o que cada agência escolheu checar, e o que deixou de checar, não entra',
+      'não quem acertou, e não prova favorecimento',
+    ]) {
+      expect(text).toContain(limit)
+    }
+    const spec = '.specs/features/agency-comparator/spec.md'
+    expect(body.find('a').attr('href')).toBe(`${REPO}/blob/main/${spec}`)
+    expect(existsSync(join(ROOT, spec))).toBe(true)
+  })
+
+  it('explains how changed verdicts are kept, counted and marked, with the repair report', async () => {
+    const { body, text } = section('Vereditos que mudaram')
+    expect(text).toContain('Quando o rótulo, a citação ou o identificador interno')
+    expect(text).toContain('com a data em que a coleta percebeu a mudança')
+    expect(text).toContain('A faixa de um rótulo antigo é a que ele tem hoje na tabela de faixas.')
+    expect(text).toContain('mostra as palavras tiradas e as acrescentadas')
+    expect(text).toContain(
+      'as mudanças de faixa na ordem verdadeiro < impreciso < falso: mais dura, mais branda, ganhou faixa (saiu de “Sem faixa”) ou perdeu a faixa',
+    )
+    expect(text).toContain('o detalhe da fala mostra a faixa anterior')
+    const report = 'data/repairs/2026-10-24-estadao.json'
+    const links = body
+      .find('a')
+      .map((_, a) => a.attribs.href)
+      .get()
+    expect(links).toEqual(['comparar.html#mudancas', `${REPO}/blob/main/${report}`])
+    expect(compare('section#mudancas')).toHaveLength(1)
+    expect(existsSync(join(ROOT, report))).toBe(true)
+
+    const readme = await readFile(join(ROOT, 'README.md'), 'utf8')
+    const comparator = readme.slice(readme.indexOf('\n## Comparador\n'))
+    expect(comparator.slice(0, comparator.indexOf('\n## ', 1))).toMatch(
+      /```sh\npnpm lean\n```[\s\S]*`src\/repair\/estadao-2026-10-24\.ts`[\s\S]*`data\/repairs\/2026-10-24-estadao\.json`/,
+    )
   })
 })
 

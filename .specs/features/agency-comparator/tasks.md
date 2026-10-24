@@ -432,11 +432,13 @@ T13 → T15
 
 **Done when**:
 
-- [ ] Built methodology page has the formula, scale, interval, sentence rule, limits and the spec link
-- [ ] Gate check passes: `pnpm vitest run test/unit/site/build.test.ts`
-- [ ] Test count: at least 2 new tests pass
+- [x] Built methodology page has the formula, scale, interval, sentence rule, limits and the spec link
+- [x] Gate check passes: `pnpm vitest run test/unit/site/build.test.ts`
+- [x] Test count: at least 2 new tests pass
 
 **Tests**: unit
 **Gate**: build
 
 **Commit**: `docs(site): Explain the distance measure and changed verdicts`
+
+**Status**: ✅ Complete

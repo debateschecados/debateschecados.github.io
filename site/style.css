@@ -904,6 +904,8 @@ textarea:focus-visible {
 .doc p,
 .doc li {
   color: #424245;
+  /* The repository links are one long word; they break rather than widen the page. */
+  overflow-wrap: break-word;
 }
 .doc a {
   color: var(--link);
@@ -1031,10 +1033,6 @@ textarea:focus-visible {
 }
 .cmp > section {
   padding-top: 8px;
-}
-/* The repository links are one long word; they break rather than widen the page. */
-.cmp p {
-  overflow-wrap: break-word;
 }
 .cmp .answer {
   font:
