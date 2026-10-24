@@ -345,22 +345,26 @@ describe('interval bar (LEAN-06)', () => {
   it('fills the bar at a contrast of 3:1 or more against the page', async () => {
     const page = await open()
     // The fixture agencies have small samples and draw no bar, so the page styles a probe.
-    const [bar, bg] = await page.evaluate(() => {
+    const [bar, bg, fade] = await page.evaluate(() => {
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
       svg.setAttribute('class', 'track')
       const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
       rect.setAttribute('class', 'ci')
       svg.append(rect)
       document.querySelector('#balance')?.append(svg)
-      return [getComputedStyle(rect).fill, getComputedStyle(document.body).backgroundColor]
+      const style = getComputedStyle(rect)
+      // Opacity and fill-opacity fade the fill as much as its own alpha does.
+      const fade = Number(style.opacity) * Number(style.fillOpacity)
+      return [style.fill, getComputedStyle(document.body).backgroundColor, fade] as const
     })
     const rgba = (c: string) => {
       const [r, g, b, a = 1] = (c.match(/[\d.]+/g) ?? []).map(Number)
       return [r, g, b, a]
     }
     // The bar's fill laid over the page, so a see-through fill counts as the page itself.
-    const over = (c: string) => {
-      const [r, g, b, a] = rgba(c)
+    const over = (c: string, alpha = 1) => {
+      const [r, g, b, own] = rgba(c)
+      const a = own * alpha
       const base = rgba(bg)
       return [r, g, b].map((v, i) => v * a + base[i] * (1 - a))
     }
@@ -372,7 +376,7 @@ describe('interval bar (LEAN-06)', () => {
       return 0.2126 * r + 0.7152 * g + 0.0722 * b
     }
     expect(bar).toMatch(/^rgba?\(/)
-    const [hi, lo] = [lum(over(bar)), lum(over(bg))].sort((a, b) => b - a)
+    const [hi, lo] = [lum(over(bar, fade)), lum(over(bg))].sort((a, b) => b - a)
     expect((hi + 0.05) / (lo + 0.05)).toBeGreaterThanOrEqual(3)
   })
 })
