@@ -165,8 +165,10 @@ describe('layout (SITE-06)', () => {
     await searched(page, 'teste')
     await settle(page)
     expect(await overflow()).toBeLessThanOrEqual(0)
-    await page.click('.audit-fab')
+    await page.click('.topbar .audit-btn')
     expect(await overflow()).toBeLessThanOrEqual(0)
+    const how = await open('/como-funciona.html', { viewport: { width: 360, height: 740 } })
+    expect(await how.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBe(0)
     const method = await open('/metodologia.html', { viewport: { width: 360, height: 740 } })
     expect(await method.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBe(0)
     // Both candidate columns stay on screen, none hidden behind a horizontal scroll.
@@ -385,7 +387,7 @@ describe('audit panel (AUDIT-01, AUDIT-02, AUDIT-04, AUDIT-05)', () => {
       true,
     )
     expect(await page.evaluate(() => Boolean(document.activeElement?.closest('dialog')))).toBe(true)
-    expect(await page.locator('.rules li').count()).toBe(5)
+    expect(await page.locator('#rules li').count()).toBe(5)
     await page.click('[data-close-audit]')
     expect(await page.evaluate(() => document.activeElement?.textContent)).toBe('Veja como auditar')
   })
@@ -400,13 +402,14 @@ describe('audit panel (AUDIT-01, AUDIT-02, AUDIT-04, AUDIT-05)', () => {
     }
   })
 
-  it('opens from the fixed "Como auditar" button on mobile and desktop', async () => {
+  it('opens from the "Como auditar" button in the top bar, which stays on screen', async () => {
     for (const width of [360, 1280]) {
       const page = await open('/', { viewport: { width, height: 740 } })
       await page.evaluate(() => scrollTo(0, document.body.scrollHeight))
-      const fab = page.getByRole('button', { name: 'Como auditar', exact: true })
-      expect(await fab.evaluate((b) => getComputedStyle(b).position)).toBe('fixed')
-      await fab.click()
+      const button = page.getByRole('button', { name: 'Como auditar', exact: true })
+      expect(await button.evaluate((b) => b.getBoundingClientRect().top)).toBeGreaterThanOrEqual(0)
+      expect(await button.evaluate((b) => b.getBoundingClientRect().bottom)).toBeLessThan(80)
+      await button.click()
       expect(
         await page.locator('dialog#audit').evaluate((d) => (d as HTMLDialogElement).open),
       ).toBe(true)
@@ -417,15 +420,27 @@ describe('audit panel (AUDIT-01, AUDIT-02, AUDIT-04, AUDIT-05)', () => {
     }
   })
 
+  it('opens the panel on the home page from "Como auditar" on any other page', async () => {
+    for (const path of ['/como-funciona.html', '/metodologia.html']) {
+      const page = await open(path, { viewport: { width: 360, height: 740 } })
+      await page.getByRole('link', { name: 'Como auditar', exact: true }).first().click()
+      await page.waitForURL(/#auditar$/)
+      expect(
+        await page.locator('dialog#audit').evaluate((d) => (d as HTMLDialogElement).open),
+        path,
+      ).toBe(true)
+    }
+  })
+
   it('copies the audit prompt to the clipboard', async () => {
     const page = await open('/', { permissions: ['clipboard-read', 'clipboard-write'] })
-    await page.click('.audit-fab')
+    await page.click('.topbar .audit-btn')
     await page.click('#copy')
     await page.waitForFunction(() => document.getElementById('copied')?.textContent !== '')
     expect(await page.textContent('#copied')).toBe('Prompt copiado')
     const text = await page.evaluate(() => navigator.clipboard.readText())
     expect(text).toContain(`Código e dados: ${REPO}`)
-    expect(text).toContain(`Todas as checagens: ${REPO}/blob/main/data/checks.csv`)
+    expect(text).toContain('/main/data/checks.csv')
     expect(text.match(/^\d\. /gm)).toEqual(['1. ', '2. ', '3. ', '4. ', '5. '])
   })
 
@@ -433,7 +448,7 @@ describe('audit panel (AUDIT-01, AUDIT-02, AUDIT-04, AUDIT-05)', () => {
     const page = await open('/', {}, () => {
       Object.defineProperty(Navigator.prototype, 'clipboard', { get: () => undefined })
     })
-    await page.click('.audit-fab')
+    await page.click('.topbar .audit-btn')
     await page.click('#copy')
     expect(await page.textContent('#copied')).toBe('Texto selecionado. Use Ctrl+C para copiar.')
     const selection = await page.evaluate(() => {
@@ -489,7 +504,7 @@ describe('privacy (SITE-07)', () => {
     const page = await open()
     await page.click('[data-debate="band-2026-10-18"]')
     await choose(page, 'outlet', 'g1')
-    await page.click('.audit-fab')
+    await page.click('.topbar .audit-btn')
     await page.evaluate(() => document.fonts.ready)
     expect(requests.length).toBeGreaterThan(5)
     expect(requests.filter((u) => !u.startsWith(`${origin}/`) && !u.startsWith('data:'))).toEqual(

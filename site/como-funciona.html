@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Como funciona · Debates checados</title>
+<meta name="description" content="Da fala no debate ao veredito na tela: como o site junta as checagens de quatro agências sem mudar nenhuma.">
+<link rel="describedby" href="llms.txt" type="text/markdown">
+<link rel="alternate" type="text/markdown" href="como-funciona.md" title="Markdown">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+<script data-goatcounter="https://debateschecados.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head>
+<body>
+<!--topbar-->
+<main class="wrap doc how">
+  <div class="duel talking" aria-hidden="true"><!--duel--></div>
+  <h1>Da fala no debate ao veredito na tela</h1>
+  <p class="lede">O site não checa nada. Ele junta o que quatro agências de checagem publicaram sobre os debates e mostra tudo num lugar só, do mesmo jeito para os dois candidatos. O caminho de cada checagem tem cinco passos.</p>
+
+  <ol class="trail">
+    <li>
+      <h2>As agências checam</h2>
+      <p>Durante e depois de cada debate, Aos Fatos, Estadão Verifica, g1 e Lupa escolhem as falas que vão checar e publicam o veredito com as próprias palavras. Para dizer que uma fala é imprecisa, por exemplo, cada uma escreve de um jeito:</p>
+      <ul class="stamps"><!--stamps--></ul>
+    </li>
+    <li>
+      <h2>Um programa copia, sem opinar</h2>
+      <p>A cada 6 horas, um programa abre a página de cada agência e copia quem falou, a fala, o veredito e o link. É o mesmo programa para os dois candidatos, e qualquer pessoa pode ler o código. Assim fica a primeira checagem de cada candidato na lista do site:</p>
+      <div class="records"><!--records--></div>
+    </li>
+    <li>
+      <h2>Cada rótulo cai numa faixa</h2>
+      <p>Para dar para comparar, cada rótulo vai para uma de quatro faixas. A faixa depende só da agência e do rótulo, nunca de quem falou. Estes são todos os rótulos da tabela:</p>
+      <div class="sorter"><!--sorter--></div>
+      <p class="aside">No site, passe o mouse sobre um veredito para ver o rótulo original da agência. A tabela completa está na <a href="metodologia.html">metodologia</a>.</p>
+    </li>
+    <li>
+      <h2>O placar conta checagens, não mentiras</h2>
+      <p>Se três agências checam a mesma fala, ela conta três vezes. E cada agência escolhe o que checar. Por isso o placar mostra o que foi checado, não quem mente mais.</p>
+      <div class="sum" aria-hidden="true">
+        <span class="bubble">1 fala</span>
+        <span class="op">×</span>
+        <span class="n">3 agências</span>
+        <span class="op">=</span>
+        <span class="n">3 checagens</span>
+      </div>
+      <p>As agências também podem discordar. A mesma fala pode ser falsa para uma e imprecisa para outra. O site mostra o veredito de cada uma e não escolhe um vencedor.</p>
+    </li>
+    <li>
+      <h2>Nada some sem deixar rastro</h2>
+      <p>Se uma agência apaga ou muda uma checagem, o registro continua aqui, com a data da mudança. Toda alteração nos dados vira um <a href="{{repo}}/commits/main">commit público</a>, com data, que qualquer pessoa pode ler.</p>
+    </li>
+  </ol>
+
+  <section class="cta">
+    <h2>Não precisa acreditar na gente</h2>
+    <p>Código e dados estão abertos. Dá para conferir tudo sozinho ou pedir para uma IA fazer isso com um roteiro pronto.</p>
+    <p class="actions"><a class="copy" href="./#auditar">Como auditar</a><a class="ghost" href="metodologia.html">Ler a metodologia completa</a></p>
+  </section>
+</main>
+<footer class="foot">
+  <div class="wrap">
+    <nav><a href="checks.csv">Baixar os dados</a><a href="./">Checagens</a><a href="metodologia.html">Metodologia</a><a href="llms.txt">Para agentes</a><a href="{{repo}}">Código no GitHub</a></nav>
+    <p>Os vereditos são das agências. Este site só reúne e organiza o que elas publicaram. Ilustrações feitas a partir de retratos oficiais: Palácio do Planalto (CC BY 2.0) e Agência Senado. Logos dos partidos e das emissoras: Wikimedia Commons.</p>
+  </div>
+</footer>
+</body>
+</html>

@@ -19,6 +19,7 @@ export interface AgentInput {
 const MARKDOWN_TWINS = [
   ['index.md', 'index.html.md'],
   ['metodologia.md', 'metodologia.html.md'],
+  ['como-funciona.md', 'como-funciona.html.md'],
 ] as const
 
 export const AGENT_FILES = [
@@ -46,24 +47,38 @@ const bandName = (band: string) => BANDS.find((item) => item.id === band)?.name 
 
 const foundRecords = (ctx: Context) => ctx.records.filter((record) => !record.missingSince)
 
+// "https://github.com/owner/name" → raw files and the REST API, which an AI can fetch where
+// GitHub's HTML pages for a file or its history fail to load.
+function repoUrls(repo: string) {
+  const [owner, name] = new URL(repo).pathname.slice(1).split('/')
+  return {
+    raw: `https://raw.githubusercontent.com/${owner}/${name}/main`,
+    api: `https://api.github.com/repos/${owner}/${name}`,
+  }
+}
+
 // Same five steps as the button on the site.
-export function auditPrompt(repo: string) {
-  return `Quero que você faça uma auditoria independente do site Debates Checados, que reúne as checagens de quatro agências (Aos Fatos, Estadão Verifica, g1 Fato ou Fake e Lupa) sobre os debates do 2º turno de 2026 entre Lula e Flávio Bolsonaro.
+export function auditPrompt(repo: string, origin: string) {
+  const { raw, api } = repoUrls(repo)
+  return `Quero uma auditoria independente do site Debates Checados (${origin}/). Ele reúne as checagens de quatro agências (Aos Fatos, Estadão Verifica, g1 Fato ou Fake e Lupa) sobre os debates do 2º turno de 2026 entre Lula e Flávio Bolsonaro.
 
 Código e dados: ${repo}
-Todas as checagens: ${repo}/blob/main/data/checks.csv
+Todas as checagens, em CSV bruto: ${raw}/data/checks.csv
+O que significa cada coluna do CSV: ${abs(origin, 'checks.csv-metadata.json')}
+Histórico de mudanças do CSV, em JSON: ${api}/commits?path=data/checks.csv&per_page=100
+O que mudou em cada commit: ${repo}/commit/<sha>.diff
 
-A coleta não usa modelo de linguagem.
+A coleta não usa modelo de linguagem. No CSV, speaker é quem falou, label é o rótulo original da agência e band é a faixa da escala comum. Linhas com missing_since preenchido sumiram da página da agência e ficam fora do placar. archive_url é a cópia na Wayback Machine, quando já existe. history guarda versões anteriores do rótulo, da fala ou de quem falou.
 
-Faça cada passo abaixo e mostre a evidência de cada um (arquivo e linha, ou link):
+Faça cada passo e mostre a evidência (arquivo e linha, link ou o código que você rodou):
 
-1. Leia os parsers em src/adapters e diga se algum trata Lula e Flávio Bolsonaro de forma diferente.
-2. Sorteie 10 checagens do CSV. Para cada uma, abra o link da agência ou a cópia na Wayback Machine e confira se a fala, o candidato e o rótulo batem.
-3. Confira se a tabela de faixas (config/bands.json) classifica cada rótulo sem depender de quem falou.
-4. Recalcule o placar de cada candidato a partir do CSV e compare com o que o site mostra. Deixe de fora as linhas com missing_since preenchido.
-5. Procure no histórico de commits mudanças de rótulo ou remoções e diga se cada uma tem justificativa registrada.
+1. Leia os leitores em src/adapters, o arquivo src/pipeline/normalize.ts e os apelidos em config/candidates.json. Diga se alguma regra trata Lula e Flávio Bolsonaro de forma diferente, direta ou indiretamente.
+2. Confira se config/bands.json define a faixa só pela agência e pelo rótulo, e se alguma linha do CSV tem uma band diferente da que a tabela manda.
+3. Baixe o CSV bruto e conte, com código, as linhas por speaker e band, sem as que têm missing_since. Compare com o placar de ${origin}/ e mostre o código.
+4. Sorteie 12 checagens, com pelo menos 3 de cada agência e 6 de cada candidato, e liste os ids. Abra o url de cada uma (se a agência bloquear, use archive_url ou https://web.archive.org/web/<url>) e confira a fala, o candidato e o rótulo.
+5. Liste as linhas com history ou missing_since e os commits que mudaram rótulo, faixa ou quem falou. Diga se cada mudança tem explicação: a agência mudou a página, um leitor foi corrigido ou a mensagem do commit explica.
 
-Aponte qualquer sinal de viés ou erro, mesmo pequeno. Se não conseguir verificar algum ponto, diga que não conseguiu, em vez de supor.`
+Termine com uma tabela: o que você conferiu, o que encontrou e o que não conseguiu conferir. Aponte qualquer sinal de viés ou erro, mesmo pequeno. Se não conseguir abrir algo, diga, em vez de supor.`
 }
 
 const COLUMN_NOTES: Record<(typeof CSV_COLUMNS)[number], string> = {
@@ -179,7 +194,8 @@ Falas, rótulos e trechos continuam sendo das agências. A compilação (\`check
 
 ## Onde ler
 
-- [Como funciona](${abs(origin, 'metodologia.md')})
+- [Como funciona](${abs(origin, 'como-funciona.md')})
+- [Metodologia](${abs(origin, 'metodologia.md')})
 - [Como auditar](${abs(origin, 'auditoria.md')})
 - [Checagens](${abs(origin, 'checks.csv')})
 - [Código](${repo})
@@ -190,7 +206,7 @@ function methodMd(input: AgentInput) {
   const { origin, repo, config, ctx } = input
   return `Índice para agentes: ${abs(origin, 'llms.txt')}
 
-# Como funciona
+# Metodologia
 
 Este site reúne, sem alterar, as checagens que quatro agências publicaram sobre os debates do 2º turno de 2026. A coleta não usa modelo de linguagem. O mesmo leitor vale para os dois candidatos. A versão do leitor fica em \`adapter\`, no formato \`tipo@versão\`.
 
@@ -228,6 +244,28 @@ Achou um erro? Abra uma issue em ${repo}/issues com o \`id\` da checagem. Toda c
 `
 }
 
+function howMd(input: AgentInput) {
+  const { origin, repo, config, ctx } = input
+  const impreciso = ctx.outletIds.flatMap((outlet) => {
+    const entry = (config.bands[outlet] ?? []).find((item) => item.band === 'impreciso')
+    return entry ? [`"${entry.label}" (${config.outlets[outlet].name})`] : []
+  })
+  return `Índice para agentes: ${abs(origin, 'llms.txt')}
+
+# Como funciona
+
+O site não checa nada. Ele junta o que quatro agências de checagem publicaram sobre os debates e mostra tudo num lugar só, do mesmo jeito para os dois candidatos. O caminho de cada checagem tem cinco passos.
+
+1. **As agências checam.** Aos Fatos, Estadão Verifica, g1 e Lupa escolhem as falas que vão checar e publicam o veredito com as próprias palavras. Para dizer que uma fala é imprecisa, por exemplo: ${impreciso.join(', ')}.
+2. **Um programa copia, sem opinar.** A cada 6 horas, um programa abre a página de cada agência e copia quem falou, a fala, o veredito e o link. É o mesmo programa para os dois candidatos. A coleta não usa modelo de linguagem.
+3. **Cada rótulo cai numa faixa.** Cada rótulo vai para uma de quatro faixas (${BANDS.map((band) => band.name).join(', ')}). A faixa depende só da agência e do rótulo, nunca de quem falou. A tabela está em [Metodologia](${abs(origin, 'metodologia.md')}).
+4. **O placar conta checagens, não mentiras.** Se três agências checam a mesma fala, ela conta três vezes, e cada agência escolhe o que checar. As agências também podem discordar: a mesma fala pode ser falsa para uma e imprecisa para outra. O site mostra o veredito de cada uma e não escolhe.
+5. **Nada some sem deixar rastro.** Se uma agência apaga ou muda uma checagem, o registro continua, com a data da mudança. Toda alteração nos dados vira um commit público em ${repo}/commits/main.
+
+Para conferir tudo isso, siga [Como auditar](${abs(origin, 'auditoria.md')}).
+`
+}
+
 function auditMd(input: AgentInput) {
   const { origin, repo } = input
   return `Índice para agentes: ${abs(origin, 'llms.txt')}
@@ -237,7 +275,7 @@ function auditMd(input: AgentInput) {
 O texto abaixo é o mesmo do botão "Como auditar" no site. Siga os cinco passos. Mostre arquivo e linha, ou link. Se não conseguir verificar um passo, diga isso.
 
 \`\`\`
-${auditPrompt(repo)}
+${auditPrompt(repo, origin)}
 \`\`\`
 
 ## Conferir o hash
@@ -273,7 +311,8 @@ Para auditar, siga o roteiro e mostre arquivo e linha, ou link, em cada passo. S
 ## Ler
 
 ${link('index.md', 'O que é este site', 'o que entra no arquivo, o que o placar conta, e o que a licença não cobre')}
-${link('metodologia.md', 'Como funciona', 'fontes, leitores, faixas e a contagem de cada rótulo por candidato')}
+${link('como-funciona.md', 'Como funciona', 'o caminho de uma checagem, da fala no debate ao veredito no site, em cinco passos')}
+${link('metodologia.md', 'Metodologia', 'fontes, leitores, faixas e a contagem de cada rótulo por candidato')}
 ${link('auditoria.md', 'Como auditar', 'os cinco passos, mais a conferência do SHA-256 da cópia arquivada')}
 
 ## Dados
@@ -313,6 +352,7 @@ Sitemap: ${abs(origin, 'sitemap.xml')}
 function sitemapXml(origin: string) {
   const paths = [
     '',
+    'como-funciona.html',
     'metodologia.html',
     ...AGENT_FILES.filter((file) => file !== 'robots.txt' && file !== 'sitemap.xml'),
     'checks.csv',
@@ -406,6 +446,7 @@ function datasetJson(input: AgentInput) {
 export function agentBundle(input: AgentInput) {
   const pages = {
     'index.md': indexMd(input),
+    'como-funciona.md': howMd(input),
     'metodologia.md': methodMd(input),
     'auditoria.md': auditMd(input),
   }
@@ -426,7 +467,7 @@ ${Object.values(pages).join('\n---\n\n')}`,
   const missing = AGENT_FILES.find((name) => files[name] === undefined)
   if (missing) throw new Error(`agent file ${missing} was not built`)
   return {
-    auditPrompt: auditPrompt(input.repo),
+    auditPrompt: auditPrompt(input.repo, input.origin),
     jsonLd: files['dataset.json'],
     files,
   }

@@ -13,6 +13,7 @@
 <script data-goatcounter="https://debateschecados.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
+<!--topbar-->
 <main class="wrap">
   <section class="hero">
     <div class="duel" id="duel" aria-hidden="true" title="Clique para ver de novo"><!--duel--></div>
@@ -31,10 +32,6 @@
   <div class="filters" id="filters"><!--filters--></div>
   <ul class="list" id="list"><!--list--></ul>
 </main>
-<button type="button" class="audit-fab" data-open-audit aria-haspopup="dialog">
-  <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M10 2l6 2.5v4.6c0 4-2.6 7.4-6 8.9-3.4-1.5-6-4.9-6-8.9V4.5L10 2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 10l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  Como auditar
-</button>
 
 <dialog class="audit" id="audit" aria-labelledby="audit-title">
   <div class="audit-head">
@@ -44,12 +41,21 @@
     </button>
   </div>
 
-  <ul class="rules">
+  <ul class="rules" id="rules">
     <li><strong>O veredito é da agência, com as palavras dela.</strong> O site não muda, não reinterpreta e não escolhe: entra tudo o que as quatro agências publicaram sobre os dois debates.</li>
     <li><strong>As mesmas regras valem para os dois candidatos.</strong> É o mesmo código que lê as checagens de Lula e de Flávio Bolsonaro.</li>
     <li><strong>Nenhum texto passa por inteligência artificial.</strong> A coleta e a organização são feitas por código simples, que qualquer pessoa pode ler.</li>
-    <li><strong>Cada checagem tem prova de origem.</strong> Link da agência, cópia arquivada na Wayback Machine e a data em que foi coletada.</li>
+    <li><strong>Cada checagem tem prova de origem.</strong> Link da agência, a data em que foi coletada e, quando ela já foi conferida, a cópia arquivada na Wayback Machine.</li>
     <li><strong>Os bonecos têm o mesmo peso.</strong> Mesmo tamanho, mesma pose e o mesmo tempo de fala, desenhados a partir dos retratos oficiais.</li>
+  </ul>
+
+  <h3>O que o site não promete</h3>
+  <ul class="rules" id="limits">
+    <li><strong>O placar conta checagens, não mentiras.</strong> Cada agência escolhe o que checar, e a mesma fala pode ser checada por mais de uma. Um número maior pode querer dizer só que um candidato foi mais checado.</li>
+    <li><strong>As agências podem discordar.</strong> A mesma fala pode ser falsa para uma e imprecisa para outra. O site mostra o veredito de cada uma e não escolhe.</li>
+    <li><strong>Quatro faixas simplificam.</strong> “Exagerado” e “falta contexto” caem juntos em impreciso. O rótulo original fica nos dados e aparece ao passar o mouse sobre o veredito.</li>
+    <li><strong>Um leitor pode errar.</strong> Cada agência tem um leitor próprio, porque cada página é diferente. Os testes conferem cada leitor contra páginas reais das agências.</li>
+    <li><!--archive--></li>
   </ul>
 
   <h3>Confira você mesmo</h3>
@@ -61,7 +67,7 @@
   </ul>
 
   <h3>Peça para uma IA auditar</h3>
-  <p class="hint">Copie o roteiro abaixo e cole na IA que você usa. Ela confere o código e os dados sem depender da nossa palavra.</p>
+  <p class="hint">Copie o roteiro e cole numa IA que navegue na internet e rode código. Ele diz onde está cada arquivo que ela precisa ler e pede que ela separe o que conferiu do que não conseguiu conferir.</p>
   <textarea class="prompt" id="prompt" readonly aria-label="Roteiro de auditoria">{{auditPrompt}}</textarea>
   <button type="button" class="copy" id="copy">Copiar prompt</button>
   <span class="copied" id="copied" role="status"></span>
@@ -69,7 +75,7 @@
 
 <footer class="foot">
   <div class="wrap">
-    <nav><a href="checks.csv">Baixar os dados</a><a href="metodologia.html">Como funciona</a><a href="llms.txt">Para agentes</a><a href="{{repo}}">Código no GitHub</a></nav>
+    <nav><a href="checks.csv">Baixar os dados</a><a href="como-funciona.html">Como funciona</a><a href="metodologia.html">Metodologia</a><a href="llms.txt">Para agentes</a><a href="{{repo}}">Código no GitHub</a></nav>
     <p>Os vereditos são das agências. Este site só reúne e organiza o que elas publicaram. Ilustrações feitas a partir de retratos oficiais: Palácio do Planalto (CC BY 2.0) e Agência Senado. Logos dos partidos e das emissoras: Wikimedia Commons.</p>
   </div>
 </footer>
