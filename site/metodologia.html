@@ -32,13 +32,13 @@
   <p>Com uma agência escolhida, o placar conta só as checagens dela. Sem agência escolhida, o placar soma as checagens de todas. Cada agência escolhe o que checar, e a mesma fala pode aparecer uma vez por agência, então o placar geral soma checagens, não falas.</p>
 
   <h2>Comparação entre agências</h2>
-  <p>A página <a href="comparar.html">Comparar agências</a> mostra, alegação por alegação, o veredito de cada agência quando duas ou mais checaram a mesma alegação de um candidato no mesmo debate. Também conta, por agência e candidato, quantas dessas alegações a agência checou e como o veredito dela se compara com o das outras. Os números mostram diferenças, não provam favorecimento: cada agência escolhe o que checar.</p>
+  <p>A página <a href="comparar.html">Comparar agências</a> mostra, fala por fala, o veredito de cada agência quando duas ou mais checaram a mesma fala de um candidato no mesmo debate. Também conta, por agência e candidato, quantas dessas falas a agência checou e como o veredito dela se compara com o das outras. Os números mostram diferenças, não provam favorecimento: cada agência escolhe o que checar.</p>
   <p>A IA só agrupa checagens da mesma alegação, sem saber a agência nem o veredito. Ela nunca define veredito. Os grupos são feitos assim:</p>
   <ol>
     <li>Os agentes recebem só a fala e o trecho de cada checagem, com a agência trocada por uma letra.</li>
     <li>Três agentes agrupam as checagens de cada debate, cada um sem ver o trabalho dos outros.</li>
     <li>Onde eles discordam, um juiz decide só aqueles casos.</li>
-    <li>Um revisor lê a frase de cada alegação atrás de palavras que tomem partido.</li>
+    <li>Um revisor lê a frase de cada fala atrás de palavras que tomem partido.</li>
     <li>O mantenedor revisa o resultado antes de publicar e registra o motivo de cada mudança feita à mão.</li>
   </ol>
   <p>Todos os grupos estão em <a href="claim-groups.json">claim-groups.json</a>. A entrada dos agentes, a resposta de cada um e o roteiro da curadoria estão em <a href="{{repo}}/tree/main/data/claim-curation">data/claim-curation</a>.</p>

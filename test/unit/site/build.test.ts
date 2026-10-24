@@ -735,7 +735,7 @@ describe('AI disclosure (DISC-01, DISC-02, DISC-04)', () => {
       'com a agência trocada por uma letra',
       'Três agentes agrupam as checagens de cada debate',
       'um juiz decide só aqueles casos',
-      'Um revisor lê a frase de cada alegação',
+      'Um revisor lê a frase de cada fala',
       'O mantenedor revisa o resultado antes de publicar',
     ]) {
       expect(how).toContain(step)
