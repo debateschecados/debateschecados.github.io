@@ -272,6 +272,50 @@ describe('step 3: matching (INGEST-04)', () => {
     expect(records.find((r) => r.quote === f2)?.id).toBe(idOf(p2))
   })
 
+  it('keeps ids with their speaker when both say the same quote and the order swaps', () => {
+    const quote = 'O Brasil voltou a crescer'
+    const previous = first([
+      lupa([
+        lupaItem(1, quote, { speaker: 'lula' }),
+        lupaItem(2, quote, { speaker: 'flavio', label: 'FALSO' }),
+      ]),
+    ])
+    const idOf = (speaker: string) => previous.find((r) => r.speaker === speaker)?.id
+    const { records } = merge(
+      previous,
+      [
+        lupa([
+          lupaItem(1, quote, { speaker: 'flavio', label: 'FALSO' }),
+          lupaItem(2, quote, { speaker: 'lula' }),
+        ]),
+      ],
+      ctx(),
+    )
+    expect(records.map((r) => [r.id, r.speaker, r.label, r.history])).toEqual([
+      [idOf('flavio'), 'flavio', 'FALSO', undefined],
+      [idOf('lula'), 'lula', 'VERDADEIRO', undefined],
+    ])
+  })
+
+  it('prefers the duplicate with the same label and settles on a second identical run', () => {
+    const quote = 'A inflação caiu pela metade no meu governo'
+    const previous = first([lupa([lupaItem(1, quote, { label: 'FALSO' }), lupaItem(2, quote)])])
+    const page = lupa([
+      lupaItem(1, 'Uma fala nova sobre o emprego formal', { label: 'FALSO' }),
+      lupaItem(2, 'Outra fala nova sobre escolas técnicas', { label: 'FALSO' }),
+      lupaItem(3, quote),
+    ])
+    const second = merge(previous, [page], ctx())
+    const kept = byId(second.records, previous[1].id)
+    expect(kept).toMatchObject({ pos: 3, label: 'VERDADEIRO' })
+    expect(kept?.history).toBeUndefined()
+    expect(byId(second.records, previous[0].id)?.missingSince).toBe('2026-10-25')
+
+    const third = merge(second.records, [page], ctx({ date: '2026-10-26' }))
+    expect(third.records).toEqual(second.records)
+    expect(third.events.filter((e) => e.type !== 'source')).toEqual([])
+  })
+
   it('matches a rewritten quote through config/id-links.json', () => {
     const before = 'Nós construímos mais escolas técnicas que todos os governos anteriores juntos'
     const after = 'Foram 400 institutos federais abertos nos meus mandatos'

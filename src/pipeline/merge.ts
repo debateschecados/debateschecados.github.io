@@ -54,6 +54,16 @@ const jaccard = (a: Set<string>, b: Set<string>) => {
   return union === 0 ? 0 : shared / union
 }
 
+// Order of preference among previous records that match an item equally well: still
+// published, same speaker, same label, nearest position, then id. Keeps identical quotes
+// with their own speaker and makes the result independent of the order of `previous`.
+const rank = (item: FreshItem, a: CheckRecord, b: CheckRecord) =>
+  Number(a.missingSince !== undefined) - Number(b.missingSince !== undefined) ||
+  Number(a.speaker !== item.speaker) - Number(b.speaker !== item.speaker) ||
+  Number(a.label !== item.label) - Number(b.label !== item.label) ||
+  Math.abs(a.pos - item.pos) - Math.abs(b.pos - item.pos) ||
+  cmp(a.id, b.id)
+
 // Pairs fresh item index -> previous record, following design steps 3.1 to 3.4.
 function match(
   previous: readonly CheckRecord[],
@@ -68,18 +78,21 @@ function match(
   }
   const free = (filter: (r: CheckRecord) => boolean) =>
     previous.filter((r) => !used.has(r) && filter(r))
-
-  items.forEach((item, i) => {
-    if (item.key === null) return
-    const record = free((r) => r.key === item.key)[0]
+  const pairBest = (i: number, filter: (r: CheckRecord) => boolean) => {
+    const [record] = free(filter).sort((a, b) => rank(items[i], a, b))
     if (record) pair(i, record)
-  })
+  }
 
-  const keyless = items.flatMap((item, i) => (item.key === null ? [i] : []))
+  // Page order, so the assignment does not depend on how the adapter listed the items.
+  const order = items.map((_, i) => i).sort((a, b) => items[a].pos - items[b].pos || a - b)
+  const keyed = order.filter((i) => items[i].key !== null)
+  const keyless = order.filter((i) => items[i].key === null)
+
+  for (const i of keyed) pairBest(i, (r) => r.key === items[i].key)
+
   for (const i of keyless) {
     const key = quoteKey(items[i].quote)
-    const record = free((r) => r.key === null && quoteKey(r.quote) === key)[0]
-    if (record) pair(i, record)
+    pairBest(i, (r) => r.key === null && quoteKey(r.quote) === key)
   }
 
   const candidates: { i: number; record: CheckRecord; score: number }[] = []
@@ -91,7 +104,13 @@ function match(
       if (score >= JACCARD_MIN) candidates.push({ i, record, score })
     }
   }
-  candidates.sort((a, b) => b.score - a.score || a.i - b.i || a.record.pos - b.record.pos)
+  candidates.sort(
+    (a, b) =>
+      b.score - a.score ||
+      items[a.i].pos - items[b.i].pos ||
+      a.i - b.i ||
+      rank(items[a.i], a.record, b.record),
+  )
   for (const { i, record } of candidates) {
     if (!matched.has(i) && !used.has(record)) pair(i, record)
   }
@@ -99,8 +118,7 @@ function match(
   for (const i of keyless) {
     if (matched.has(i)) continue
     const id = links[quoteKey(items[i].quote)]
-    const record = id === undefined ? undefined : free((r) => r.id === id)[0]
-    if (record) pair(i, record)
+    if (id !== undefined) pairBest(i, (r) => r.id === id)
   }
 
   return matched
