@@ -68,6 +68,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: N14 src/pipeline/merge.ts:93 (validation.md iteration 2) (merge)
 - last seen: 2026-10-24T09:05:45Z
 
+### L-010 - Test an override that names one item with a second qualifying item in the same run, so the override cannot apply to items it does not name
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `merge` · harmful: 0
+- features: debate-archive
+- evidence: R06 src/pipeline/merge.ts:183 (merge)
+- last seen: 2026-10-24T09:20:34Z
+
+### L-011 - Include a config entry that maps to the fallback value on purpose, so code cannot treat mapped-to-fallback as unmapped
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `ingest` · harmful: 0
+- features: debate-archive
+- evidence: R07 src/ingest.ts:324 (ingest)
+- last seen: 2026-10-24T09:20:34Z
+
+### L-012 - Assert provenance fields on every update path with a fresh value that differs from the stored one
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `merge` · harmful: 0
+- features: debate-archive
+- evidence: R04 src/pipeline/merge.ts:158 (merge)
+- last seen: 2026-10-24T09:20:34Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

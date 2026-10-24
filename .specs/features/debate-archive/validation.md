@@ -1,31 +1,26 @@
 # Debate Archive Validation
 
-## Validation: debate-archive - FAIL
+## Validation: debate-archive - PASS
 
 **Date**: 2026-10-24
-**Iteration**: 2 of 3 (re-verification after the iteration 1 FAIL at `b710b2f`)
+**Iteration**: 3 of 3 (re-verification after the iteration 2 FAIL at `523adc2`)
 **Spec**: `.specs/features/debate-archive/spec.md`
-**Diff range**: `88e9ef1..HEAD` (HEAD `29fd94e`); changes since iteration 1: `b710b2f..29fd94e`
+**Diff range**: `88e9ef1..HEAD` (HEAD `b487783`); changes since iteration 2: `523adc2..b487783`
 **Verifier**: independent sub-agent (author ≠ verifier)
 
-The verdict is FAIL. All five iteration 1 survivors are now killed and the six iteration 1 gaps are closed. Fifteen new mutants found two new survivors in impartiality-critical logic: the browser's scoreboard can be fed every agency's records while one agency is selected and no test notices (`site/app.js:60`, N06), and ingest can resolve speakers against every configured candidate instead of the debate's own (`src/ingest.ts:197`, N04). A third survivor, quote matching applied to keyed sources (`src/pipeline/merge.ts:93`, N14), leaves the reworded INGEST-04 without a negative test.
+The verdict is PASS. The three iteration 2 survivors (N04, N06, N14 in both variants) are killed by tests that assert the spec outcome with expectations computed independently of the code under test, and the five iteration 1 survivors stay killed. Of 24 new mutants in areas no earlier iteration touched, 21 were killed. The three survivors sit outside impartiality-critical logic (band mapping, speaker resolution, scoreboard counting, candidate ordering, archive verification) and become ranked gaps: `--accept-drop` leaks to every source (`src/pipeline/merge.ts:183`), a label mapped to "sem faixa" on purpose can be reported as unmapped (`src/ingest.ts:324`), and a silent field change can keep the old `fetchedAt` (`src/pipeline/merge.ts:158`).
 
 ---
 
-## What changed since iteration 1
+## What changed since iteration 2
 
-Commits `66d315a..29fd94e` add tests only and reword INGEST-04. `git diff --stat b710b2f HEAD -- src site data config` is empty, so the product code and the published dataset are the ones iteration 1 checked.
+Commits `42539c3..b487783` add tests only. `git diff --stat 523adc2 HEAD -- src site data config` is empty, so product code and the published dataset are the ones iterations 1 and 2 checked. Three test files changed, 119 insertions, 2 deletions.
 
-| Iteration 1 gap | Commit | New test | Asserts the spec outcome? | Status |
-| --------------- | ------ | -------- | ------------------------- | ------ |
-| Fix 1, DATA-06 snapshot ignores speaker and quote (M12, M26) | `66d315a` | `test/unit/archive.test.ts:341` to `:357`, `it.each` over label, speaker and quote on a keyed and a keyless record | Yes. Each case changes one field, then checks `archiveUrl` stays `null` for both records, the attempt outcome is `waiting` and the step reads `0 of 2 records, rejected`. A second candidate was added so the speaker case really resolves to `flavio` | ✅ Closed |
-| Fix 2, INGEST-05 prefix match (M03) | `a8c4ae0` | `test/unit/normalize.test.ts:47` to `:55` (five near-miss names, prefix, suffix and inner match); `test/integration/ingest.test.ts:253` (excluded entry with source URL, pos and reason; published records keep only pos 1 and 3) | Yes. Null for names that only contain an alias, and the run report lists the item with its source URL | ✅ Closed |
-| Fix 3, INGEST-04 rank without speaker tie-break (M07) | `03bd57a` | `test/unit/merge.test.ts:318`, same quote and same label, speakers swap places | Yes. Ids stay with the speaker, `history` stays undefined and no `new` or `missing` event appears. Any other assignment would write a speaker change into HIST-01 history that never happened | ✅ Closed |
-| Fix 4, INGEST-06 30 s default (M25) | `e8e507e` | `test/unit/io/http.test.ts:249` | Yes. Without `timeoutMs` both requests ask for `30_000` ms and the error reads `no response after 30000 ms` | ✅ Closed |
-| Fix 5, INGEST-04 wording | `972c687` | `spec.md:72` | Consistent with design steps 3.1 to 3.3 ("keyless only") and with the merge tests, which run quote matching only on Lupa (keyless) items. The implementation decides per item (`items[i].key === null`, `src/pipeline/merge.ts:89`); every MVP adapter gives keys to all of its items or to none, so per item and per source agree. No test pins the "keyless only" limit, see N14 | ✅ Closed, new gap N14 |
-| Fix 6, AUDIT-08 footer and AUDIT-01 position | `29fd94e` | `test/unit/site/build.test.ts:109` (`.hero > h1 + p + p.trust`, exact text, last child is the panel button); `test/unit/site/build.test.ts:247` to `:273` (credits in both footers and the methodology list); `test/e2e/site.test.ts:267` (control inside a 740 px first screen at 360 and 1280 px) | Yes | ✅ Closed |
-
-Correction to iteration 1: several of its citations pointed at lines that do not exist (for example `test/unit/site/sprites.test.ts:357` in a 101-line file, `test/unit/adapters/lupa.test.ts:236` in a 112-line file). Every citation below was re-read at `29fd94e`.
+| Iteration 2 gap | Commit | New test | Asserts the spec outcome, independently? | Status |
+| --------------- | ------ | -------- | ---------------------------------------- | ------ |
+| Fix 1, SCORE-01/SCORE-04 browser board never read (N06) | `b487783` | `test/e2e/site.test.ts:261`; helpers `boardNumbers` at `:111` and `expectedBoard` at `:131` | Yes. `expectedBoard` filters the fixture `records` by hand (`!r.missingSince`, speaker, the test's own predicate) and counts the four bands in the spec's order. It imports nothing from `site/core.js`. The test reads each candidate's total and four legend numbers from `#board` after the count-up settles, for "Todas" (`:263`), Lupa (`:268`, with the anchor `lupa.flavio.total === 3` at `:267`), "Todas" again (`:271`) and Globo plus Estadão (`:277`), and checks the list length equals the board total (`:278`, SCORE-04) | ✅ Closed |
+| Fix 2, INGEST-05 per-debate candidate list (N04) | `e692ae8` | `test/integration/ingest.test.ts:275`; the `debate()` helper now takes `candidates` (`:56` to `:68`) | Yes. A Globo debate listing only `lula` excludes the Flávio item: report `excluded` holds `{ url, pos: 2, reason: 'speaker not resolved: "FLÁVIO BOLSONARO (PL)"' }` (`:283` to `:287`), only positions 1 and 3 are published (`:289`), and the same speaker still resolves on the Band debate that lists him (`:294`) | ✅ Closed |
+| Fix 3, INGEST-04 keyed sources match only by key (N14) | `42539c3` | `test/unit/merge.test.ts:355` (new key, known quote) and `:377` (keyed item vs keyless record) | Yes. The new key gets `recordId(G1, 'chunk-9')`, the old record equals itself plus `missingSince` (`:366`), no history, and `new` plus `missing` events (`:373`, `:374`). The keyed item does not inherit the keyless record's id (`:380`) | ✅ Closed |
 
 ---
 
@@ -33,46 +28,48 @@ Correction to iteration 1: several of its citations pointed at lines that do not
 
 | Task | Status | Notes |
 | ---- | ------ | ----- |
-| T1 to T24 | ✅ Done | Unchanged since iteration 1. `data/` still holds 314 records, 83 waiting for a snapshot because web.archive.org refused connections during the run (DATA-06 retries them). |
+| T1 to T24 | ✅ Done | Unchanged since iteration 1. `data/` holds 314 records, 83 waiting for a snapshot because web.archive.org refused connections during the run (DATA-06 retries them). |
 
 ---
 
 ## Spec-Anchored Acceptance Criteria
 
+Every citation below was re-read at `b487783`. Files untouched since iteration 2 keep their line numbers; the three changed files were re-indexed.
+
 ### P1: Collect the debate checks
 
 | Criterion | Spec-defined outcome | `file:line` + assertion | Result |
 | --------- | -------------------- | ----------------------- | ------ |
-| INGEST-01 | every manifest source fetched (4 agencies x 2 debates) | `test/integration/ingest.test.ts:195` writes all three files for every configured source; `test/integration/ingest.test.ts:466` run log lists every source; `test/unit/config.test.ts:28` real config has 2 debates and 8 sources | ✅ |
-| INGEST-02 | one record per check with agency, debate, speaker, quote, label, band, excerpt, source URL, anchor or position | `test/integration/ingest.test.ts:195`, full record equality on every field | ✅ |
+| INGEST-01 | every manifest source fetched (4 agencies x 2 debates) | `test/integration/ingest.test.ts:200` writes all three files for every configured source; `test/integration/ingest.test.ts:493` run log lists every source; `test/unit/config.test.ts:28` real config has 2 debates and 8 sources | ✅ |
+| INGEST-02 | one record per check with agency, debate, speaker, quote, label, band, excerpt, source URL, anchor or position | `test/integration/ingest.test.ts:200`, full record equality on every field | ✅ |
 | INGEST-03 | one parser per agency format | `test/unit/adapters/g1.test.ts:57`, `test/unit/adapters/lupa.test.ts:51`, `test/unit/adapters/estadao.test.ts:41`, `test/unit/adapters/aosfatos.test.ts:86` and `:123`; `test/golden/golden.ts:41` pins counts and label distribution per page | ✅ |
-| INGEST-04 | ID kept on match by item ID or, for a source without item IDs, by the same quote or a similar quote from the same speaker | `test/unit/merge.test.ts:194` (key, quote rewritten), `:205` (same quoteKey), `:215` and `:228` (Jaccard ≥ 0.6), `:249` (same speaker required), `:318` (ids stay with speaker) | ⚠️ N14 survived: no test shows that a keyed item is NOT matched by quote |
-| INGEST-05 | unresolved speaker excluded and listed with source URL | `test/unit/normalize.test.ts:42` and `:47` to `:55`, `resolveSpeaker(raw)` is null; `test/integration/ingest.test.ts:227` and `:253`, excluded entry `{ url, pos, reason }` | ❌ N04 survived: ingest may resolve against every configured candidate instead of the debate's own; only `resolveSpeaker` itself is tested with a narrowed list (`test/unit/normalize.test.ts:57`) |
-| INGEST-06 | non-200, 30 s timeout, zero records or under 80% keeps prior records and reports | `test/unit/merge.test.ts:117`, `:128`, `:140`, `:164`, `:173`; `test/unit/io/http.test.ts:221`, `:228`, `:249` (`delays` equal `[30_000, 30_000]`); `test/integration/ingest.test.ts:270`, `:354` | ✅ |
+| INGEST-04 | ID kept on match by item ID or, for a source without item IDs, by the same or a similar quote from the same speaker | `test/unit/merge.test.ts:194` (key, quote rewritten), `:205` (same quoteKey), `:215` and `:228` (Jaccard ≥ 0.6), `:249` (same speaker required), `:318` (ids stay with speaker), `:355` and `:377` (keyed items never matched by quote) | ✅ |
+| INGEST-05 | unresolved speaker excluded and listed with source URL | `test/unit/normalize.test.ts:42`, `:47` to `:55`, `:57`; `test/integration/ingest.test.ts:232`, `:258`, `:275` (candidate configured but not in the debate) | ✅ |
+| INGEST-06 | non-200, 30 s timeout, zero records or under 80% keeps prior records and reports | `test/unit/merge.test.ts:117`, `:128`, `:140`, `:164`, `:173`; `test/unit/io/http.test.ts:221`, `:228`, `:249`; `test/integration/ingest.test.ts:297`, `:381` | ✅ (gap R06: the `--accept-drop` override is not pinned to the source it names) |
 | INGEST-07 | one request per domain per 5 s, UA with name and repo URL, robots.txt honored | `test/unit/io/http.test.ts:75`, `:127`, `:138`, `:159`, `:344` | ✅ |
-| INGEST-08 | no agency content sent to AI | `test/unit/io/http.test.ts:310` and `:322`, hosts outside the allowlist refused; no AI or LLM client under `src/` or `site/` (unchanged since iteration 1) | ✅ |
-| INGEST-09 | run report per source: HTTP status, count, excluded items, unmapped labels | `test/integration/ingest.test.ts:227`, `:327`; `test/unit/write.test.ts:148` | ✅ |
+| INGEST-08 | no agency content sent to AI | `test/unit/io/http.test.ts:310` and `:322`, hosts outside the allowlist refused; no AI or LLM client under `src/` or `site/` | ✅ |
+| INGEST-09 | run report per source: HTTP status, count, excluded items, unmapped labels | `test/integration/ingest.test.ts:232` (`unmappedLabels: ['INSUSTENTÁVEL']` at `:250`), `:354`; `test/unit/write.test.ts:148` | ✅ (gap R07: no fixture has a label mapped to "sem faixa" on purpose) |
 
 ### P1: Browse every check
 
 | Criterion | Spec-defined outcome | `file:line` + assertion | Result |
 | --------- | -------------------- | ----------------------- | ------ |
-| SITE-01 | "Todos" view with every record, no login | `test/e2e/site.test.ts:136`; `test/unit/site/build.test.ts:37` | ✅ |
+| SITE-01 | "Todos" view with every record, no login | `test/e2e/site.test.ts:173`; `test/unit/site/build.test.ts:37` | ✅ |
 | SITE-02 | speaker, quote, label most prominent, band, agency, excerpt, link | `test/unit/site/render.test.ts:23` | ✅ |
-| SITE-03 | filters combine with AND | `test/unit/site/core.test.ts:34`, `:50`; `test/e2e/site.test.ts:143` | ✅ |
-| SITE-04 | debate newest first, agency alphabetical, page order | `test/unit/site/core.test.ts:76`, `:92`; `test/unit/merge.test.ts:522` | ✅ |
-| SITE-05 | "Nenhuma checagem com esses filtros." plus a clear control | `test/e2e/site.test.ts:168` | ✅ |
-| SITE-06 | no horizontal scroll at 360 px | `test/e2e/site.test.ts:116` | ✅ |
-| SITE-07 | no tracking cookies, analytics or cross-origin assets | `test/e2e/site.test.ts:362`; `test/unit/site/sprites.test.ts:83` | ✅ |
+| SITE-03 | filters combine with AND | `test/unit/site/core.test.ts:34`, `:50`; `test/e2e/site.test.ts:180` | ✅ |
+| SITE-04 | debate newest first, agency alphabetical, page order | `test/unit/site/core.test.ts:76`, `:92`; `test/unit/merge.test.ts:553` | ✅ |
+| SITE-05 | "Nenhuma checagem com esses filtros." plus a clear control | `test/e2e/site.test.ts:205` | ✅ |
+| SITE-06 | no horizontal scroll at 360 px | `test/e2e/site.test.ts:153` | ✅ |
+| SITE-07 | no tracking cookies, analytics or cross-origin assets | `test/e2e/site.test.ts:421`; `test/unit/site/sprites.test.ts:83` | ✅ |
 
 ### P1: Scoreboards
 
 | Criterion | Spec-defined outcome | `file:line` + assertion | Result |
 | --------- | -------------------- | ----------------------- | ------ |
-| SCORE-01 | per-agency board per candidate and band, current filters | `test/unit/site/core.test.ts:106` (pure `scoreboard`); `test/e2e/site.test.ts:153` checks only the scope text " da Lupa" | ❌ N06 survived: the browser board can be fed records outside the selected agency and no test reads its numbers |
-| SCORE-02 | general board sums all agencies | `test/unit/site/core.test.ts:121`; `test/unit/site/build.test.ts:68` (pre-rendered general board) | ✅ |
-| SCORE-03 | exact notice text next to the general board | `test/unit/site/core.test.ts:132`; `test/e2e/site.test.ts:153` (per-agency notice) | ✅ |
-| SCORE-04 | board total equals listed records still found | `test/unit/site/core.test.ts:141` | ⚠️ the test computes the board from `listed()` itself, so it cannot see the browser wiring that N06 breaks |
+| SCORE-01 | per-agency board per candidate and band, current filters | `test/unit/site/core.test.ts:106`; `test/e2e/site.test.ts:268` and `:277`, `expect(await boardNumbers(page)).toEqual(expectedBoard(...))` | ✅ |
+| SCORE-02 | general board sums all agencies | `test/unit/site/core.test.ts:121`; `test/unit/site/build.test.ts:68`; `test/e2e/site.test.ts:263` and `:271` | ✅ |
+| SCORE-03 | exact notice text next to the general board | `test/unit/site/core.test.ts:132`; `test/e2e/site.test.ts:190` (per-agency notice) | ✅ |
+| SCORE-04 | board total equals listed records still found | `test/unit/site/core.test.ts:141`; `test/e2e/site.test.ts:278`, `expect(await listedIds(page)).toHaveLength(pair.lula.total + pair.flavio.total)` | ✅ |
 | SCORE-05 | ascending ballot order, four bands including zero | `test/unit/site/core.test.ts:166`; `test/unit/site/render.test.ts:77` | ✅ |
 
 ### P1: Open, auditable data
@@ -80,85 +77,94 @@ Correction to iteration 1: several of its citations pointed at lines that do not
 | Criterion | Spec-defined outcome | `file:line` + assertion | Result |
 | --------- | -------------------- | ----------------------- | ------ |
 | DATA-01 | JSON and CSV linked, same records as the site | `test/unit/site/build.test.ts:90`, `:277`; `test/unit/write.test.ts:115`, `:123` | ✅ |
-| DATA-02 | source URL, snapshot URL, SHA-256 of snapshot bytes, fetch time, parser version | `test/unit/archive.test.ts:154`; `test/integration/ingest.test.ts:195`, `:426` | ✅ |
+| DATA-02 | source URL, snapshot URL, SHA-256 of snapshot bytes, fetch time, parser version | `test/unit/archive.test.ts:154`; `test/integration/ingest.test.ts:200`, `:453` | ✅ (gap R04: `fetchedAt` on a silent change is not pinned) |
 | DATA-03 | mapping file published and linked | `test/unit/config.test.ts:50`; `test/unit/normalize.test.ts:64` to `:91`; `test/unit/check-labels.test.ts:32`, `:42`; `test/unit/site/build.test.ts:139` | ✅ |
-| DATA-04 | byte-identical records for same parser and HTML | `test/unit/write.test.ts:62`, `:76`; `test/integration/ingest.test.ts:419`; `test/unit/adapters/g1.test.ts:160`; `test/golden/golden.ts:79` | ✅ |
+| DATA-04 | byte-identical records for same parser and HTML | `test/unit/write.test.ts:62`, `:76`; `test/integration/ingest.test.ts:446`; `test/unit/adapters/g1.test.ts:160`; `test/golden/golden.ts:79` | ✅ |
 | DATA-05 | no raw agency HTML published | `.gitignore:3`; `test/unit/site/build.test.ts:277` | ✅ |
-| DATA-06 | retry until the snapshot parses to the same statement, speaker and label; list as waiting meanwhile | `test/unit/archive.test.ts:170`, `:222`, `:341` to `:357` (label, speaker and quote each rejected), `:369`; `test/integration/ingest.test.ts:426` (`awaitingArchive`) | ✅ |
+| DATA-06 | retry until the snapshot parses to the same statement, speaker and label; list as waiting meanwhile | `test/unit/archive.test.ts:170`, `:222`, `:341` (label, speaker and quote each rejected), `:369`; `test/integration/ingest.test.ts:453` | ✅ |
 | DATA-07 | methodology: sources, parsers, mapping with per-candidate counts, order rule, error reporting | `test/unit/site/build.test.ts:139`, `:166`, `:224` | ✅ |
 
 ### P1: Visible impartiality and self-service audit
 
 | Criterion | Spec-defined outcome | `file:line` + assertion | Result |
 | --------- | -------------------- | ----------------------- | ------ |
-| AUDIT-01 | exact sentence in the first screen below the subtitle plus a panel control | `test/unit/site/build.test.ts:109`; `test/e2e/site.test.ts:251`, `:267` | ✅ |
-| AUDIT-02 | fixed "Como auditar" button on every viewport | `test/e2e/site.test.ts:277` | ✅ |
-| AUDIT-03 | five rules and links to repo, dataset, mapping, history | `test/unit/site/build.test.ts:90`; `test/e2e/site.test.ts:251` | ✅ |
-| AUDIT-04 | prompt with repo URL, dataset URL, five steps; "Prompt copiado" | `test/e2e/site.test.ts:294` | ✅ |
-| AUDIT-05 | fallback selects text and shows the exact message | `test/e2e/site.test.ts:306` | ✅ |
+| AUDIT-01 | exact sentence in the first screen below the subtitle plus a panel control | `test/unit/site/build.test.ts:109`; `test/e2e/site.test.ts:310`, `:326` | ✅ |
+| AUDIT-02 | fixed "Como auditar" button on every viewport | `test/e2e/site.test.ts:336` | ✅ |
+| AUDIT-03 | five rules and links to repo, dataset, mapping, history | `test/unit/site/build.test.ts:90`; `test/e2e/site.test.ts:310` | ✅ |
+| AUDIT-04 | prompt with repo URL, dataset URL, five steps; "Prompt copiado" | `test/e2e/site.test.ts:353` | ✅ |
+| AUDIT-05 | fallback selects text and shows the exact message | `test/e2e/site.test.ts:365` | ✅ |
 | AUDIT-06 | same template, size, pose, mirrored, equal animation and mouth frames | `test/unit/site/sprites.test.ts:26`, `:49`, `:57` | ✅ |
-| AUDIT-07 | illustration never changes with verdicts or counts | `test/e2e/site.test.ts:323` | ✅ |
+| AUDIT-07 | illustration never changes with verdicts or counts | `test/e2e/site.test.ts:382` | ✅ |
 | AUDIT-08 | portrait and logo credits in the footer and on the methodology page | `test/unit/site/build.test.ts:253` (both footers), `:262` (methodology list) | ✅ |
 
 ### P2: History, sharing, configuration
 
 | Criterion | Spec-defined outcome | `file:line` + assertion | Result |
 | --------- | -------------------- | ----------------------- | ------ |
-| HIST-01 | new value published, previous kept with detection date | `test/unit/merge.test.ts:215`, `:389`, `:419` | ✅ |
-| HIST-02 | missing record kept, marked, out of boards, shown only with "Mostrar removidos" | `test/unit/merge.test.ts:479`; `test/unit/site/core.test.ts:182`, `:193`, `:201`; `test/unit/site/render.test.ts:52`; `test/e2e/site.test.ts:224`, `:244`; `test/integration/ingest.test.ts:374` | ✅ |
-| SHARE-01 | all active filters in the URL | `test/unit/site/core.test.ts:210`; `test/e2e/site.test.ts:143` | ✅ |
-| SHARE-02 | URL filters applied on open | `test/unit/site/core.test.ts:225`, `:233`; `test/e2e/site.test.ts:143` | ✅ |
-| CONF-01 | new manifest entry ingested without code changes | `test/integration/ingest.test.ts:404`; `test/unit/config.test.ts:174` | ✅ |
-| CONF-02 | agency without parser fails that entry and is named | `test/integration/ingest.test.ts:383` | ✅ |
+| HIST-01 | new value published, previous kept with detection date | `test/unit/merge.test.ts:215`, `:420`, `:450` | ✅ |
+| HIST-02 | missing record kept, marked, out of boards, shown only with "Mostrar removidos" | `test/unit/merge.test.ts:510`; `test/unit/site/core.test.ts:182`, `:193`, `:201`; `test/unit/site/render.test.ts:52`; `test/e2e/site.test.ts:283`, `:303`; `test/integration/ingest.test.ts:401` | ✅ |
+| SHARE-01 | all active filters in the URL | `test/unit/site/core.test.ts:210`; `test/e2e/site.test.ts:180` | ✅ |
+| SHARE-02 | URL filters applied on open | `test/unit/site/core.test.ts:225`, `:233`; `test/e2e/site.test.ts:180` | ✅ |
+| CONF-01 | new manifest entry ingested without code changes | `test/integration/ingest.test.ts:431`; `test/unit/config.test.ts:174` | ✅ |
+| CONF-02 | agency without parser fails that entry and is named | `test/integration/ingest.test.ts:410` | ✅ |
 
-**Status**: ❌ Gaps present (INGEST-05 wiring, SCORE-01 browser board), ⚠️ INGEST-04 negative case and SCORE-04 wiring flagged
+**Status**: ✅ All 42 ACs covered with spec-anchored assertions. Three ranked gaps (R06, R07, R04) narrow INGEST-06, INGEST-09 and DATA-02 but do not leave an AC without evidence.
 
 ---
 
 ## Discrimination Sensor
 
-Scratch: `git worktree add` at `29fd94e` under the session scratchpad, `node_modules` symlinked and the git-ignored `.cache/` and `mocks/` copied in. One mutant at a time, only the listed test files run with the local `vitest` binary, `git checkout -- <file>` after each run and a clean worktree check before the next. The worktree was removed with `git worktree remove --force`.
+Scratch: `git worktree add` at `b487783` under the session scratchpad, `node_modules` symlinked, git-ignored `.cache/` and `mocks/` copied in. One mutant at a time through a script that checks the target text occurs exactly once, runs only the listed test files with the local `vitest` binary, runs `git checkout -- <file>` and confirms a clean worktree. A first pass of R02 to R06 passed both test paths as one argument under zsh, so vitest found no files and exited 1. Those five were rerun with separate arguments, and the script now refuses to call a mutant killed when vitest prints no test summary. Only the rerun results are recorded.
 
-### Iteration 1 survivors, re-applied exactly
+### Regression: iteration 1 and 2 survivors, re-applied
 
 | Mutation | File:line | Description | Tests run | Killed? |
 | -------- | --------- | ----------- | --------- | ------- |
-| M03 | `src/pipeline/normalize.ts:16` | `c.aliases.includes(key)` changed to `c.aliases.some((a) => key.startsWith(a))` | normalize, integration | ✅ Killed (4 failures, incl. `test/integration/ingest.test.ts:253`) |
+| N04 | `src/ingest.ts:197` | `speakers = config.candidates` instead of the debate's candidates | integration | ✅ Killed (`test/integration/ingest.test.ts:275`) |
+| N06a | `site/app.js:60` | board fed `listed(ctx, state, 'outlet')` inside `renderBoard` | e2e | ✅ Killed (`test/e2e/site.test.ts:261`) |
+| N06b | `site/app.js:208` | `render()` passes `listed(ctx, state, 'outlet')` to `renderBoard` | e2e | ✅ Killed (`test/e2e/site.test.ts:261`) |
+| N14 A | `src/pipeline/merge.ts:93` | quote matching loops over every item and drops `r.key === null` | merge, integration | ✅ Killed (`test/unit/merge.test.ts:355` and `:377`) |
+| N14 B | `src/pipeline/merge.ts:93` | quote matching loops over every item, keeps `r.key === null` | merge, integration | ✅ Killed (`test/unit/merge.test.ts:377`) |
+| N14 C | `src/pipeline/merge.ts:95` | keyless items may match a keyed previous record by quote | merge, integration | ❌ Survived, unreachable today (see gap 4) |
+| M03 | `src/pipeline/normalize.ts:16` | alias prefix match | normalize, integration | ✅ Killed (4 tests) |
 | M07 | `src/pipeline/merge.ts:62` | same-speaker preference removed from `rank` | merge | ✅ Killed (`test/unit/merge.test.ts:318`) |
-| M12 | `src/pipeline/archive.ts:56` | `content()` drops the speaker | archive | ✅ Killed (speaker case of `test/unit/archive.test.ts:345`) |
+| M12 | `src/pipeline/archive.ts:56` | `content()` drops the speaker | archive | ✅ Killed |
 | M25 | `src/io/http.ts:18` | `TIMEOUT_MS` 30_000 changed to 60_000 | http, integration | ✅ Killed (`test/unit/io/http.test.ts:249`) |
-| M26 | `src/pipeline/archive.ts:56` | `content()` drops the quote | archive | ✅ Killed (quote case of `test/unit/archive.test.ts:345`) |
+| M26 | `src/pipeline/archive.ts:56` | `content()` drops the quote | archive | ✅ Killed |
 
-### New mutants (iteration 2)
+### New mutants (iteration 3)
 
 | Mutation | File:line | Description | Tests run | Killed? |
 | -------- | --------- | ----------- | --------- | ------- |
-| N01 | `src/pipeline/normalize.ts:29` | band fallback `'sem faixa'` changed to `'impreciso'` | normalize, merge | ✅ Killed |
-| N02 | `src/pipeline/normalize.ts:20` | `labelKey` strips only whitespace, keeps `#` and `/` | normalize, check-labels, golden g1 | ✅ Killed |
-| N03 | `src/pipeline/normalize.ts:11` | `nameKey` keeps the text after the first comma | normalize, integration | ✅ Killed |
-| N04 | `src/ingest.ts:197` | `speakers = config.candidates` instead of the debate's candidates | integration | ❌ Survived |
-| N05 | `site/core.js:117` | scoreboard `total` counts removed records (bands still exclude them) | core, render, build | ✅ Killed |
-| N06 | `site/app.js:60` | browser board fed `listed(ctx, state, 'outlet')`, so the per-agency board shows every agency | e2e | ❌ Survived |
-| N07 | `site/core.js:47` | candidates sorted by short name instead of ballot number | core, render, build | ✅ Killed |
-| N08 | `src/pipeline/merge.ts:140` | an unchanged returning record keeps `missingSince` | merge, integration | ✅ Killed |
-| N09 | `src/pipeline/merge.ts:181` | partial guard applies only above 5 previous records (`>=` changed to `>`) | merge | ✅ Killed |
-| N10 | `src/pipeline/write.ts:102` | CSV stops doubling inner quotes | write | ✅ Killed |
-| N11 | `site/render.js:39` | quote rendered without HTML escaping | render, build | ✅ Killed |
-| N12 | `site/core.js:78` | `readState` accepts any value from the URL | core | ✅ Killed |
-| N13 | `src/pipeline/merge.ts:133` | a label, quote or speaker change keeps the old verified snapshot | merge, integration | ✅ Killed |
-| N14 | `src/pipeline/merge.ts:93` | quote matching runs for keyed items too (keyless filter dropped) | merge, integration | ❌ Survived |
-| N15 | `src/pipeline/normalize.ts:11` | `nameKey` lowercases without folding diacritics | normalize, integration | ✅ Killed |
+| R01 | `src/pipeline/merge.ts:130` | history stores the new label instead of the old one | merge, integration | ✅ Killed |
+| R02 | `src/pipeline/merge.ts:161` | a second change replaces earlier history entries | merge, integration | ✅ Killed |
+| R03 | `src/pipeline/merge.ts:161` | `until` is the old fetch day instead of the detection date | merge, integration | ✅ Killed |
+| R04 | `src/pipeline/merge.ts:158` | a pos, anchor, excerpt or url change keeps the old `evidence.fetchedAt` | merge, integration | ❌ Survived |
+| R05 | `src/pipeline/merge.ts:140` | an unchanged record gets the new `fetchedAt` | merge, integration | ✅ Killed (4 tests incl. byte-identical second run) |
+| R06 | `src/pipeline/merge.ts:183` | `!ctx.acceptDrop.has(sourceId)` changed to `ctx.acceptDrop.size === 0` | merge, integration | ❌ Survived |
+| R07 | `src/ingest.ts:324` | `unmappedLabels` also lists labels mapped to "sem faixa" | integration, write | ❌ Survived |
+| R08 | `src/pipeline/write.ts:58` | run report gains a `generatedAt` timestamp | write, integration | ✅ Killed |
+| R09 | `src/pipeline/write.ts:46` | records written in construction key order instead of `RECORD_KEYS` | write, integration | ✅ Killed |
+| R10 | `src/adapters/g1.ts:84` | second verdict keyed `.1` instead of `.2` | g1 unit, g1 golden | ✅ Killed |
+| R11 | `src/adapters/estadao.ts:65` | key is the conclusion element's `_id` instead of the "O que" element's | estadao unit, estadao golden | ✅ Killed |
+| R12 | `src/adapters/aosfatos.ts:96` | Escriba items lose their anchor | aosfatos unit, aosfatos golden | ✅ Killed |
+| R13 | `src/io/http.ts:156` | robots.txt checked only on the first hop | http | ✅ Killed |
+| R14 | `src/io/http.ts:118` | host allowlist checked only on the first hop | http | ✅ Killed |
+| R15 | `src/site/build.ts:117` | methodology label counts ignore the speaker | build | ✅ Killed |
+| R16 | `src/site/build.ts:107` | methodology label counts include removed records | build | ✅ Killed |
+| R17 | `site/core.js:108` | "Mostrar removidos (N)" counts removed records under no filter | core, render, build | ✅ Killed |
+| R18 | `site/app.js:78` | browser legend numbers written in reverse band order | e2e | ✅ Killed |
+| R19 | `site/core.js:87` | URL state drops the band filter | core | ✅ Killed |
+| R20 | `src/pipeline/archive.ts:137` | keyed record verified by key alone, content ignored | archive | ✅ Killed |
+| R21 | `src/pipeline/archive.ts:234` | `archiveUrl` stores the live evidence URL instead of the snapshot | archive, integration | ✅ Killed |
+| R22 | `src/site/build.ts:135` | illustrations swap left and right | build, sprites | ✅ Killed |
+| R23 | `site/app.js:60` | browser board writes each candidate's numbers on the other card | e2e | ✅ Killed |
+| R24 | `site/app.js:292` | "Copiar prompt" copies the prompt without step 5 | e2e | ✅ Killed |
 
-**Sensor depth**: P0-full (manual, 5 re-applied + 15 new mutants across band mapping, speaker resolution, scoreboard counting, candidate order, archive evidence, merge identity, CSV and HTML escaping, URL state)
-**Result**: old 5/5 killed; new 12/15 killed; 17/20 overall - FAIL
+**Sensor depth**: P0-full (manual: 11 regression mutants and 24 new ones across history, provenance timestamps, accept-drop scope, report stability, record key order, adapter keys and anchors, robots and allowlist on redirects, methodology counts, removed toggle, URL state, archive verification, browser board and legend, illustration placement and the copied prompt)
+**Result**: regression 10/11 killed (every iteration 1 and 2 survivor dies; the extra N14 C variant survives); new 21/24 killed. No survivor sits in impartiality-critical logic.
 
-Why the survivors matter:
-
-- **N06** (scoreboard counting): `test/unit/site/core.test.ts:106` and `:141` test the pure `scoreboard()` with records the test itself filters. Nothing reads the numbers the browser shows after an agency is picked: `test/e2e/site.test.ts:153` checks only the " da Lupa" scope text, and `:323` only checks that the totals change after four filters. A visitor choosing Lupa would see the general counts under a Lupa label.
-- **N04** (speaker resolution): `test/unit/normalize.test.ts:57` proves `resolveSpeaker` honors a narrowed list, but no integration test has a debate whose `candidates` is a subset of `config/candidates.json` (the integration helper at `test/integration/ingest.test.ts:61` always lists both). Today both debates list both candidates, so the published data is unaffected. A 2028 debate added by configuration (CONF-01) would attribute a quote from a 2026 candidate who is not in that debate to that candidate and count it.
-- **N14** (merge identity): with a g1, Estadão or Aos Fatos item whose key is new but whose quote equals an unmatched previous record, the mutant reuses the old id; INGEST-04 now says keyed sources match only by item ID.
-
-Main tree `git status --porcelain` was empty before the sensor and is empty after `git worktree remove --force` (compared byte for byte).
+Main tree `git status --porcelain` was empty before the sensor and empty after `git worktree remove --force` (compared with `cmp`).
 
 ---
 
@@ -166,12 +172,12 @@ Main tree `git status --porcelain` was empty before the sensor and is empty afte
 
 | Principle | Status |
 | --------- | ------ |
-| Minimum code | ✅ (iteration 2 adds tests only) |
-| Surgical changes | ✅ (8 files, 143 insertions, 8 deletions, each tied to an iteration 1 fix) |
+| Minimum code | ✅ (iteration 3 adds tests only) |
+| Surgical changes | ✅ (3 files, 119 insertions, 2 deletions, each tied to an iteration 2 fix) |
 | No scope creep | ✅ |
 | Matches patterns | ✅ (`biome check .` clean on 60 files) |
-| Spec-anchored outcome check (asserted values match spec) | ✅ for the new tests; ⚠️ SCORE-04 test is self-referential for the browser path |
-| Per-layer Coverage Expectation met | ❌ browser scoreboard wiring (N06) and ingest speaker wiring (N04) lack tests |
+| Spec-anchored outcome check (asserted values match spec) | ✅ (the e2e board check counts from records without `site/core.js`) |
+| Per-layer Coverage Expectation met | ✅ for every AC; gaps 1 to 3 below narrow three of them |
 | Every test maps to a spec requirement, no unclaimed tests | ✅ |
 | Documented guidelines followed: `AGENTS.md`, `tasks.md` Gate Check Commands | ✅ |
 
@@ -179,8 +185,8 @@ Main tree `git status --porcelain` was empty before the sensor and is empty afte
 
 ## Edge Cases
 
-- [x] Duplicate statement on one page: one record per anchor, duplicate reported (`test/unit/ids.test.ts:33`, `test/integration/ingest.test.ts:244`)
-- [x] Unknown label: band "sem faixa", label listed in the report (`test/unit/normalize.test.ts:81`, `test/integration/ingest.test.ts:245`)
+- [x] Duplicate statement on one page: one record per anchor, duplicate reported (`test/unit/ids.test.ts:33`, `test/integration/ingest.test.ts:249`)
+- [x] Unknown label: band "sem faixa", label listed in the report (`test/unit/normalize.test.ts:81`, `test/integration/ingest.test.ts:250`); see gap 2 for a label mapped to "sem faixa" on purpose
 - [x] No explanation: empty excerpt (`test/unit/normalize.test.ts:124`, `test/unit/site/render.test.ts:71`)
 - [x] Excerpt over 280 characters: cut at the last word boundary plus "…" (`test/unit/normalize.test.ts:105`, `:115`)
 
@@ -188,62 +194,61 @@ Main tree `git status --porcelain` was empty before the sensor and is empty afte
 
 ## Gate Check
 
-- **Gate command**: `tsc --noEmit`, `biome check .`, `node src/ingest.ts --help`, then `vitest run <files>` in batches inside the scratch worktree: unit in three batches, integration, golden, e2e. The local `vitest` binary ran instead of `pnpm vitest`, as in iteration 1.
-- **Result**: 283 passed, 0 failed, 0 skipped (unit 213, integration 14, golden 41, e2e 15). Typecheck exit 0, lint clean, CLI smoke exit 0.
-- **Test count at iteration 1**: 268
-- **Test count now**: 283
-- **Delta**: +15 (archive +2, normalize +5, merge +1, http +1, build +4, integration +1, e2e +1); no test removed. The archive "label or speaker" test became three cases, each stricter than the original.
+- **Gate command**: `tsc --noEmit`, `biome check .`, `node src/ingest.ts --help`, then `vitest run <files>` in the scratch worktree, one batch at a time: `test/unit/adapters` plus `test/unit/io`; `test/unit/site`; the seven remaining unit files; `test/integration`; `test/golden`; `test/e2e/site.test.ts`.
+- **Result**: 287 passed, 0 failed, 0 skipped (unit 215, integration 15, golden 41, e2e 16). Typecheck exit 0, lint clean, CLI smoke exit 0.
+- **Test count at iteration 2**: 283
+- **Test count now**: 287
+- **Delta**: +4 (merge +2, integration +1, e2e +1); no test removed or weakened. The integration helper change only adds a defaulted parameter.
 - **Skipped tests**: none
 - **Failures**: none
 
 ---
 
-## Fix Plans
+## Remaining gaps (ranked)
 
-### Fix 1: browser scoreboard numbers are never checked (N06)
+1. **`--accept-drop` applies to every source (R06), Major.** `test/unit/merge.test.ts:149` and `test/integration/ingest.test.ts:381` accept a drop with only one shrinking source in the run. With R06, a manual run that accepts a drop for one source also lets any other source that shrank below 80% mark its records missing, which INGEST-06 forbids. Fix: in `test/unit/merge.test.ts`, merge two sources that both shrink, accept one, and expect the other to stay `partial` with its records unchanged.
+2. **Labels mapped to "sem faixa" can be reported as unmapped (R07), Major.** The integration bands config (`test/integration/ingest.test.ts:130`) maps no label to "sem faixa", so the report cannot tell "mapped to sem faixa" from "unmapped". With R07 the real Lupa `INSUSTENTÁVEL` and Estadão `é inconclusivo` would show up in `unmappedLabels` and `check:labels` would fail every CI run. Fix: add a label mapped to "sem faixa" to that config and expect it absent from `unmappedLabels`.
+3. **`fetchedAt` on a silent change is not pinned (R04), Minor.** The design says `evidence.fetchedAt` is the "fetch that last changed this record". `test/unit/merge.test.ts:460` changes pos, anchor, excerpt and url but reuses the first run's `fetchedAt`, so keeping the old value passes. Fix: give the fresh item a later `fetchedAt` there and assert it. DATA-02 itself only says "the fetch timestamp", so this is also a spec-precision note.
+4. **Keyless item against a keyed previous record (N14 C), Informational.** No MVP adapter mixes keyed and keyless items (`src/adapters/lupa.ts:39` is the only `key: null`), so the mutant cannot change today's data. It matters only if an adapter switches between keyed and keyless output across versions.
 
-- **Root cause**: SCORE-01 and SCORE-04 are tested on the pure `scoreboard()` only; `renderBoard` in `site/app.js:60` can take the wrong record set and every test passes.
-- **Fix task**: in `test/e2e/site.test.ts`, pick one agency (and one debate) and assert each candidate's total and four band counts in `#board` equal a count computed from `records` for that agency, still found at the source. Repeat with "Todas" for the general board.
-- **Priority**: Blocker
-
-### Fix 2: ingest speaker list per debate is untested (N04)
-
-- **Root cause**: the integration `debate()` helper hardcodes `candidates: ['lula', 'flavio']`, so `src/ingest.ts:197` can drop the per-debate filter unnoticed.
-- **Fix task**: let the helper take a candidate list and add an integration test with a debate that lists only `lula`; an item spoken by `FLÁVIO BOLSONARO (PL)` on that debate's page must land in `excluded` with `speaker not resolved` and must not be published.
-- **Priority**: Blocker
-
-### Fix 3: keyed sources must not match by quote (N14)
-
-- **Root cause**: every quote-matching test uses Lupa items; nothing shows a keyed item staying unmatched when only its quote is equal.
-- **Fix task**: in `test/unit/merge.test.ts`, re-run a g1 source where `chunk-1` disappears and a new `chunk-9` carries the same quote. Expect a new id for `chunk-9` and `missingSince` on the old record.
-- **Priority**: Major
+None of these blocks the feature: none touches band mapping, speaker resolution, scoreboard counting, candidate ordering or archive verification, and every AC has spec-anchored evidence.
 
 ---
 
 ## Requirement Traceability Update
 
-| Requirement | Iteration 1 status | Iteration 2 status |
+| Requirement | Iteration 2 status | Iteration 3 status |
 | ----------- | ------------------ | ------------------ |
-| DATA-06 | ❌ Needs Fix | ✅ Verified |
-| INGEST-06 | ⚠️ Needs Fix | ✅ Verified |
-| AUDIT-01, AUDIT-08 | ✅ Verified (weak) | ✅ Verified |
-| INGEST-05 | ❌ Needs Fix | ❌ Needs Fix (Fix 2) |
-| SCORE-01, SCORE-04 | ✅ Verified | ❌ Needs Fix (Fix 1) |
-| INGEST-04 | ⚠️ Needs Fix | ⚠️ Needs Fix (Fix 3) |
+| INGEST-05 | ❌ Needs Fix | ✅ Verified |
+| SCORE-01, SCORE-04 | ❌ Needs Fix | ✅ Verified |
+| INGEST-04 | ⚠️ Needs Fix | ✅ Verified |
+| INGEST-06 | ✅ Verified | ✅ Verified, gap 1 open |
+| INGEST-09 | ✅ Verified | ✅ Verified, gap 2 open |
+| DATA-02 | ✅ Verified | ✅ Verified, gap 3 open |
 | All other IDs | ✅ Verified | ✅ Verified |
+
+---
+
+## Iterations 1 to 3
+
+| Iteration | HEAD | Verdict | Sensor | Outcome |
+| --------- | ---- | ------- | ------ | ------- |
+| 1 | `b710b2f` | FAIL | 23/28 killed | Survivors in archive content (speaker, quote), alias prefix match, merge speaker tie-break and the 30 s default; six fix tasks |
+| 2 | `523adc2` | FAIL | 17/20 killed | Old survivors dead; new survivors in the browser board (N06), ingest's per-debate candidates (N04) and keyed quote matching (N14) |
+| 3 | `b487783` | PASS | regression 10/11, new 21/24 killed | N04, N06 and N14 A/B dead; remaining survivors outside impartiality-critical logic, listed as gaps 1 to 4 |
 
 ---
 
 ## Summary
 
-**Overall**: ❌ Not Ready
+**Overall**: ✅ Ready, with ranked gaps
 
-**Spec-anchored check**: 38/42 ACs matched the spec outcome; 2 gaps (INGEST-05 wiring, SCORE-01 browser board), 2 flagged (INGEST-04 negative case, SCORE-04 wiring)
-**Sensor**: 17/20 killed (old 5/5, new 12/15)
-**Gate**: 283 passed, 0 failed
+**Spec-anchored check**: 42/42 ACs matched the spec outcome; 1 spec-precision note (DATA-02 `fetchedAt`)
+**Sensor**: regression 10/11 killed, new 21/24 killed
+**Gate**: 287 passed, 0 failed
 
-**What works**: every iteration 1 gap is closed with tests that assert the spec outcome, and the old survivors die. Band mapping, label keys, name keys, candidate order, removed-record exclusion, the 80% guard boundary, evidence reset on content change, CSV quoting, HTML escaping and URL state parsing all killed their mutants.
+**What works**: the browser scoreboard is now checked number by number against counts taken from the records, for one agency, all agencies and a debate plus agency. Ingest resolves speakers against each debate's own candidates. Keyed sources never match by quote. History, adapter keys and anchors, robots and allowlist on redirects, report stability, methodology counts, URL state, archive verification and the copied prompt all killed their mutants.
 
-**Issues found**: the two new survivors sit where pure functions meet their callers: the browser board (Fix 1) and ingest's per-debate candidate list (Fix 2). Fix 3 pins the reworded INGEST-04.
+**Issues found**: gaps 1 and 2 are cheap test additions that pin INGEST-06 and INGEST-09 more tightly; gap 3 pins a design rule for provenance timestamps.
 
-**Next steps**: run Fix 1 and Fix 2, then Fix 3, then re-verify. One fix and re-verify iteration remains before escalation to the user.
+**Next steps**: route gaps 1 to 3 as fix tasks when convenient; they do not block the feature.

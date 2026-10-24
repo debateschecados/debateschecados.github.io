@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 10,
+  "next_id": 13,
   "lessons": [
     {
       "id": "L-001",
@@ -166,6 +166,60 @@
       ],
       "created": "2026-10-24T09:05:45Z",
       "last_seen": "2026-10-24T09:05:45Z"
+    },
+    {
+      "id": "L-010",
+      "key": "surviving_mutant::test an override that names one item with a second qualifying item in the same run so the override cannot apply to items it does not name",
+      "text": "Test an override that names one item with a second qualifying item in the same run, so the override cannot apply to items it does not name",
+      "signal": "surviving_mutant",
+      "scope": "merge",
+      "status": "candidate",
+      "features": [
+        "debate-archive"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "R06 src/pipeline/merge.ts:183 (merge)"
+      ],
+      "created": "2026-10-24T09:20:34Z",
+      "last_seen": "2026-10-24T09:20:34Z"
+    },
+    {
+      "id": "L-011",
+      "key": "surviving_mutant::include a config entry that maps to the fallback value on purpose so code cannot treat mapped to fallback as unmapped",
+      "text": "Include a config entry that maps to the fallback value on purpose, so code cannot treat mapped-to-fallback as unmapped",
+      "signal": "surviving_mutant",
+      "scope": "ingest",
+      "status": "candidate",
+      "features": [
+        "debate-archive"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "R07 src/ingest.ts:324 (ingest)"
+      ],
+      "created": "2026-10-24T09:20:34Z",
+      "last_seen": "2026-10-24T09:20:34Z"
+    },
+    {
+      "id": "L-012",
+      "key": "surviving_mutant::assert provenance fields on every update path with a fresh value that differs from the stored one",
+      "text": "Assert provenance fields on every update path with a fresh value that differs from the stored one",
+      "signal": "surviving_mutant",
+      "scope": "merge",
+      "status": "candidate",
+      "features": [
+        "debate-archive"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "R04 src/pipeline/merge.ts:158 (merge)"
+      ],
+      "created": "2026-10-24T09:20:34Z",
+      "last_seen": "2026-10-24T09:20:34Z"
     }
   ]
 }
