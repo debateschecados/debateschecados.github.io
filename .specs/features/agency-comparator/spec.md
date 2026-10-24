@@ -167,8 +167,8 @@ The archive shows each agency's checks side by side, but it cannot answer the qu
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| CLAIM-01 | P1: Claim groups | Tasks: T1 | In Tasks |
-| CLAIM-02 | P1: Claim groups | Tasks: T1, T6 | In Tasks |
+| CLAIM-01 | P1: Claim groups | Tasks: T1 | Implemented |
+| CLAIM-02 | P1: Claim groups | Tasks: T1, T6 | In Progress (T1 done, T6 pending) |
 | CLAIM-03 | P1: Claim groups | Tasks: T2 | In Tasks |
 | CLAIM-04 | P1: Claim groups | Tasks: T3, T4 | In Tasks |
 | CLAIM-05 | P1: Claim groups | Tasks: T3, T4 | In Tasks |

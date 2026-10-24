@@ -68,15 +68,17 @@ T6 → T8
 
 **Done when**:
 
-- [ ] Each CLAIM-02 rule has a test that feeds a broken group and expects `"<id>: <rule>"`
-- [ ] A valid file with two groups passes with no message
-- [ ] Gate check passes: `pnpm vitest run test/unit/claims/groups.test.ts`
-- [ ] Test count: at least 9 tests pass
+- [x] Each CLAIM-02 rule has a test that feeds a broken group and expects `"<id>: <rule>"`
+- [x] A valid file with two groups passes with no message
+- [x] Gate check passes: `pnpm vitest run test/unit/claims/groups.test.ts`
+- [x] Test count: at least 9 tests pass
 
 **Tests**: unit
 **Gate**: quick
 
 **Commit**: `feat(claims): Validate the claim groups file against the records`
+
+**Status**: ✅ Complete
 
 ---
 
