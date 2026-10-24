@@ -168,27 +168,27 @@ The archive shows each agency's checks side by side, but it cannot answer the qu
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
 | CLAIM-01 | P1: Claim groups | Tasks: T1 | Implemented |
-| CLAIM-02 | P1: Claim groups | Tasks: T1, T6 | In Progress (T1 done, T6 pending) |
+| CLAIM-02 | P1: Claim groups | Tasks: T1, T6 | Implemented |
 | CLAIM-03 | P1: Claim groups | Tasks: T2 | Implemented |
 | CLAIM-04 | P1: Claim groups | Tasks: T3, T4 | Implemented |
 | CLAIM-05 | P1: Claim groups | Tasks: T3, T4 | Implemented |
 | CLAIM-06 | P1: Claim groups | Tasks: T4 | Implemented |
-| CMP-01 | P1: Compare agencies | Tasks: T6 | In Tasks |
-| CMP-02 | P1: Compare agencies | Tasks: T6 | In Tasks |
+| CMP-01 | P1: Compare agencies | Tasks: T6 | Implemented |
+| CMP-02 | P1: Compare agencies | Tasks: T6 | Implemented |
 | CMP-03 | P1: Compare agencies | Tasks: T5, T7 | In Progress (T5 done, T7 pending) |
 | CMP-04 | P1: Compare agencies | Tasks: T5 | Implemented |
 | CMP-05 | P1: Compare agencies | Tasks: T5 | Implemented |
-| CMP-06 | P1: Compare agencies | Tasks: T5, T6 | In Progress (T5 done, T6 pending) |
+| CMP-06 | P1: Compare agencies | Tasks: T5, T6 | Implemented |
 | CMP-07 | P1: Compare agencies | Tasks: T7 | In Tasks |
 | RIGOR-01 | P1: Coverage and relative rigor | Tasks: T5 | Implemented |
 | RIGOR-02 | P1: Coverage and relative rigor | Tasks: T5 | Implemented |
-| RIGOR-03 | P1: Coverage and relative rigor | Tasks: T5, T6 | In Progress (T5 done, T6 pending) |
-| RIGOR-04 | P1: Coverage and relative rigor | Tasks: T6 | In Tasks |
-| RIGOR-05 | P1: Coverage and relative rigor | Tasks: T6 | In Tasks |
+| RIGOR-03 | P1: Coverage and relative rigor | Tasks: T5, T6 | Implemented |
+| RIGOR-04 | P1: Coverage and relative rigor | Tasks: T6 | Implemented |
+| RIGOR-05 | P1: Coverage and relative rigor | Tasks: T6 | Implemented |
 | RIGOR-06 | P1: Coverage and relative rigor | Tasks: T5, T7 | In Progress (T5 done, T7 pending) |
 | DISC-01 | P1: Honest AI disclosure | Tasks: T8 | In Tasks |
-| DISC-02 | P1: Honest AI disclosure | Tasks: T6, T8 | In Tasks |
-| DISC-03 | P1: Honest AI disclosure | Tasks: T6 | In Tasks |
+| DISC-02 | P1: Honest AI disclosure | Tasks: T6, T8 | In Progress (T6 done, T8 pending) |
+| DISC-03 | P1: Honest AI disclosure | Tasks: T6 | Implemented |
 | DISC-04 | P1: Honest AI disclosure | Tasks: T8 | In Tasks |
 | REPRO-01 | P2: Reproducible consensus | Tasks: T4 | Implemented |
 | REPRO-02 | P2: Reproducible consensus | Tasks: T4 | Implemented |

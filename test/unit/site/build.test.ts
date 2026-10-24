@@ -7,7 +7,15 @@ import pkg from '../../../package.json' with { type: 'json' }
 import { createContext, emptyState, listed } from '../../../site/core.js'
 import { type Config, loadConfig } from '../../../src/config.ts'
 import type { CheckRecord } from '../../../src/types.ts'
-import { buildFixture, fixtureRecords } from '../../fixtures/site.ts'
+import {
+  buildFixture,
+  FIXTURE_GROUPS,
+  FIXTURE_PENDING,
+  fixtureGroupId,
+  fixtureGroups,
+  fixtureRecords,
+  recordId,
+} from '../../fixtures/site.ts'
 
 const ROOT = join(import.meta.dirname, '../../..')
 const REPO = pkg.repository
@@ -19,6 +27,7 @@ let records: CheckRecord[]
 let config: Config
 let index: CheerioAPI
 let method: CheerioAPI
+let compare: CheerioAPI
 let indexHtml: string
 
 beforeAll(async () => {
@@ -28,6 +37,7 @@ beforeAll(async () => {
   indexHtml = await readFile(join(outDir, 'index.html'), 'utf8')
   index = load(indexHtml)
   method = load(await readFile(join(outDir, 'metodologia.html'), 'utf8'))
+  compare = load(await readFile(join(outDir, 'comparar.html'), 'utf8'))
 })
 afterAll(() => rm(tmp, { recursive: true, force: true }))
 
@@ -282,6 +292,7 @@ describe('dist layout (DATA-01, DATA-05)', () => {
       ['checks.csv', join(dataDir, 'checks.csv')],
       ['run-report.json', join(dataDir, 'run-report.json')],
       ['bands.json', join(ROOT, 'config/bands.json')],
+      ['claim-groups.json', join(dataDir, 'claim-groups.json')],
     ]) {
       expect(await readFile(join(outDir, file), 'utf8'), file).toBe(await readFile(source, 'utf8'))
     }
@@ -292,11 +303,148 @@ describe('dist layout (DATA-01, DATA-05)', () => {
       .filter((d) => d.isFile())
       .map((d) => join(d.parentPath, d.name).slice(outDir.length + 1))
     expect(dist.sort()).toEqual(
-      [...site, 'checks.json', 'checks.csv', 'run-report.json', 'bands.json'].sort(),
+      [
+        ...site,
+        'checks.json',
+        'checks.csv',
+        'run-report.json',
+        'bands.json',
+        'claim-groups.json',
+      ].sort(),
     )
     expect(dist.filter((f) => f.endsWith('.html')).sort()).toEqual([
+      'comparar.html',
       'index.html',
       'metodologia.html',
     ])
+  })
+})
+
+describe('comparar.html (CMP-01, CMP-02, CMP-06)', () => {
+  const OUTLETS = ['aosfatos', 'estadao', 'g1', 'lupa']
+  const text = (sel: string) => compare(sel).text().replace(/\s+/g, ' ').trim()
+
+  it('pre-renders one row per group with two or more live records, verdict or "não checou" per agency', () => {
+    const rows = compare('#rows > li.claim')
+    // D lost its Lupa record (removed at the source) and has one record left.
+    expect(rows.map((_, li) => li.attribs['data-id']).get()).toEqual(
+      ['G', 'F', 'H', 'E', 'A', 'I', 'B', 'C'].map(fixtureGroupId),
+    )
+    rows.each((_, li) => {
+      const letter = Object.keys(FIXTURE_GROUPS).find(
+        (l) => fixtureGroupId(l) === li.attribs['data-id'],
+      )
+      const members = FIXTURE_GROUPS[letter as string]
+        .map((n) => records[n - 1])
+        .filter((r) => !r.missingSince)
+      const cells = compare(li).find('.cells > li')
+      expect(cells).toHaveLength(4)
+      OUTLETS.forEach((outlet, i) => {
+        const record = members.find((r) => r.outlet === outlet)
+        const cell = cells.eq(i)
+        expect(cell.find('.agency').text()).toBe(config.outlets[outlet].name)
+        if (!record) {
+          expect(cell.find('.none').text()).toBe('não checou')
+          expect(cell.find('a')).toHaveLength(0)
+          return
+        }
+        const chip = cell.find('a.chip')
+        expect(chip.attr('title')).toBe(`Rótulo da agência: ${record.label}`)
+        expect(chip.attr('href')).toBe(record.url)
+      })
+      expect(compare(li).find('.gid').text()).toBe(li.attribs['data-id'])
+    })
+    expect(compare('#rows .none')).toHaveLength(10)
+  })
+
+  it('shows how many published records are not grouped yet', () => {
+    expect(text('#pending')).toBe(
+      `${FIXTURE_PENDING.length} checagens publicadas depois da última revisão ainda não foram agrupadas.`,
+    )
+  })
+
+  it('states the caveat above both tables, with agencies by name and candidates in ballot order', () => {
+    const caveat = compare('#caveat')
+    expect(caveat.text()).toBe(
+      'Cada agência escolhe o que checar e pode checar partes diferentes da mesma fala. Estes números mostram diferenças, não provam favorecimento.',
+    )
+    expect(caveat.nextAll().find('table')).toHaveLength(2)
+    expect(caveat.prevAll().find('table')).toHaveLength(0)
+    for (const id of ['#coverage', '#rigor']) {
+      expect(
+        compare(`${id} thead th`)
+          .map((_, th) => compare(th).text())
+          .get(),
+      ).toEqual(['Agência', 'Lula', 'Flávio'])
+      expect(
+        compare(`${id} tbody th`)
+          .map((_, th) => compare(th).text())
+          .get(),
+      ).toEqual(OUTLETS.map((o) => config.outlets[o].name))
+    }
+    // Lupa, both debates: Lula in A, B, E, F; Flávio in C and G.
+    expect(compare('#coverage tbody tr').eq(3).find('td .line').first().text()).toBe(
+      '4 de 4 alegações',
+    )
+  })
+
+  it('explains how the groups were made and how to contest one (DISC-02, DISC-03)', () => {
+    const section = compare('h2')
+      .filter((_, h) => compare(h).text() === 'Como os grupos foram feitos')
+      .nextUntil('h2')
+    const how = section.text().replace(/\s+/g, ' ')
+    for (const step of [
+      'com a agência trocada por uma letra. Não veem o nome da agência, o rótulo nem o veredito.',
+      'Três agentes agrupam as checagens de cada debate',
+      'um juiz decide só aqueles casos',
+      'um revisor lê cada frase',
+      'O mantenedor revisa o resultado antes de publicar.',
+      'A IA nunca define veredito.',
+    ]) {
+      expect(how).toContain(step)
+    }
+    expect(
+      section
+        .find('a')
+        .map((_, a) => a.attribs.href)
+        .get(),
+    ).toEqual(['claim-groups.json', `${REPO}/tree/main/data/claim-curation`])
+    const contest = compare('h2')
+      .filter((_, h) => compare(h).text() === 'Contestar um grupo')
+      .next('p')
+    expect(contest.text()).toContain('abra uma issue em')
+    expect(contest.text()).toContain('com o código do grupo')
+    expect(contest.find('a').attr('href')).toBe(`${REPO}/issues`)
+  })
+
+  it('is linked from the main page and the methodology page', () => {
+    expect(index('a[href="comparar.html"]')).toHaveLength(2)
+    expect(index('#notice + p a[href="comparar.html"]')).toHaveLength(1)
+    expect(index('footer a[href="comparar.html"]')).toHaveLength(1)
+    expect(method('a[href="comparar.html"]').length).toBeGreaterThan(0)
+  })
+
+  it('inlines the groups and the curated record ids for the browser', () => {
+    const data = JSON.parse(compare('script#compare-data[type="application/json"]').text())
+    expect(data.groups).toEqual(fixtureGroups().groups)
+    const pending = new Set(FIXTURE_PENDING.map(recordId))
+    expect(new Set(data.curated)).toEqual(
+      new Set(records.filter((r) => !r.missingSince && !pending.has(r.id)).map((r) => r.id)),
+    )
+    expect(data.records.map((r: CheckRecord) => r.id)).toEqual(records.map((r) => r.id))
+    expect(data.candidates).toEqual(config.candidates)
+  })
+
+  it('fails the build on a broken claim group and names it (CLAIM-02)', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'site-build-'))
+    try {
+      const groups = fixtureGroups()
+      groups.groups[1] = { ...groups.groups[1], claim: '' }
+      await expect(buildFixture(dir, fixtureRecords(), groups)).rejects.toThrow(
+        `${groups.groups[1].id}: claim is empty`,
+      )
+    } finally {
+      await rm(dir, { recursive: true, force: true })
+    }
   })
 })

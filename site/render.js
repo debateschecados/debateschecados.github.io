@@ -1,8 +1,11 @@
 // String templates shared by the build (pre-rendered page) and the browser.
 
+import { isSmall, visibleRows } from './compare.js'
 import { BANDS, optionCount, removedCount } from './core.js'
 
 /** @typedef {import('./core.js').Context} Context */
+/** @typedef {import('./compare.js').Row} Row */
+/** @typedef {import('./compare.js').CompareState} CompareState */
 /** @typedef {import('./core.js').State} State */
 /** @typedef {import('../src/types.ts').CheckRecord} CheckRecord */
 /** @typedef {ReturnType<typeof import('./core.js').scoreboard>} Board */
@@ -141,3 +144,86 @@ export function filtersHtml(ctx, state, shown) {
     `<span class="count"><span class="n">${shown}</span> checagens</span>`
   )
 }
+
+const plural = (/** @type {number} */ n, /** @type {string} */ one, /** @type {string} */ many) =>
+  `${n} ${n === 1 ? one : many}`
+
+// One claim group: who said it, the claim, the group id to cite, then one cell per agency
+// with the band as the verdict and the agency's label on hover, or "não checou" (CMP-02).
+/** @param {Row} row @param {Context} ctx */
+export function compareRowHtml(row, ctx) {
+  const debate = ctx.debates.find((d) => d.id === row.debate)
+  const speaker = ctx.candidates.find((c) => c.id === row.speaker)
+  const cells = row.cells
+    .map((r, i) => {
+      const verdict = r
+        ? `<a class="chip ${bandClass(r.band)}" href="${esc(r.url)}" title="Rótulo da agência: ${esc(r.label)}">${esc(bandName(r.band))}</a>`
+        : '<span class="none">não checou</span>'
+      return `<li><span class="agency">${esc(ctx.outlets[ctx.outletIds[i]].name)}</span>${verdict}</li>`
+    })
+    .join('')
+  return `<li class="claim" data-id="${esc(row.id)}">
+  <div class="said">
+    <div class="who">${esc(speaker?.short ?? row.speaker)} no debate da ${esc(debate?.broadcaster.name ?? row.debate)}, ${debate ? shortDate(debate.date) : ''}</div>
+    <p>${esc(row.claim)}</p>
+    <code class="gid">${esc(row.id)}</code>
+  </div>
+  <ul class="cells">${cells}</ul>
+</li>`
+}
+
+const SMALL_SAMPLE = '<span class="small">amostra pequena</span>'
+
+// Agencies always in name order and candidates in ballot order, never sorted by a number,
+// and no column adds up an agency across candidates (RIGOR-05).
+/** @template {{ candidate: { short: string }, outlets: unknown[] }} T @param {Context} ctx @param {T[]} columns @param {(cell: T['outlets'][number]) => string} cell */
+const agencyTable = (ctx, columns, cell) =>
+  `<table><thead><tr><th>Agência</th>${columns.map((c) => `<th>${esc(c.candidate.short)}</th>`).join('')}</tr></thead><tbody>${ctx.outletIds
+    .map(
+      (outlet, i) =>
+        `<tr><th scope="row">${esc(ctx.outlets[outlet].name)}</th>${columns.map((c) => `<td>${cell(c.outlets[i])}</td>`).join('')}</tr>`,
+    )
+    .join('')}</tbody></table>`
+
+/** @param {Context} ctx @param {ReturnType<typeof import('./compare.js').coverage>} cov */
+export const coverageHtml = (ctx, cov) =>
+  agencyTable(
+    ctx,
+    cov,
+    (o) =>
+      `<span class="line"><b>${o.n}</b> de ${plural(o.of, 'alegação', 'alegações')}</span><span class="line"><b>${o.solo}</b> só ela checou</span>${isSmall(o.of) ? SMALL_SAMPLE : ''}`,
+  )
+
+/** @param {Context} ctx @param {ReturnType<typeof import('./compare.js').rigor>} rig */
+export const rigorHtml = (ctx, rig) =>
+  agencyTable(
+    ctx,
+    rig,
+    (o) =>
+      `<span class="line"><b>${o.harsher}</b> mais dura</span><span class="line"><b>${o.equal}</b> igual</span><span class="line"><b>${o.milder}</b> mais branda</span>${isSmall(o.n) ? SMALL_SAMPLE : ''}`,
+  )
+
+// Candidate select and the divergence toggle; counts apply the other filters.
+/** @param {Context} ctx @param {Row[]} rows @param {CompareState} state @param {number} shown */
+export function compareFiltersHtml(ctx, rows, state, shown) {
+  const opts = ctx.candidates
+    .map(
+      (c) =>
+        `<option value="${esc(c.id)}"${state.speaker === c.id ? ' selected' : ''}>${esc(c.short)} (${visibleRows(rows, { ...state, speaker: c.id }).length})</option>`,
+    )
+    .join('')
+  const divergent = visibleRows(rows, { ...state, div: true }).length
+  return (
+    `<label>Candidato<select data-key="speaker"><option value="">Todos</option>${opts}</select></label>` +
+    `<label class="toggle"><input type="checkbox" data-div${state.div ? ' checked' : ''}>Só divergências (${divergent})</label>` +
+    `<span class="count"><span class="n">${shown}</span> ${shown === 1 ? 'alegação' : 'alegações'}</span>`
+  )
+}
+
+// Records published after the last curation run (CMP-06); nothing when there are none.
+export const pendingText = (/** @type {number} */ n) =>
+  n === 0
+    ? ''
+    : n === 1
+      ? '1 checagem publicada depois da última revisão ainda não foi agrupada.'
+      : `${n} checagens publicadas depois da última revisão ainda não foram agrupadas.`

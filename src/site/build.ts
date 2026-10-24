@@ -2,16 +2,30 @@ import { cp, readFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { parseArgs } from 'node:util'
 import pkg from '../../package.json' with { type: 'json' }
+import {
+  coverage,
+  createComparison,
+  emptyCompareState,
+  pendingCount,
+  rigor,
+} from '../../site/compare.js'
 import { BANDS, createContext, emptyState, listed, notice, scoreboard } from '../../site/core.js'
 import {
   bandClass,
   boardHtml,
+  compareFiltersHtml,
+  compareRowHtml,
+  coverageHtml,
   debatesHtml,
   esc,
   filtersHtml,
   fullDate,
   itemHtml,
+  pendingText,
+  rigorHtml,
 } from '../../site/render.js'
+import type { BlindDebate } from '../claims/blind.ts'
+import { GROUPS_FILE, loadGroups } from '../claims/groups.ts'
 import { type Config, loadConfig } from '../config.ts'
 import { labelKey } from '../pipeline/normalize.ts'
 import type { CheckRecord } from '../types.ts'
@@ -128,6 +142,14 @@ function countsTable(config: Config, ctx: Context) {
   )
 }
 
+// Record ids the latest curation run was given; none before the first run.
+async function curatedIds(dataDir: string, run: string | null) {
+  if (!run) return []
+  const path = join(dataDir, 'claim-curation', run, 'input.json')
+  const input = JSON.parse(await readFile(path, 'utf8')) as BlindDebate[]
+  return input.flatMap((d) => d.partitions.flatMap((p) => p.records.map((r) => r.ref)))
+}
+
 async function duelHtml(siteDir: string, ctx: Context) {
   const fighters = await Promise.all(
     ctx.candidates.map(async (c, i) => {
@@ -143,6 +165,10 @@ export async function build({ siteDir, dataDir, configDir, outDir, repo }: Build
   const records = JSON.parse(await readFile(join(dataDir, 'checks.json'), 'utf8')) as CheckRecord[]
   const debates = config.debates.map(({ id, date, broadcaster }) => ({ id, date, broadcaster }))
   const ctx = createContext({ ...config, debates, records })
+  // A broken claim group stops the build before dist/ is touched (CLAIM-02).
+  const groups = await loadGroups(dataDir, records)
+  const curated = await curatedIds(dataDir, groups.run)
+  const comparison = createComparison(ctx, groups, curated)
   const state = emptyState()
   const items = listed(ctx, state)
   const repoSlots = { repo: esc(repo), repoLabel: esc(repo.replace(/^https?:\/\//, '')) }
@@ -151,6 +177,10 @@ export async function build({ siteDir, dataDir, configDir, outDir, repo }: Build
   await cp(siteDir, outDir, { recursive: true, filter: (src) => !src.endsWith('.py') })
   for (const file of DATA_FILES) await cp(join(dataDir, file), join(outDir, file))
   await cp(join(configDir, 'bands.json'), join(outDir, 'bands.json'))
+  // The public copy is the committed file itself; before the first run, an empty file.
+  await cp(join(dataDir, GROUPS_FILE), join(outDir, GROUPS_FILE)).catch(() =>
+    writeFile(join(outDir, GROUPS_FILE), `${JSON.stringify(groups, null, 2)}\n`),
+  )
 
   const index = fill(await readFile(join(siteDir, 'index.html'), 'utf8'), {
     ...repoSlots,
@@ -178,6 +208,42 @@ export async function build({ siteDir, dataDir, configDir, outDir, repo }: Build
     order: ctx.candidates.map((c) => `${c.number}, ${esc(c.name)}`).join('; '),
   })
   await writeFile(join(outDir, 'metodologia.html'), method)
+
+  const compareState = emptyCompareState()
+  const compare = fill(await readFile(join(siteDir, 'comparar.html'), 'utf8'), {
+    ...repoSlots,
+    debates: debatesHtml(ctx),
+    pending: esc(pendingText(pendingCount(ctx, comparison.curated))),
+    coverage: coverageHtml(ctx, coverage(ctx, comparison, compareState.debate)),
+    rigor: rigorHtml(ctx, rigor(ctx, comparison, compareState.debate)),
+    filters: compareFiltersHtml(ctx, comparison.rows, compareState, comparison.rows.length),
+    agencies: ['Alegação', ...ctx.outletIds.map((id) => config.outlets[id].name)]
+      .map((name) => `<span>${esc(name)}</span>`)
+      .join(''),
+    rows: comparison.rows.map((row) => compareRowHtml(row, ctx)).join('\n'),
+    // Only the record fields the comparison reads, to keep the page light.
+    data: jsonScript('compare-data', {
+      records: records.map(
+        ({ id, debate, outlet, speaker, pos, band, label, url, missingSince }) => ({
+          id,
+          debate,
+          outlet,
+          speaker,
+          pos,
+          band,
+          label,
+          url,
+          missingSince,
+        }),
+      ),
+      candidates: config.candidates,
+      outlets: config.outlets,
+      debates,
+      groups: groups.groups,
+      curated,
+    }),
+  })
+  await writeFile(join(outDir, 'comparar.html'), compare)
 }
 
 if (import.meta.main) {

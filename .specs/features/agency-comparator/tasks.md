@@ -194,17 +194,19 @@ T6 → T8
 
 **Done when**:
 
-- [ ] Built `comparar.html` has one row per visible fixture group with "não checou" in empty agency cells and the agency label in each verdict's title
-- [ ] RIGOR-04 text, contest instruction and the "Como os grupos foram feitos" section with both links are present; the pending notice shows the fixture count
-- [ ] No element orders agencies by a number and no per-agency total exists (RIGOR-05)
-- [ ] A fixture with a broken group makes `build` reject with the group id in the message
-- [ ] Gate check passes: `pnpm vitest run test/unit/site/build.test.ts` then `pnpm vitest run test/unit/site/render.test.ts`
-- [ ] Test count: at least 7 new tests pass
+- [x] Built `comparar.html` has one row per visible fixture group with "não checou" in empty agency cells and the agency label in each verdict's title
+- [x] RIGOR-04 text, contest instruction and the "Como os grupos foram feitos" section with both links are present; the pending notice shows the fixture count
+- [x] No element orders agencies by a number and no per-agency total exists (RIGOR-05)
+- [x] A fixture with a broken group makes `build` reject with the group id in the message
+- [x] Gate check passes: `pnpm vitest run test/unit/site/build.test.ts` then `pnpm vitest run test/unit/site/render.test.ts`
+- [x] Test count: at least 7 new tests pass
 
 **Tests**: unit
 **Gate**: quick
 
 **Commit**: `feat(site): Build the agency comparison page`
+
+**Status**: ✅ Complete
 
 ---
 

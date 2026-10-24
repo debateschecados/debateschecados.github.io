@@ -1,11 +1,20 @@
 import { join } from 'node:path'
 import { load } from 'cheerio'
 import { beforeAll, describe, expect, it } from 'vitest'
+import { coverage, createComparison, emptyCompareState, rigor } from '../../../site/compare.js'
 import { createContext, emptyState, listed, scoreboard } from '../../../site/core.js'
-import { boardHtml, itemHtml } from '../../../site/render.js'
+import {
+  boardHtml,
+  compareFiltersHtml,
+  compareRowHtml,
+  coverageHtml,
+  itemHtml,
+  pendingText,
+  rigorHtml,
+} from '../../../site/render.js'
 import { type Config, loadConfig } from '../../../src/config.ts'
 import type { CheckRecord } from '../../../src/types.ts'
-import { fixtureRecords } from '../../fixtures/site.ts'
+import { fixtureGroupId, fixtureGroups, fixtureRecords } from '../../fixtures/site.ts'
 
 let config: Config
 let records: CheckRecord[]
@@ -104,5 +113,197 @@ describe('boardHtml', () => {
       expect($(card).find('.total .n').text()).toBe(String(mine.length))
       expect($(card).find('.scope').text()).toBe(' da g1 Fato ou Fake')
     })
+  })
+})
+
+describe('compareRowHtml (CMP-01, CMP-02)', () => {
+  const row = (letter: string) => {
+    const rows = createComparison(
+      ctx,
+      fixtureGroups(),
+      records.map((r) => r.id),
+    ).rows
+    return load(compareRowHtml(rows.find((r) => r.id === fixtureGroupId(letter)) as never, ctx))(
+      'li.claim',
+    )
+  }
+  // Agency name and verdict text of each cell, in page order.
+  const cells = (li: ReturnType<typeof row>) =>
+    li
+      .find('.cells > li')
+      .toArray()
+      .map((c) => [li.find(c).find('.agency').text(), li.find(c).find('.chip, .none').text()])
+
+  it('shows speaker, debate, claim, group id and each agency verdict linked to the agency item', () => {
+    const li = row('A')
+    expect(li.attr('data-id')).toBe(fixtureGroupId('A'))
+    expect(li.find('.who').text()).toBe('Lula no debate da Band, 18/10')
+    expect(li.find('.said p').text()).toBe('Alegação de teste A, inventada para a suíte do site.')
+    expect(li.find('.gid').text()).toBe(fixtureGroupId('A'))
+    expect(cells(li)).toEqual([
+      ['Aos Fatos', 'Falso'],
+      ['Estadão Verifica', 'Verdadeiro'],
+      ['g1 Fato ou Fake', 'Verdadeiro'],
+      ['Lupa', 'Verdadeiro'],
+    ])
+    const chip = li.find('a.chip').first()
+    expect(chip.attr('href')).toBe(byId(14).url)
+    expect(chip.hasClass('band-falso')).toBe(true)
+    expect(
+      li
+        .find('a.chip')
+        .map((_, a) => a.attribs.title)
+        .get(),
+    ).toEqual([14, 12, 8, 4].map((n) => `Rótulo da agência: ${byId(n).label}`))
+  })
+
+  it('writes "não checou" in the cell of an agency with no record in the group', () => {
+    const li = row('B')
+    expect(cells(li)).toEqual([
+      ['Aos Fatos', 'não checou'],
+      ['Estadão Verifica', 'não checou'],
+      ['g1 Fato ou Fake', 'Falso'],
+      ['Lupa', 'Falso'],
+    ])
+    expect(
+      li
+        .find('a.chip')
+        .map((_, a) => a.attribs.href)
+        .get(),
+    ).toEqual([byId(6).url, byId(2).url])
+  })
+})
+
+describe('coverage and rigor tables (RIGOR-03, RIGOR-05)', () => {
+  const cmp = () =>
+    createComparison(
+      ctx,
+      fixtureGroups(),
+      records.map((r) => r.id),
+    )
+  const cellTexts = (html: string) => {
+    const $ = load(html)
+    return $('tbody tr')
+      .map((_, tr) => [
+        [
+          $(tr).find('th').text(),
+          ...$(tr)
+            .find('td')
+            .map((_, td) =>
+              $(td)
+                .find('.line')
+                .map((_, l) => $(l).text())
+                .get()
+                .join(' | '),
+            )
+            .get(),
+        ],
+      ])
+      .get()
+  }
+
+  it('lists agencies by name and candidates in ballot order, with no total per agency', () => {
+    for (const html of [
+      coverageHtml(ctx, coverage(ctx, cmp(), null)),
+      rigorHtml(ctx, rigor(ctx, cmp(), null)),
+    ]) {
+      const $ = load(html)
+      expect(
+        $('thead th')
+          .map((_, th) => $(th).text())
+          .get(),
+      ).toEqual(['Agência', 'Lula', 'Flávio'])
+      expect(
+        $('tbody th')
+          .map((_, th) => $(th).text())
+          .get(),
+      ).toEqual(['Aos Fatos', 'Estadão Verifica', 'g1 Fato ou Fake', 'Lupa'])
+      expect($('tbody tr td')).toHaveLength(8)
+      expect($.text()).not.toMatch(/total/i)
+    }
+  })
+
+  it('shows coverage and the comparisons of each agency and candidate', () => {
+    const band = 'band-2026-10-18'
+    expect(cellTexts(coverageHtml(ctx, coverage(ctx, cmp(), band)))[2]).toEqual([
+      'g1 Fato ou Fake',
+      '2 de 2 alegações | 0 só ela checou',
+      '1 de 2 alegações | 1 só ela checou',
+    ])
+    expect(cellTexts(rigorHtml(ctx, rigor(ctx, cmp(), band)))[0]).toEqual([
+      'Aos Fatos',
+      '3 mais dura | 0 igual | 0 mais branda',
+      '0 mais dura | 0 igual | 0 mais branda',
+    ])
+  })
+
+  it('marks "amostra pequena" only in cells based on fewer than 10 claims or comparisons', () => {
+    const column = (short: string, outlets: unknown[]) => ({ candidate: { short }, outlets })
+    const cov = (of: number) => ({ outlet: 'x', n: 1, of, solo: 0 })
+    const rig = (n: number) => ({ outlet: 'x', harsher: n, equal: 0, milder: 0, n })
+    const four = <T>(f: () => T) => [0, 1, 2, 3].map(f)
+    const marks = (html: string) => {
+      const $ = load(html)
+      return $('tbody td')
+        .map((_, td) => $(td).find('.small').text())
+        .get()
+    }
+    expect(
+      marks(
+        coverageHtml(ctx, [
+          column(
+            'Lula',
+            four(() => cov(9)),
+          ),
+          column(
+            'Flávio',
+            four(() => cov(10)),
+          ),
+        ] as never),
+      ),
+    ).toEqual(four(() => ['amostra pequena', '']).flat())
+    expect(
+      marks(
+        rigorHtml(ctx, [
+          column(
+            'Lula',
+            four(() => rig(10)),
+          ),
+          column(
+            'Flávio',
+            four(() => rig(9)),
+          ),
+        ] as never),
+      ),
+    ).toEqual(four(() => ['', 'amostra pequena']).flat())
+  })
+})
+
+describe('compareFiltersHtml (CMP-03)', () => {
+  it('offers the candidates in ballot order and the divergence toggle, with row counts', () => {
+    const rows = createComparison(
+      ctx,
+      fixtureGroups(),
+      records.map((r) => r.id),
+    ).rows
+    const state = { ...emptyCompareState(), div: true }
+    const $ = load(compareFiltersHtml(ctx, rows, state, 3))
+    expect(
+      $('select[data-key="speaker"] option')
+        .map((_, o) => $(o).text())
+        .get(),
+    ).toEqual(['Todos', 'Lula (1)', 'Flávio (2)'])
+    expect($('input[data-div]').is(':checked')).toBe(true)
+    expect($('label.toggle').text()).toBe('Só divergências (3)')
+    expect($('.count').text()).toBe('3 alegações')
+  })
+})
+
+describe('pendingText (CMP-06)', () => {
+  it('states how many published records are not grouped yet, and nothing when none', () => {
+    expect(pendingText(2)).toBe(
+      '2 checagens publicadas depois da última revisão ainda não foram agrupadas.',
+    )
+    expect(pendingText(0)).toBe('')
   })
 })

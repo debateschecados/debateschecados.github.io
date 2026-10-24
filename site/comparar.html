@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comparar agências · Debates checados</title>
+<meta name="description" content="As alegações dos debates do 2º turno checadas por mais de uma agência, com o veredito de cada uma lado a lado.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="wrap doc cmp">
+  <a class="back" href="./">← Voltar para as checagens</a>
+  <h1>Comparar agências</h1>
+  <p class="lede">Quando duas ou mais agências checaram a mesma alegação de um candidato, ela aparece aqui uma vez, com o veredito de cada agência na escala comum. Passe o mouse sobre um veredito para ver o rótulo original. O link leva à checagem da agência.</p>
+  <!-- biome-ignore lint/a11y/useSemanticElements: a pill of toggle buttons, not a form fieldset -->
+  <div class="segmented" id="debates" role="group" aria-label="Debate"><!--debates--></div>
+  <p class="pending" id="pending"><!--pending--></p>
+
+  <h2>Números por agência</h2>
+  <p class="caveat" id="caveat">Cada agência escolhe o que checar e pode checar partes diferentes da mesma fala. Estes números mostram diferenças, não provam favorecimento.</p>
+  <h3>Cobertura</h3>
+  <p>Quantas das alegações de cada candidato checadas por mais de uma agência esta agência checou. “Só ela checou” conta as checagens da agência que nenhuma outra checou.</p>
+  <div class="table-wrap" id="coverage"><!--coverage--></div>
+  <h3>Veredito comparado</h3>
+  <p>Em cada alegação, o veredito da agência é comparado com o de cada outra agência que a checou, na ordem verdadeiro, impreciso, falso. “Mais dura” quer dizer que o veredito dela ficou mais perto de falso. Checagens sem faixa ficam de fora.</p>
+  <div class="table-wrap" id="rigor"><!--rigor--></div>
+
+  <h2>Alegação por alegação</h2>
+  <div class="filters" id="filters"><!--filters--></div>
+  <div class="claims-head" aria-hidden="true"><!--agencies--></div>
+  <ol class="claims" id="rows"><!--rows--></ol>
+
+  <h2>Como os grupos foram feitos</h2>
+  <p>Um grupo junta as checagens de agências diferentes que avaliam a mesma alegação, do mesmo candidato, no mesmo debate. Os grupos são propostos por agentes de inteligência artificial e revisados pelo mantenedor:</p>
+  <ol>
+    <li>Os agentes recebem só a fala e o trecho de cada checagem, com a agência trocada por uma letra. Não veem o nome da agência, o rótulo nem o veredito.</li>
+    <li>Três agentes agrupam as checagens de cada debate, cada um sem ver o trabalho dos outros. Um grupo em que os três concordam entra direto.</li>
+    <li>Onde eles discordam, um juiz decide só aqueles casos.</li>
+    <li>Um agente escreve uma frase curta para cada alegação, e um revisor lê cada frase atrás de palavras que tomem partido.</li>
+    <li>O mantenedor revisa o resultado antes de publicar. Toda mudança feita à mão fica registrada, com o motivo.</li>
+  </ol>
+  <p>A IA nunca define veredito. Cada veredito desta página é o da agência, na faixa da escala comum. Todos os grupos estão em <a href="claim-groups.json">claim-groups.json</a>. A entrada que os agentes receberam, a resposta de cada um e o roteiro da curadoria estão em <a href="{{repo}}/tree/main/data/claim-curation">data/claim-curation</a>.</p>
+
+  <h2>Contestar um grupo</h2>
+  <p>Se um grupo junta checagens que avaliam coisas diferentes, ou se falta nele uma checagem, abra uma issue em <a href="{{repo}}/issues">{{repoLabel}}/issues</a> com o código do grupo, que aparece abaixo de cada alegação, e diga o que está errado. Toda correção vira um commit público, com data.</p>
+</main>
+<footer class="foot">
+  <div class="wrap">
+    <nav><a href="checks.csv">Baixar os dados</a><a href="./">Checagens</a><a href="metodologia.html">Como funciona</a><a href="{{repo}}">Código no GitHub</a></nav>
+    <p>Os vereditos são das agências. Este site só reúne e organiza o que elas publicaram. Ilustrações feitas a partir de retratos oficiais: Palácio do Planalto (CC BY 2.0) e Agência Senado. Logos dos partidos e das emissoras: Wikimedia Commons.</p>
+  </div>
+</footer>
+<!--data-->
+<script type="module" src="comparar.js"></script>
+</body>
+</html>
