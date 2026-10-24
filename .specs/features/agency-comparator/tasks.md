@@ -310,7 +310,7 @@ T13 → T15
 **Done when**:
 
 - [x] On the pinned files: no record of the source is missing, `d5bca87d832d` is Lula's hunger claim again, the report lists the merged IDs, and other sources are byte-identical
-- [x] Refuses to write when the current source records differ from the `after` ones
+- [x] Refuses to write when the current source records differ from the `after` ones, unless they already equal the repaired ones: then a second run exits 0, says the repair is already applied and writes nothing
 - [x] `pnpm check:claims` and the build pass on the repaired data
 - [x] Gate check passes: `pnpm vitest run test/unit/repair.test.ts`
 - [x] Test count: at least 3 tests pass

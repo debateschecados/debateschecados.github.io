@@ -173,7 +173,7 @@ Requirements: CMP-01, CMP-02, CMP-07, CMP-08, RIGOR-01, RIGOR-05, LEAN-01..08, D
 
 - One-off CLI, committed with its output. Inputs pinned by commit: `before` = `git show e13bac2:data/checks.json`, `after` = `git show bc3a25d:data/checks.json`.
 - Fresh items = the live records of `estadao-globo-2026-10-23` in `after`, mapped to `FreshItem` (`evidenceUrl` = `evidence.url`, `fetchedAt` = `evidence.fetchedAt`). Previous = that source's records in `before`. `merge` runs with date `2026-10-24` and the source's adapter.
-- It replaces that source's records in the current `data/checks.json` only when they still equal the `after` ones; otherwise it exits 1 and says the source changed since the run. Every other source is untouched. It writes `data/checks.json` and `data/checks.csv` through the existing writer, and the report `data/repairs/2026-10-24-estadao.json`: `{ source, before, after, merged: [{ from, into }], new: [...], missing: [...] }`.
+- It replaces that source's records in the current `data/checks.json` only when they still equal the `after` ones; when they already equal the repaired records (a second run), it exits 0, says the repair is already applied and writes nothing; otherwise it exits 1 and says the source changed since the run. Every other source is untouched. It writes `data/checks.json` and `data/checks.csv` through the existing writer, and the report `data/repairs/2026-10-24-estadao.json`: `{ source, before, after, merged: [{ from, into }], new: [...], missing: [...] }`.
 
 ### `site/lean.js` (LEAN-01..05, LEAN-07)
 
