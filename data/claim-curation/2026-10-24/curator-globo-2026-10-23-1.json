@@ -1,0 +1,311 @@
+{
+  "groups": [
+    {
+      "speaker": "lula",
+      "refs": [
+        "673d8a46f845",
+        "04989eabb0cd",
+        "9434ddd37c76",
+        "a7d18869cbb8"
+      ],
+      "claim": "Flávio Bolsonaro chamou o Bolsa Família de \"bolsa farelo\""
+    },
+    {
+      "speaker": "lula",
+      "refs": [
+        "2fbfdbe7c524",
+        "0685edce88cb",
+        "a556c65ae249"
+      ],
+      "claim": "O governo Bolsonaro anulou o Fundo Amazônia e o governo Lula o fez voltar a funcionar"
+    },
+    {
+      "speaker": "lula",
+      "refs": [
+        "57b8856addd9",
+        "c4f2905ad6a6",
+        "e5cd0b2a2c2f"
+      ],
+      "claim": "No governo Bolsonaro, dizia-se que quem tomasse vacina ia virar gay e virar jacaré"
+    },
+    {
+      "speaker": "lula",
+      "refs": [
+        "30c683088488",
+        "ac798113d769",
+        "42cce5fb67c6"
+      ],
+      "claim": "O governo Lula herdou a taxa de juros em 13%"
+    },
+    {
+      "speaker": "lula",
+      "refs": [
+        "cd25bcc68692",
+        "f3886e4f06bd",
+        "12561b6f71d3"
+      ],
+      "claim": "Nunca se exportou tanto no Brasil quanto no governo Lula"
+    },
+    {
+      "speaker": "lula",
+      "refs": [
+        "8c316c96a936",
+        "e2b4033e9da2",
+        "5f9d5a546c36"
+      ],
+      "claim": "Na Argentina, a pobreza chegou a 40%"
+    },
+    {
+      "speaker": "lula",
+      "refs": [
+        "1db722ab7d1a",
+        "b2804fdd2f85"
+      ],
+      "claim": "Sem os reajustes acima da inflação dos governos do PT, o salário mínimo seria de apenas R$ 900"
+    },
+    {
+      "speaker": "lula",
+      "refs": [
+        "fdc679ed7206",
+        "d08ddeb050c2"
+      ],
+      "claim": "O governo Lula levou um computador quântico para a Paraíba"
+    },
+    {
+      "speaker": "lula",
+      "refs": [
+        "df548ecb7998",
+        "1569d86e77cb",
+        "48bd323f026c",
+        "b317fad8d4b3"
+      ],
+      "claim": "O governo Lula herdou 6 mil obras paradas em 2023"
+    },
+    {
+      "speaker": "lula",
+      "refs": [
+        "e84a6f94f449",
+        "ffd005e85db7"
+      ],
+      "claim": "Quem coloca dinheiro no túnel de Santos é o governo federal, com orçamento e financiamento do BNDES"
+    },
+    {
+      "speaker": "lula",
+      "refs": [
+        "97dd907ad475",
+        "0243f6ba4f2c",
+        "85c498d5d8b4"
+      ],
+      "claim": "A economia não crescia acima de 3% desde que Lula deixou a Presidência em 2010"
+    },
+    {
+      "speaker": "lula",
+      "refs": [
+        "ba283740847c",
+        "cf2adf6d48fd"
+      ],
+      "claim": "Flávio Bolsonaro votou contra o aumento da licença-maternidade quando era deputado estadual no Rio"
+    },
+    {
+      "speaker": "lula",
+      "refs": [
+        "d5bca87d832d",
+        "9e519989a5c5",
+        "550f80bf5c6c"
+      ],
+      "claim": "Lula tinha acabado com a fome no Brasil em 2012"
+    },
+    {
+      "speaker": "lula",
+      "refs": [
+        "8f1bba1945a7",
+        "f2de76954f88",
+        "b4fdbfb81dad"
+      ],
+      "claim": "Quando Lula voltou em 2023, havia 33 milhões de pessoas passando fome"
+    },
+    {
+      "speaker": "lula",
+      "refs": [
+        "df250d7b4df0",
+        "92e3caa21ac1"
+      ],
+      "claim": "O governo Lula abriu 700 novos mercados"
+    },
+    {
+      "speaker": "lula",
+      "refs": [
+        "b22ed7086eea",
+        "71424857edcb"
+      ],
+      "claim": "O \"Tigrinho\" foi criado pelo governo Bolsonaro em 2022"
+    },
+    {
+      "speaker": "lula",
+      "refs": [
+        "42d87610f8d3",
+        "c223b0fdf100"
+      ],
+      "claim": "O governo Lula está fazendo a BR-319, que liga Porto Velho a Manaus e que ninguém teve coragem de fazer"
+    },
+    {
+      "speaker": "flavio",
+      "refs": [
+        "ee3691bd7acb",
+        "446aabed062e"
+      ],
+      "claim": "No governo Lula há recorde de mulheres assassinadas"
+    },
+    {
+      "speaker": "flavio",
+      "refs": [
+        "8143529f813c",
+        "5fcb291ef8c3",
+        "bd0e58402f86",
+        "0f85b9f09e96"
+      ],
+      "claim": "O governo Lula está deixando uma dívida de R$ 11 trilhões"
+    },
+    {
+      "speaker": "flavio",
+      "refs": [
+        "7ac5a0df074f",
+        "a8184c39cd4a",
+        "ed1357093197"
+      ],
+      "claim": "Em outubro de 2022, a previsão era de juros em torno de 7% hoje com Bolsonaro, mas a taxa está em 14%"
+    },
+    {
+      "speaker": "flavio",
+      "refs": [
+        "5f7a88d195d1",
+        "ecc1d9eecb7c",
+        "65324ba2ae78",
+        "a577a4ac6f02"
+      ],
+      "claim": "Relatório recente do TCU aponta mais de 11,5 mil obras paralisadas no governo atual"
+    },
+    {
+      "speaker": "flavio",
+      "refs": [
+        "05f223000002",
+        "4ea3d7478dcd",
+        "b3b15d7a2416"
+      ],
+      "claim": "O governo Bolsonaro instalou mais de 21,3 mil pontos de internet em mais de 3,1 mil cidades"
+    },
+    {
+      "speaker": "flavio",
+      "refs": [
+        "69fd931392f0",
+        "af414a135d88",
+        "1f56c0bba5e1"
+      ],
+      "claim": "Jair Bolsonaro concluiu as obras da transposição do Rio São Francisco e levou a água ao Nordeste"
+    },
+    {
+      "speaker": "flavio",
+      "refs": [
+        "5f5c2907bfa3",
+        "0d1a23ff22b2"
+      ],
+      "claim": "O governo Bolsonaro fez o Marco Legal do Saneamento Básico"
+    },
+    {
+      "speaker": "flavio",
+      "refs": [
+        "590abbb7ae76",
+        "11d4ee8a9567"
+      ],
+      "claim": "Mais de 80 milhões de brasileiros estão com contas atrasadas"
+    },
+    {
+      "speaker": "flavio",
+      "refs": [
+        "383bd641adab",
+        "501b2e33a51d",
+        "84a04c32b045",
+        "fc1bb4ec3de9"
+      ],
+      "claim": "Lula diz que ladrão de celular não tem que ser preso porque rouba só para tomar uma cervejinha"
+    },
+    {
+      "speaker": "flavio",
+      "refs": [
+        "8fdf51d3165f",
+        "c1816d658397",
+        "09f038666df6",
+        "75ecedc97305"
+      ],
+      "claim": "Foi Bolsonaro quem deu no mínimo R$ 600 no Bolsa Família"
+    },
+    {
+      "speaker": "flavio",
+      "refs": [
+        "d26d5b66e3e2",
+        "11b7855d11b4",
+        "c4ef9b6c74b9",
+        "c077a420a2ca"
+      ],
+      "claim": "Bolsonaro não estava debochando de pessoas sem ar no vídeo em que aparece suspirando"
+    },
+    {
+      "speaker": "flavio",
+      "refs": [
+        "0f6978417369",
+        "1bd5f7c069c2",
+        "33100b1e69a7"
+      ],
+      "claim": "Lula é o pai do Tigrinho e do cassino online: ele criou e liberou"
+    },
+    {
+      "speaker": "flavio",
+      "refs": [
+        "c7de744df501",
+        "b3a0e59f91f2"
+      ],
+      "claim": "Relatório da Polícia Federal diz que não há dinheiro público no filme sobre Bolsonaro"
+    },
+    {
+      "speaker": "flavio",
+      "refs": [
+        "799fd010e99b",
+        "1a1e7ae86026"
+      ],
+      "claim": "O número de moradores de rua quase dobrou no governo Lula, de 199 mil no CadÚnico"
+    },
+    {
+      "speaker": "flavio",
+      "refs": [
+        "b4fdaeed9ed5",
+        "aceb0736b61e"
+      ],
+      "claim": "Flávio Bolsonaro nunca foi investigado por envolvimento com milícia"
+    },
+    {
+      "speaker": "flavio",
+      "refs": [
+        "53e6524b9091",
+        "6bfee33bc111"
+      ],
+      "claim": "Flávio Bolsonaro vai criar a Casa da Mulher Brasileira"
+    },
+    {
+      "speaker": "flavio",
+      "refs": [
+        "ef63242769b5",
+        "135ef699dad5",
+        "2c899bb6a7f7"
+      ],
+      "claim": "A morte da menina Ana Clara ocorreu numa troca de tiros em uma comunidade conflagrada"
+    },
+    {
+      "speaker": "flavio",
+      "refs": [
+        "243423821df2",
+        "9bf4124b481d"
+      ],
+      "claim": "Lula disse a frase: \"se a comida está cara, não compra\""
+    }
+  ]
+}

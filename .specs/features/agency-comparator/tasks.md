@@ -143,17 +143,19 @@ T6 → T8
 
 **Done when**:
 
-- [ ] Assembling the committed run yields 81 groups: 78 unanimous, 2 adjudicated, 1 manual (the 700-markets group with 3 records), and passes `checkGroups` against `data/checks.json`
-- [ ] Every claim equals the workflow result in the orchestrator's scratch `result.json` for the same refs, reviewer rewrites included
-- [ ] `check:claims` fails on a copy with one adjudicated group edited and lists the manual group with its reason
-- [ ] A manual edit whose `from` matches no group throws
-- [ ] Gate check passes: `pnpm vitest run test/unit/claims/assemble.test.ts`
-- [ ] Test count: at least 5 tests pass
+- [x] Assembling the committed run yields 81 groups: 78 unanimous, 2 adjudicated, 1 manual (the 700-markets group with 3 records), and passes `checkGroups` against `data/checks.json`
+- [x] Every claim equals the workflow result in the orchestrator's scratch `result.json` for the same refs, reviewer rewrites included
+- [x] `check:claims` fails on a copy with one adjudicated group edited and lists the manual group with its reason
+- [x] A manual edit whose `from` matches no group throws
+- [x] Gate check passes: `pnpm vitest run test/unit/claims/assemble.test.ts`
+- [x] Test count: at least 5 tests pass
 
 **Tests**: unit
 **Gate**: build
 
 **Commit**: `feat(claims): Assemble claim groups from the committed curation run`
+
+**Status**: ✅ Complete
 
 ---
 

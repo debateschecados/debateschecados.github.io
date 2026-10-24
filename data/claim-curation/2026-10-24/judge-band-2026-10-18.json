@@ -1,0 +1,41 @@
+{
+  "components": [
+    {
+      "component": 0,
+      "speaker": "lula",
+      "refs": [
+        "78fc2ef28ae7",
+        "b0c13289fb42"
+      ]
+    },
+    {
+      "component": 1,
+      "speaker": "flavio",
+      "refs": [
+        "21024e5b2532",
+        "39b93f3dbc8f"
+      ]
+    }
+  ],
+  "decisions": [
+    {
+      "component": 0,
+      "groups": [
+        {
+          "speaker": "lula",
+          "refs": [
+            "78fc2ef28ae7",
+            "b0c13289fb42"
+          ],
+          "claim": "O Brasil tem hoje 17,5 milhões de MEIs"
+        }
+      ],
+      "reason": "D checks only the MEI count. C covers both the creation of the MEI and the count, but its excerpt opens by checking the 17.5 million figure against official data, so the count is the shared claim."
+    },
+    {
+      "component": 1,
+      "groups": [],
+      "reason": "C checks the claim that Bolsonaro's first act was MP 871 against INSS fraud and that the PT opposed it, while D checks a different statement, that the PT caucus pushed an amendment favoring unions and uncontrolled deductions. The topic is the same, but the assertions are not."
+    }
+  ]
+}

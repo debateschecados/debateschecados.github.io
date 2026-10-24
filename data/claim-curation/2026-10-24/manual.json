@@ -1,0 +1,12 @@
+{
+  "edits": [
+    {
+      "from": ["92e3caa21ac1", "df250d7b4df0"],
+      "to": {
+        "records": ["5434697c0611", "92e3caa21ac1", "df250d7b4df0"],
+        "claim": "O governo Lula abriu 700 novos mercados"
+      },
+      "reason": "A checagem do g1 (5434697c0611) também avalia os 700 novos mercados; incluída na revisão do mantenedor em 2026-10-24."
+    }
+  ]
+}
