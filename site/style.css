@@ -383,34 +383,6 @@ body {
   text-decoration: underline;
 }
 
-.audit-fab {
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  z-index: 10;
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  font:
-    500 14px / 1 -apple-system,
-    BlinkMacSystemFont,
-    "Inter",
-    sans-serif;
-  color: var(--ink);
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: saturate(180%) blur(20px);
-  border: 1px solid #e8e8ed;
-  border-radius: 999px;
-  padding: 9px 14px 9px 12px;
-  cursor: pointer;
-}
-.audit-fab:hover {
-  background: #fff;
-}
-body:has(dialog[open]) .audit-fab {
-  visibility: hidden;
-}
-
 .audit {
   width: min(520px, 100vw);
   max-width: 100vw;
@@ -475,6 +447,9 @@ body:has(dialog[open]) .audit-fab {
   gap: 14px;
   font-size: 15px;
   color: #424245;
+}
+.rules a {
+  color: var(--link);
 }
 .rules strong {
   color: var(--ink);
@@ -794,7 +769,8 @@ body:has(dialog[open]) .audit-fab {
   padding: 40px 0 18px;
   border-bottom: 1px solid #e8e8ed;
   position: sticky;
-  top: 0;
+  /* Sticks under the 53 px top bar, keeping 12 px of the top padding in view. */
+  top: 25px;
   background: rgba(255, 255, 255, 0.86);
   backdrop-filter: saturate(180%) blur(20px);
   z-index: 2;
@@ -962,6 +938,7 @@ textarea:focus-visible {
 }
 .doc a {
   color: var(--link);
+  overflow-wrap: anywhere;
 }
 .table-wrap {
   overflow-x: auto;
@@ -1004,6 +981,332 @@ textarea:focus-visible {
   background: var(--c);
 }
 
+/* How it works */
+.how .duel {
+  justify-content: flex-start;
+  gap: 8px;
+  margin: 0 0 8px;
+  cursor: default;
+}
+.how .fighter {
+  width: 84px;
+}
+.how .vs {
+  font-size: 22px;
+}
+.how .lede {
+  font-size: 19px;
+  line-height: 1.42;
+  max-width: 60ch;
+}
+.trail {
+  list-style: none;
+  counter-reset: step;
+  margin: 48px 0 0;
+  padding: 0;
+}
+.how .trail > li {
+  counter-increment: step;
+  position: relative;
+  padding: 0 0 48px 64px;
+}
+/* The numbered path: one dot per step, joined by a line down to the next one. */
+.how .trail > li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font:
+    700 18px / 1 "Inter Tight",
+    sans-serif;
+  color: #fff;
+  background: var(--ink);
+}
+.how .trail > li::after {
+  content: "";
+  position: absolute;
+  left: 19px;
+  top: 48px;
+  bottom: 8px;
+  width: 2px;
+  background: repeating-linear-gradient(var(--line) 0 6px, transparent 6px 12px);
+}
+.how .trail > li:last-child::after {
+  display: none;
+}
+.doc .trail h2 {
+  margin: 4px 0 10px;
+}
+.trail .aside {
+  font-size: 15px;
+  color: var(--muted);
+}
+.stamps {
+  list-style: none;
+  margin: 20px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 22px;
+}
+.doc .stamps li {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+/* A rubber stamp: the agency's own words, slightly crooked, in the band's color. */
+.stamp {
+  font:
+    700 17px / 1 "Inter Tight",
+    sans-serif;
+  letter-spacing: -0.01em;
+  color: var(--impreciso);
+  border: 2.5px solid currentColor;
+  border-radius: 8px;
+  padding: 9px 12px;
+  transform: rotate(-3deg);
+}
+.stamps li:nth-child(2) .stamp {
+  transform: rotate(2deg);
+}
+.stamps li:nth-child(3) .stamp {
+  transform: rotate(-1.5deg);
+}
+.stamps li:nth-child(4) .stamp {
+  transform: rotate(3deg);
+}
+.records {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0 0;
+}
+.record {
+  margin: 0;
+  padding: 6px 18px;
+  background: var(--surface);
+  border-radius: 14px;
+  font-size: 15px;
+}
+.record div {
+  padding: 8px 0;
+  border-bottom: 1px solid #e3e3e8;
+}
+.record div:last-child {
+  border-bottom: 0;
+}
+.record dt {
+  font-size: 13px;
+  color: var(--muted);
+}
+.record dd {
+  margin: 0;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.sorter {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 20px 0 0;
+}
+/* Each band is a bin: its colored floor holds the labels that fall into it. */
+.bin {
+  display: flex;
+  flex-direction: column;
+}
+.doc .bin-name {
+  order: 2;
+  margin: 0;
+  padding: 8px 0 0;
+  border-top: 4px solid var(--c);
+  font-size: 15px;
+  color: var(--c);
+}
+.bin ul {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 8px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 6px;
+}
+.doc .bin li {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 7px 10px;
+}
+.bin li small {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muted);
+}
+/* The page's one moment: as the bins scroll in, the labels drop into them one by one. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .bin li {
+      animation: drop linear both;
+      animation-timeline: view();
+      animation-range: entry calc(20% + var(--i) * 2%) entry calc(60% + var(--i) * 2%);
+    }
+  }
+}
+@keyframes drop {
+  from {
+    transform: translateY(-48px);
+    opacity: 0;
+  }
+  70% {
+    transform: translateY(4px);
+    opacity: 1;
+  }
+}
+.sum {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin: 20px 0 4px;
+  font:
+    600 19px / 1.2 "Inter Tight",
+    sans-serif;
+}
+.sum .bubble {
+  position: relative;
+  background: var(--surface);
+  border-radius: 14px;
+  padding: 10px 14px;
+}
+.sum .bubble::after {
+  content: "";
+  position: absolute;
+  left: 16px;
+  bottom: -7px;
+  border: 7px solid transparent;
+  border-top-color: var(--surface);
+  border-bottom: 0;
+}
+.sum .op {
+  color: var(--muted);
+  font-weight: 400;
+}
+.cta {
+  margin-top: 8px;
+  padding: 32px;
+  background: var(--surface);
+  border-radius: 20px;
+}
+.doc .cta h2 {
+  margin-top: 0;
+}
+.cta .actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  margin: 20px 0 0;
+}
+.doc .cta .copy {
+  color: #fff;
+  text-decoration: none;
+}
+.doc .cta .ghost {
+  text-decoration: none;
+}
+.doc .cta .ghost:hover {
+  text-decoration: underline;
+}
+
+/* Top bar, the same on every page. */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid #e8e8ed;
+}
+.topbar .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 52px;
+}
+.brand {
+  font-family: "Inter Tight", sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  color: var(--ink);
+  text-decoration: none;
+}
+.topbar nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.topbar nav a {
+  font-size: 14px;
+  line-height: 1;
+  color: #424245;
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 9px 11px;
+  border-radius: 999px;
+}
+.topbar nav a:hover {
+  color: var(--ink);
+  background: var(--surface);
+}
+.topbar nav a[aria-current="page"] {
+  color: var(--ink);
+  font-weight: 600;
+}
+.topbar nav .audit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 6px;
+  font:
+    500 14px / 1 -apple-system,
+    BlinkMacSystemFont,
+    "Inter",
+    sans-serif;
+  color: #fff;
+  background: var(--ink);
+  border: 0;
+  border-radius: 999px;
+  padding: 9px 14px 9px 11px;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+}
+.topbar nav .audit-btn:hover {
+  color: #fff;
+  background: #000;
+}
+.topbar :focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+
 @media (max-width: 720px) {
   /* Every candidate column must fit without scrolling, so none is hidden off screen. */
   .doc table {
@@ -1034,6 +1337,31 @@ textarea:focus-visible {
   .item {
     grid-template-columns: 1fr;
     gap: 10px;
+  }
+  .how .trail > li {
+    padding-left: 52px;
+  }
+  .how .trail > li::before {
+    width: 34px;
+    height: 34px;
+    font-size: 16px;
+  }
+  .how .trail > li::after {
+    left: 16px;
+    top: 42px;
+  }
+  .sorter {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px 12px;
+  }
+  .records {
+    grid-template-columns: 1fr;
+  }
+  .record {
+    padding: 4px 14px;
+  }
+  .cta {
+    padding: 24px 20px;
   }
   .filters {
     gap: 10px;
@@ -1071,9 +1399,22 @@ textarea:focus-visible {
     border-radius: 20px 20px 0 0;
     padding: 24px 20px 36px;
   }
-  .audit-fab {
-    top: 12px;
-    right: 12px;
+  .topbar .wrap {
+    padding: 0 14px;
+  }
+  .brand {
+    font-size: 14px;
+    width: 9ch;
+  }
+  .topbar nav a {
+    padding: 9px 8px;
+  }
+  .topbar nav .audit-btn {
+    margin-left: 2px;
+    padding: 9px 12px;
+  }
+  .topbar nav .audit-btn svg {
+    display: none;
   }
 }
 @media (prefers-reduced-motion: reduce) {
