@@ -386,7 +386,7 @@ describe('audit panel (AUDIT-01, AUDIT-02, AUDIT-04, AUDIT-05)', () => {
     const page = await open()
     const trust = page.locator('.hero .trust')
     expect(await trust.textContent()).toContain(
-      'O veredito é sempre da agência. Código e dados são abertos.',
+      'Nenhuma IA decide veredito. Código e dados são abertos.',
     )
     await trust.getByRole('button', { name: 'Veja como auditar' }).click()
     expect(await page.locator('dialog#audit').evaluate((d) => (d as HTMLDialogElement).open)).toBe(

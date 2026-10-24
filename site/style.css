@@ -549,6 +549,47 @@ body {
   margin: 0 auto 18px;
   max-width: 14ch;
 }
+/* The one moment on load: the box next to "checado" fills and the tick draws. */
+.hero h1 .checked {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.18em;
+}
+.hero h1 .checked svg {
+  flex: none;
+  width: 0.72em;
+  height: 0.72em;
+}
+.hero h1 .checked rect {
+  fill: var(--verdadeiro);
+  stroke: var(--verdadeiro);
+  stroke-width: 3;
+  animation: tick-box 0.2s 0.9s ease-out backwards;
+}
+.hero h1 .checked path {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 4.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  animation: tick-draw 0.35s 1s cubic-bezier(0.3, 0.7, 0.2, 1) backwards;
+}
+@keyframes tick-box {
+  from {
+    fill: transparent;
+    stroke: var(--line);
+  }
+}
+@keyframes tick-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+.hero strong {
+  color: var(--ink);
+  font-weight: 600;
+}
 .hero p {
   color: var(--muted);
   font-size: 21px;
@@ -1418,6 +1459,10 @@ textarea:focus-visible {
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .hero h1 .checked rect,
+  .hero h1 .checked path {
+    animation: none;
+  }
   .bar span,
   .segmented.ready .seg-thumb {
     transition: none;
