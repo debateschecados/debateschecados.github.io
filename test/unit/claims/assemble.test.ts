@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process'
-import { cp, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -116,6 +116,16 @@ describe('check:claims (REPRO-01, REPRO-02)', () => {
     const result = check(await dataCopy())
     expect(result.status).toBe(0)
     expect(result.stdout).toContain(`${manualId}: ${REASON}`)
+  })
+
+  it('takes the latest dated run folder, ignoring other files and folders', async () => {
+    const dir = await dataCopy()
+    await writeFile(join(dir, 'claim-curation/README.md'), '# Curation runs\n')
+    await mkdir(join(dir, 'claim-curation/notes'))
+    const result = check(dir)
+    expect(result.stderr).toBe('')
+    expect(result.status).toBe(0)
+    expect(result.stdout).toContain('matches run 2026-10-24')
   })
 
   it('fails naming the group when an adjudicated group was edited by hand', async () => {

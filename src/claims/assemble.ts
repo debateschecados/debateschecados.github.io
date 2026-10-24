@@ -207,6 +207,16 @@ export async function assemble(
   return { file: { run: basename(runDir), groups: out }, manual }
 }
 
+// The latest dated run folder; other files and folders in claim-curation/ are ignored.
+export async function latestRun(curation: string) {
+  const entries = await readdir(curation, { withFileTypes: true })
+  return entries
+    .filter((e) => e.isDirectory() && /^\d{4}-\d{2}-\d{2}$/.test(e.name))
+    .map((e) => e.name)
+    .sort()
+    .at(-1)
+}
+
 // Group ids whose content differs between two files, in either direction.
 const differing = (a: ClaimGroupsFile, b: ClaimGroupsFile) => {
   const byId = (file: ClaimGroupsFile) => new Map(file.groups.map((g) => [g.id, JSON.stringify(g)]))
@@ -235,7 +245,7 @@ committed file differs (REPRO-01); every manual change is listed with its reason
   } else {
     const dataDir = values['data-dir']
     const curation = join(dataDir, 'claim-curation')
-    const run = positionals[0] ?? (await readdir(curation)).sort().at(-1)
+    const run = positionals[0] ?? (await latestRun(curation))
     if (!run) throw new Error(`no curation run in ${curation}`)
     const { file, manual } = await assemble(join(curation, run))
     const records = JSON.parse(
