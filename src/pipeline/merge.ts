@@ -86,20 +86,27 @@ function match(
   // Page order, so the assignment does not depend on how the adapter listed the items.
   const order = items.map((_, i) => i).sort((a, b) => items[a].pos - items[b].pos || a - b)
   const keyed = order.filter((i) => items[i].key !== null)
-  const keyless = order.filter((i) => items[i].key === null)
+  const similar = (item: FreshItem, r: CheckRecord) =>
+    quoteKey(item.quote) === quoteKey(r.quote) ||
+    jaccard(tokens(item.quote), tokens(r.quote)) >= JACCARD_MIN
 
-  for (const i of keyed) pairBest(i, (r) => r.key === items[i].key)
+  // Agencies reissue and even reassign item keys (Estadão did both on 2026-10-24), so a key
+  // settles a match at once only when the quote agrees; otherwise the quote is tried first.
+  for (const i of keyed) pairBest(i, (r) => r.key === items[i].key && similar(items[i], r))
 
-  for (const i of keyless) {
+  const rest = order.filter((i) => !matched.has(i))
+  const sameKind = (i: number, r: CheckRecord) => (items[i].key === null) === (r.key === null)
+
+  for (const i of rest) {
     const key = quoteKey(items[i].quote)
-    pairBest(i, (r) => r.key === null && quoteKey(r.quote) === key)
+    pairBest(i, (r) => sameKind(i, r) && quoteKey(r.quote) === key)
   }
 
   const candidates: { i: number; record: CheckRecord; score: number }[] = []
-  for (const i of keyless) {
+  for (const i of rest) {
     if (matched.has(i)) continue
     const words = tokens(items[i].quote)
-    for (const record of free((r) => r.key === null && r.speaker === items[i].speaker)) {
+    for (const record of free((r) => sameKind(i, r) && r.speaker === items[i].speaker)) {
       const score = jaccard(words, tokens(record.quote))
       if (score >= JACCARD_MIN) candidates.push({ i, record, score })
     }
@@ -115,8 +122,14 @@ function match(
     if (!matched.has(i) && !used.has(record)) pair(i, record)
   }
 
-  for (const i of keyless) {
-    if (matched.has(i)) continue
+  // A rewritten quote keeps its key, but a key never moves a check to the other candidate.
+  for (const i of rest) {
+    if (matched.has(i) || items[i].key === null) continue
+    pairBest(i, (r) => r.key === items[i].key && r.speaker === items[i].speaker)
+  }
+
+  for (const i of rest) {
+    if (matched.has(i) || items[i].key !== null) continue
     const id = links[quoteKey(items[i].quote)]
     if (id !== undefined) pairBest(i, (r) => r.id === id)
   }
@@ -132,6 +145,7 @@ function update(record: CheckRecord, item: FreshItem, adapter: string, date: str
   if (item.speaker !== record.speaker) old.speaker = record.speaker
   const verifiedChanged = Object.keys(old).length > 0 || item.evidenceUrl !== record.evidence.url
   const silentChanged =
+    item.key !== record.key ||
     item.pos !== record.pos ||
     item.anchor !== record.anchor ||
     item.excerpt !== record.excerpt ||
@@ -142,6 +156,7 @@ function update(record: CheckRecord, item: FreshItem, adapter: string, date: str
   const { missingSince: _, ...rest } = record
   const next: CheckRecord = {
     ...rest,
+    key: item.key,
     pos: item.pos,
     anchor: item.anchor,
     speaker: item.speaker,

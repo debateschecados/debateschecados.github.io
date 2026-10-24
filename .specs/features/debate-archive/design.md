@@ -304,12 +304,13 @@ Three of the four outlets give a stable key: g1 chunk ids were identical across 
 1. **Failed source** (load error, non-200, timeout, zero items): its previous records pass through unchanged (INGEST-06).
 2. **Partial parse**: if a successful source yields fewer than 80% of its previously published, not-missing records (and it had at least 5), the source is treated as failed with reason `partial`. A maintainer accepts a real drop with `pnpm ingest --accept-drop=<sourceId>` (also a `workflow_dispatch` input).
 3. **Matching** fresh items to previous records of the same source, in order:
-   1. same `key`;
-   2. keyless only: same `quoteKey`;
-   3. keyless only: same speaker and token Jaccard ≥ 0.6, best score first, each previous record used once. The highest Jaccard between two distinct items in the sample data is 0.35, so 0.6 leaves margin;
-   4. `config/id-links.json` (`{ "<sourceId>": { "<quoteKey>": "<existing id>" } }`): manual override for a match the rules miss, reviewed in a public commit.
-   Unmatched fresh items are new records with a new ID.
-4. **Matched record**: `label`, `quote` and `speaker` changes push the previous value to `history` with the detection date (HIST-01). `pos`, `anchor`, `excerpt` and `url` are overwritten without history. If nothing compared changed, the previous record is kept byte-for-byte, including `evidence`.
+   1. same `key` and the same `quoteKey` or token Jaccard ≥ 0.6;
+   2. same `quoteKey`, keyed items against keyed records and keyless against keyless;
+   3. same speaker and token Jaccard ≥ 0.6, same pairing of kinds, best score first, each previous record used once. The highest Jaccard between two distinct items in the sample data is 0.35, so 0.6 leaves margin;
+   4. keyed only: same `key` and same speaker (a quote rewritten in place);
+   5. keyless only: `config/id-links.json` (`{ "<sourceId>": { "<quoteKey>": "<existing id>" } }`): manual override for a match the rules miss, reviewed in a public commit.
+   Unmatched fresh items are new records with a new ID. Keys alone are not trusted: on 2026-10-24 Estadão reissued the `_id` of 19 Globo checks and moved one old `_id` to a different check by the other candidate.
+4. **Matched record**: `key` follows the source. `label`, `quote` and `speaker` changes push the previous value to `history` with the detection date (HIST-01). `pos`, `anchor`, `excerpt` and `url` are overwritten without history. If nothing compared changed, the previous record is kept byte-for-byte, including `evidence`.
 5. **Previous record not matched** in a successful source: kept with `missingSince` set (HIST-02). It is cleared if the item comes back.
 6. **Band**: recomputed for every record on every run from the current `config/bands.json`, including records passed through from failed sources, so a table edit and its effect land in the same commit.
 7. Output sorted by debate date desc, outlet name (pt-BR collation), `pos`; JSON written with stable key order.

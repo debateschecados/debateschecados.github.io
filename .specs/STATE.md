@@ -27,7 +27,7 @@
 - **Status**: active
 
 ### AD-004
-- **Decision**: A record's ID is assigned once and never recomputed: from the source's own item ID when it has one (g1 chunk id, Estadão `_id`, Aos Fatos uuid), otherwise from the quote at first sight; later runs match keyless items by exact or similar quote (token Jaccard >= 0.6, same speaker), with `config/id-links.json` as a public manual override.
+- **Decision**: A record's ID is assigned once and never recomputed: from the source's own item ID when it has one (g1 chunk id, Estadão `_id`, Aos Fatos uuid), otherwise from the quote at first sight; later runs match by key when the quote agrees, then by exact or similar quote (token Jaccard >= 0.6, same speaker), then by key alone within the same speaker, with `config/id-links.json` as a public manual override for keyless sources. Keys alone are not trusted since Estadão reissued and moved `_id`s on 2026-10-24.
 - **Reason**: Agencies fix typos in quotes; a quote hash would split one check into two and lose its history.
 - **Trade-off**: Matching logic in the merger; a heavily rewritten Lupa quote may still need a manual link.
 - **Scope**: Ingestion, data model, any future comparator.

@@ -373,26 +373,77 @@ describe('step 3: matching (INGEST-04)', () => {
     expect(third.events.filter((e) => e.type !== 'source')).toEqual([])
   })
 
-  it('gives a keyed item with a new key a new id even when its quote is known', () => {
+  it('keeps the id of a keyed item whose key was reissued and records its label change', () => {
     const previous = first([g1([g1Item(1), g1Item(2)])])
-    const reborn = g1Item(9, { quote: previous[0].quote })
+    const reborn = g1Item(9, { quote: previous[0].quote, label: '#FAKE' })
     const { records, events } = merge(previous, [g1([reborn, g1Item(2)])], ctx())
     const oldId = recordId(G1, 'chunk-1')
-    const newId = recordId(G1, 'chunk-9')
-    expect(records.map((r) => [r.id, r.key, r.pos])).toEqual([
-      [oldId, 'chunk-1', 1],
-      [recordId(G1, 'chunk-2'), 'chunk-2', 2],
-      [newId, 'chunk-9', 9],
+    expect(records.map((r) => [r.id, r.key, r.pos, r.missingSince])).toEqual([
+      [recordId(G1, 'chunk-2'), 'chunk-2', 2, undefined],
+      [oldId, 'chunk-9', 9, undefined],
     ])
-    expect(byId(records, oldId)).toEqual({ ...previous[0], missingSince: '2026-10-25' })
-    expect(byId(records, newId)).toMatchObject({
-      quote: previous[0].quote,
-      speaker: 'lula',
-      label: '#FATO',
+    expect(byId(records, oldId)).toMatchObject({
+      label: '#FAKE',
+      band: 'falso',
+      history: [{ label: '#FATO', until: '2026-10-25' }],
     })
+    expect(events).toContainEqual({ type: 'changed', sourceId: G1, id: oldId })
+    expect(events.filter((e) => e.type === 'new' || e.type === 'missing')).toEqual([])
+  })
+
+  it('matches a reissued key by a similar quote from the same speaker', () => {
+    const quote = 'Fala 1 do candidato sobre a economia do país inteiro'
+    const previous = first([g1([g1Item(1, { quote }), g1Item(2)])])
+    const edited = g1Item(9, { quote: quote.replace('inteiro', 'todo') })
+    expect(jaccard(quote, edited.quote)).toBeGreaterThanOrEqual(0.6)
+    const { records } = merge(previous, [g1([edited, g1Item(2)])], ctx())
+    expect(byId(records, recordId(G1, 'chunk-1'))).toMatchObject({
+      key: 'chunk-9',
+      quote: edited.quote,
+      history: [{ quote, until: '2026-10-25' }],
+    })
+    expect(records).toHaveLength(2)
+  })
+
+  it('follows the quote when the agency moves a key to another check', () => {
+    const hunger = 'O Brasil acabou com a fome em 2012'
+    const taxes = 'Lula implementou a carga tributária mais alta da história'
+    const previous = first([
+      g1([g1Item(1, { quote: hunger }), g1Item(2, { speaker: 'flavio', quote: taxes })]),
+    ])
+    const [a, b] = previous
+    const moved = [g1Item(1, { quote: b.quote, speaker: 'flavio' }), g1Item(9, { quote: a.quote })]
+    const { records, events } = merge(previous, [g1(moved)], ctx())
+    expect(records.map((r) => [r.id, r.key, r.speaker, r.quote, r.history])).toEqual([
+      [b.id, 'chunk-1', 'flavio', b.quote, undefined],
+      [a.id, 'chunk-9', 'lula', a.quote, undefined],
+    ])
+    expect(events.filter((e) => e.type === 'new' || e.type === 'missing')).toEqual([])
+  })
+
+  it('never moves a check to the other candidate through its key alone', () => {
+    const previous = first([g1([g1Item(1), g1Item(2)])])
+    const other = g1Item(1, { speaker: 'flavio', quote: 'Fala reescrita por completo agora' })
+    const { records } = merge(previous, [g1([other, g1Item(2)])], ctx())
+    expect(records.map((r) => [r.id === previous[0].id, r.speaker, r.missingSince])).toEqual([
+      [true, 'lula', '2026-10-25'],
+      [false, 'flavio', undefined],
+      [false, 'lula', undefined],
+    ])
+  })
+
+  it('gives a keyed item a new id when its quote is known but the old key is still there', () => {
+    const previous = first([g1([g1Item(1), g1Item(2)])])
+    const repeat = g1Item(9, { quote: previous[0].quote })
+    const { records, events } = merge(previous, [g1([g1Item(1), g1Item(2), repeat])], ctx())
+    const newId = recordId(G1, 'chunk-9')
+    expect(records.map((r) => [r.id, r.key, r.missingSince])).toEqual([
+      [recordId(G1, 'chunk-1'), 'chunk-1', undefined],
+      [recordId(G1, 'chunk-2'), 'chunk-2', undefined],
+      [newId, 'chunk-9', undefined],
+    ])
     expect(byId(records, newId)?.history).toBeUndefined()
     expect(events).toContainEqual({ type: 'new', sourceId: G1, id: newId })
-    expect(events).toContainEqual({ type: 'missing', sourceId: G1, id: oldId })
   })
 
   it('does not match a keyed item to a keyless record by quote', () => {
