@@ -2,7 +2,63 @@
 
 No validation.md was committed for phases 1 and 2, so this file starts with phase 3.
 
-## Validation: Phase 3 iteration 2 (re-verification) - FAIL
+## Validation: Phase 3 iteration 3 (final verification) - FAIL
+
+**Date**: 2026-10-24
+**Diff range**: `1cf9b04..75a4a40` (`75a4a40` fix(site): Give the interval bar the contrast of the point)
+**Verifier**: independent sub-agent, fresh detached scratch worktree at `75a4a40`
+
+Final verdict for phase 3: FAIL, for a test gap only. The behavior meets every AC in scope, including the amended LEAN-06. One sensor mutant on the new LEAN-06 contrast test survived (M20 below). This was the third and last fix-and-verify round, so the gap goes to the user rather than another loop. The fix is small (Fix 5).
+
+### LEAN-06 on the built page (real data)
+
+The amended AC (spec.md:135) asks for a bar at least as thick as the point's diameter, with a fill of at least 3:1 contrast against the page background. Measured in Chromium on `node src/site/build.ts` output, all four agencies, at 1280 px and 360 px:
+
+| Mark | Measured | Rule | Holds |
+| ---- | -------- | ---- | ----- |
+| bar (`rect.ci`, `site/render.js:345`) | 8 px tall, fill `rgb(142, 142, 147)`, opacity 1, fill-opacity 1; 116 to 271 px long | thickness ≥ point diameter | ✅ 8 ≥ 8 |
+| bar fill against `rgb(255, 255, 255)` | 3.26:1 (WCAG relative luminance) | ≥ 3:1 | ✅ |
+| point (`circle.pt`, `site/render.js:370`) | 8 px solid ink `rgb(29, 29, 31)`, no stroke, no halo | n/a | n/a |
+
+On screen the bar now reads as a solid grey band the width of the interval, with the point sitting inside it. LEAN-04 is unchanged: a small sample still draws neither point nor bar (`test/unit/site/render.test.ts:476`).
+
+### Tests for the amended AC
+
+- Thickness: `test/unit/site/render.test.ts:465` `expect(Number(rect.ci height)).toBeGreaterThanOrEqual(2 * Number(circle.pt r))`, the spec rule written as an assertion.
+- Contrast: `test/e2e/compare.test.ts:376` `expect((hi + 0.05) / (lo + 0.05)).toBeGreaterThanOrEqual(3)`, on a probe `rect.ci` styled by the page CSS. The fixture's agencies all have small samples and draw no bar, so the probe stands in. The probe reads only `getComputedStyle(rect).fill` (`:355`). The fill's own alpha is blended over the background, but the element's `opacity` and `fill-opacity` are ignored.
+
+### Sensor, iteration 3
+
+| Mutation | File:line | Description | Test file | Killed? |
+| -------- | --------- | ----------- | --------- | ------- |
+| M17 | `site/style.css:1126` | bar fill transparent | e2e/compare.test.ts | ✅ Killed (contrast 1) |
+| M17b | `site/style.css:1126` | the iteration 2 fill `rgba(29, 29, 31, 0.24)` | e2e/compare.test.ts | ✅ Killed (contrast 1.66) |
+| M18 | `site/render.js:345` | bar height 0 | render.test.ts | ✅ Killed (`expected 0 to be greater than or equal to 8`) |
+| M20 | `site/style.css:1126` | `opacity: 0.3` added to the bar (effective contrast about 1.3:1) | e2e/compare.test.ts | ❌ Survived |
+| M21 | `site/render.js:370` | point r 6, wider than the bar | render.test.ts | ✅ Killed (`expected 8 to be greater than or equal to 12`) |
+
+**Result**: 4/5 killed, 1 survived - FAIL
+
+### Gate, iteration 3
+
+One file per command in the scratch at `75a4a40`: `test/unit/site/render.test.ts` 26 passed, `test/unit/site/build.test.ts` 30 passed, `test/unit/site/lean.test.ts` 17 passed, `test/e2e/compare.test.ts` 11 passed. `node src/site/build.ts` exit 0. Mutants were restored by rewriting the original file content, not by `git checkout`. Scratch removed; `git status --porcelain` of the phase3 tree empty before and after.
+
+### Fix 5: count opacity in the LEAN-06 contrast test
+
+- **Root cause**: `test/e2e/compare.test.ts:355` reads only the computed `fill`. A bar faded with `opacity` or `fill-opacity` passes the test while failing the AC.
+- **Fix task**: in the probe, also return `getComputedStyle(rect).opacity` and `.fillOpacity`, and multiply both into the alpha before `over()`. M20 must then fail.
+- **Priority**: Minor (the shipped page meets the AC; the guard misses one regression path).
+
+### Traceability update
+
+| Requirement | Status |
+| ----------- | ------ |
+| LEAN-06 | ✅ Behavior verified on the built page; ⚠️ contrast test misses opacity (Fix 5) |
+| All other ACs in scope | ✅ Verified (iterations 1 and 2) |
+
+---
+
+## Iteration 2: Phase 3 re-verification - FAIL
 
 **Date**: 2026-10-24
 **Diff range**: `a621de8..f22d0a6` (`9a93406` style of the axes, `f22d0a6` tests for gaps 1-3 and the DRIFT-03 wording)

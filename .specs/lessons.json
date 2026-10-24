@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 19,
+  "next_id": 20,
   "lessons": [
     {
       "id": "L-001",
@@ -328,6 +328,24 @@
       ],
       "created": "2026-10-24T21:01:08Z",
       "last_seen": "2026-10-24T21:01:08Z"
+    },
+    {
+      "id": "L-019",
+      "key": "surviving_mutant::when a test checks a rendered color include every property that changes it such as opacity not only the color value",
+      "text": "When a test checks a rendered color, include every property that changes it, such as opacity, not only the color value",
+      "signal": "surviving_mutant",
+      "scope": "site",
+      "status": "candidate",
+      "features": [
+        "agency-comparator"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M20 site/style.css:1126, test/e2e/compare.test.ts:355 (validation.md iteration 3) (site)"
+      ],
+      "created": "2026-10-24T21:09:09Z",
+      "last_seen": "2026-10-24T21:09:09Z"
     }
   ]
 }

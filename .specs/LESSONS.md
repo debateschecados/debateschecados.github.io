@@ -122,6 +122,12 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: M17 site/style.css:1126, M18 site/render.js:345 (validation.md iteration 2) (site)
 - last seen: 2026-10-24T21:01:08Z
 
+### L-019 - When a test checks a rendered color, include every property that changes it, such as opacity, not only the color value
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `site` · harmful: 0
+- features: agency-comparator
+- evidence: M20 site/style.css:1126, test/e2e/compare.test.ts:355 (validation.md iteration 3) (site)
+- last seen: 2026-10-24T21:09:09Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
