@@ -342,9 +342,9 @@ export function leanHtml(ctx, result) {
         const [lo, hi] = r.interval.map(x)
         const width = `${Math.round((Number.parseFloat(hi) - Number.parseFloat(lo)) * 100) / 100}%`
         parts.push(
-          `<rect class="ci" x="${lo}" y="24" width="${width}" height="20" rx="10"></rect>`,
-          `<line class="ci-end" x1="${lo}" x2="${lo}" y1="19" y2="49"></line>`,
-          `<line class="ci-end" x1="${hi}" x2="${hi}" y1="19" y2="49"></line>`,
+          `<rect class="ci" x="${lo}" y="31" width="${width}" height="6" rx="3"></rect>`,
+          `<line class="ci-end" x1="${lo}" x2="${lo}" y1="27" y2="41"></line>`,
+          `<line class="ci-end" x1="${hi}" x2="${hi}" y1="27" y2="41"></line>`,
         )
         const close = Number.parseFloat(hi) - Number.parseFloat(lo) < 16
         const ends = close
@@ -360,14 +360,14 @@ export function leanHtml(ctx, result) {
             ]
         for (const [at, text] of ends)
           parts.push(
-            `<text class="end" x="${at}" y="64" text-anchor="${anchor(at)}">${text}</text>`,
+            `<text class="end" x="${at}" y="60" text-anchor="${anchor(at)}">${text}</text>`,
           )
       }
-      parts.push('<line class="zero" x1="50%" x2="50%" y1="18" y2="50"></line>')
+      parts.push('<line class="zero" x1="50%" x2="50%" y1="20" y2="48"></line>')
       if (r.interval && distance !== null) {
         const at = x(/** @type {number} */ (r.distance))
         parts.push(
-          `<circle class="pt" cx="${at}" cy="34" r="7"></circle>`,
+          `<circle class="pt" cx="${at}" cy="34" r="6"></circle>`,
           `<text class="pt-label" x="${at}" y="14" text-anchor="${anchor(at)}">${distance}</text>`,
         )
       }
