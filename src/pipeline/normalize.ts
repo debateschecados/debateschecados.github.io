@@ -44,8 +44,43 @@ export const tokens = (quote: string) =>
       .filter((word) => word.length >= 3),
   )
 
+const MARK = /["“”]/
+
+// Positions of matching quote marks, both ways. A straight " opens at the start or after a space
+// or bracket and closes anywhere else.
+const quotePairs = (text: string) => {
+  const partner = new Map<number, number>()
+  const open = { curly: [] as number[], straight: [] as number[] }
+  for (let i = 0; i < text.length; i++) {
+    const mark = text[i]
+    if (!MARK.test(mark)) continue
+    const stack = mark === '"' ? open.straight : open.curly
+    if (mark === '“' || (mark === '"' && (i === 0 || /[\s([]/.test(text[i - 1])))) {
+      stack.push(i)
+      continue
+    }
+    const from = stack.pop()
+    if (from === undefined) continue
+    partner.set(from, i)
+    partner.set(i, from)
+  }
+  return partner
+}
+
+// One step of edge cleanup: drop a pair wrapping the whole quote, or an edge mark without a pair.
+const unwrap = (quote: string) => {
+  const end = quote.length - 1
+  const partner = quotePairs(quote)
+  const loose = (i: number) => MARK.test(quote.charAt(i)) && !partner.has(i)
+  if (end > 0 && partner.get(0) === end) return quote.slice(1, end)
+  if (loose(0)) return quote.slice(1)
+  if (loose(end)) return quote.slice(0, end)
+}
+
 // Collapsed quote without stray quote marks at the edges, or null when too short to be a quote.
+// An edge mark that closes or opens a pair inside the quote stays: `de “bolsa-farelo”`.
 export const cleanQuote = (raw: string) => {
-  const quote = collapse(raw).replace(/^["“”\s]+|["“”\s]+$/g, '')
+  let quote = collapse(raw)
+  for (let next = unwrap(quote); next !== undefined; next = unwrap(quote)) quote = next.trim()
   return quote.length >= MIN_QUOTE ? quote : null
 }

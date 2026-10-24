@@ -138,6 +138,27 @@ describe('cleanQuote', () => {
     expect(cleanQuote('"O "Bolsa Família" voltou"')).toBe('O "Bolsa Família" voltou')
   })
 
+  it('keeps an edge mark that pairs with a mark inside the quote', () => {
+    expect(cleanQuote('Ele chamou o programa de “bolsa-farelo”')).toBe(
+      'Ele chamou o programa de “bolsa-farelo”',
+    )
+    expect(cleanQuote('“Bolsa-farelo” foi o nome usado')).toBe('“Bolsa-farelo” foi o nome usado')
+    expect(cleanQuote('“Ele chamou de “bolsa-farelo””')).toBe('Ele chamou de “bolsa-farelo”')
+    expect(cleanQuote('Chamou de "bolsa-farelo"')).toBe('Chamou de "bolsa-farelo"')
+    expect(cleanQuote('"Bolsa" e "Auxílio" acabaram')).toBe('"Bolsa" e "Auxílio" acabaram')
+    expect(cleanQuote('"Bolsa" e "Auxílio"')).toBe('"Bolsa" e "Auxílio"')
+  })
+
+  it('strips an edge mark without a pair', () => {
+    expect(cleanQuote('“Uma fala sem fechamento')).toBe('Uma fala sem fechamento')
+    expect(cleanQuote('Uma fala sem abertura”')).toBe('Uma fala sem abertura')
+    expect(cleanQuote('”Marca trocada no começo')).toBe('Marca trocada no começo')
+    expect(cleanQuote('Ele chamou de “bolsa-farelo”””')).toBe('Ele chamou de “bolsa-farelo”')
+    expect(cleanQuote('Uma fala cortada"')).toBe('Uma fala cortada')
+    expect(cleanQuote('"Uma fala cortada')).toBe('Uma fala cortada')
+    expect(cleanQuote('"O "Bolsa" acabou')).toBe('O "Bolsa" acabou')
+  })
+
   it('accepts 10 characters and rejects 9', () => {
     expect(cleanQuote('"abcdefghij"')).toBe('abcdefghij')
     expect(cleanQuote('"abcdefghi"')).toBeNull()

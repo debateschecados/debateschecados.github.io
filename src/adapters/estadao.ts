@@ -85,7 +85,7 @@ export function parseEstadao(docs: Doc[], notes: ParseNote[] = []): ParsedItem[]
 
 export const estadao: Adapter = {
   kind: 'estadao-page',
-  version: 1,
+  version: 2,
   configSchema,
   async load(source, io) {
     return [await io.get(configSchema.parse(source).url)]
