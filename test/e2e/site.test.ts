@@ -178,6 +178,46 @@ describe('list, filters and URL (SITE-01, SITE-03, SHARE-01, SHARE-02)', () => {
     expect(new URL(page.url()).search).toBe('')
     expect(await page.inputValue('select[data-key="outlet"]')).toBe('')
   })
+
+  it('keeps keyboard focus on the control in use while the filters re-render', async () => {
+    const page = await open()
+    const focused = () =>
+      page.evaluate(() => {
+        const el = document.activeElement as HTMLElement
+        return el.dataset.key ?? (el.matches('[data-removed]') ? 'removed' : el.tagName)
+      })
+    const outlets = await page.$$eval('select[data-key="outlet"] option', (os) =>
+      os.map((o) => (o as HTMLOptionElement).value),
+    )
+    await page.focus('select[data-key="outlet"]')
+    await page.keyboard.press('ArrowDown')
+    await settle(page)
+    expect(new URL(page.url()).searchParams.get('outlet')).toBe(outlets[1])
+    expect(await focused()).toBe('outlet')
+    await page.keyboard.press('ArrowDown')
+    await settle(page)
+    expect(new URL(page.url()).searchParams.get('outlet')).toBe(outlets[2])
+    expect(await focused()).toBe('outlet')
+
+    const all = await open()
+    await all.focus('[data-removed]')
+    await all.keyboard.press('Space')
+    await settle(all)
+    expect(new URL(all.url()).searchParams.get('removed')).toBe('1')
+    expect(
+      await all.evaluate(() => (document.activeElement as HTMLElement).matches('[data-removed]')),
+    ).toBe(true)
+
+    // The clear button leaves with the empty state; focus moves to the first filter.
+    const empty = await open('/?outlet=g1&band=sem+faixa')
+    await empty.focus('#list .empty [data-clear]')
+    await empty.keyboard.press('Enter')
+    await settle(empty)
+    expect(new URL(empty.url()).search).toBe('')
+    expect(
+      await empty.evaluate(() => (document.activeElement as HTMLElement).dataset.key ?? null),
+    ).toBe('outlet')
+  })
 })
 
 describe('removed records (HIST-02)', () => {

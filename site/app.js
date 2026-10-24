@@ -207,7 +207,11 @@ function render() {
   renderSegmented()
   renderBoard(items)
   $('#notice').textContent = notice(ctx, state)
+  // The controls are rebuilt, so keyboard focus goes back to the one the visitor was using.
+  const focused = /** @type {HTMLElement | null} */ (filters.querySelector(':focus'))
+  const again = focused?.dataset.key ? `[data-key="${focused.dataset.key}"]` : '[data-removed]'
   filters.innerHTML = filtersHtml(ctx, state, items.length)
+  if (focused) /** @type {HTMLElement | null} */ (filters.querySelector(again))?.focus()
   const count = /** @type {HTMLElement} */ (filters.querySelector('.count .n'))
   count.dataset.v = String(shownCount)
   tween(count, items.length, Boolean(list.dataset.ready))
@@ -230,6 +234,8 @@ document.addEventListener('click', (e) => {
   if (target.closest('[data-clear]')) {
     state = emptyState()
     update()
+    // The button left with the empty state; focus moves to the first filter.
+    filters.querySelector('select')?.focus()
   }
 })
 document.addEventListener('change', (e) => {
