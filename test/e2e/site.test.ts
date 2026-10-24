@@ -96,6 +96,10 @@ const settle = (page: Page) =>
       .every((a) => a.constructor.name !== 'Animation' || a.playState === 'finished'),
   )
 
+// Search is debounced, so the view changes once the query reaches the URL.
+const searched = (page: Page, q: string) =>
+  page.waitForFunction((want) => new URLSearchParams(location.search).get('q') === want, q)
+
 const listedIds = (page: Page) =>
   page.$$eval('#list > li.item', (lis) => lis.map((li) => (li as HTMLElement).dataset.id))
 
@@ -158,6 +162,7 @@ describe('layout (SITE-06)', () => {
     await settle(page)
     expect(await overflow()).toBeLessThanOrEqual(0)
     await page.fill('#q', 'teste')
+    await searched(page, 'teste')
     await settle(page)
     expect(await overflow()).toBeLessThanOrEqual(0)
     await page.click('.audit-fab')
@@ -267,6 +272,7 @@ describe('list, filters and URL (SITE-01, SITE-03, SHARE-01, SHARE-02)', () => {
     const typing = await open()
     await typing.focus('#q')
     await typing.keyboard.type('numero 12,')
+    await searched(typing, 'numero 12,')
     await settle(typing)
     expect(await typing.inputValue('#q')).toBe('numero 12,')
     expect(await typing.evaluate(() => document.activeElement?.id)).toBe('q')
@@ -340,12 +346,21 @@ describe('search', () => {
   it('filters the list and the scoreboard as you type, and lives in the URL', async () => {
     const page = await open()
     await page.fill('#q', 'NUMERO 12,')
+    await searched(page, 'NUMERO 12,')
     await settle(page)
     expect(await listedIds(page)).toEqual(['00000000000c'])
     expect(new URL(page.url()).searchParams.get('q')).toBe('NUMERO 12,')
     const shared = await open('/?q=n%C3%BAmero+12%2C')
     expect(await shared.inputValue('#q')).toBe('número 12,')
     expect(await listedIds(shared)).toEqual(['00000000000c'])
+  })
+
+  it('waits for a pause in typing before filtering', async () => {
+    const page = await open()
+    await page.focus('#q')
+    await page.keyboard.type('numero', { delay: 20 })
+    expect(new URL(page.url()).searchParams.get('q')).toBeNull()
+    await searched(page, 'numero')
   })
 
   it('shows the empty state and clears the box with the filters', async () => {

@@ -254,6 +254,7 @@ document.addEventListener('click', (e) => {
   }
   if (target.closest('[data-clear]')) {
     state = emptyState()
+    clearTimeout(typing)
     search.value = ''
     update()
     // The button left with the empty state; focus moves to the first filter.
@@ -267,9 +268,16 @@ document.addEventListener('change', (e) => {
     update()
   }
 })
+// Each keystroke would filter every record, redraw the board and animate the list, so the
+// search waits until the visitor pauses typing.
+const TYPING_PAUSE = 200
+let typing = 0
 search.addEventListener('input', () => {
-  state.q = search.value
-  update()
+  clearTimeout(typing)
+  typing = setTimeout(() => {
+    state.q = search.value
+    update()
+  }, TYPING_PAUSE)
 })
 
 render()
