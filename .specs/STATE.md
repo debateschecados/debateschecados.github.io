@@ -45,10 +45,10 @@
 ## Handoff
 
 - **Feature**: `.specs/features/debate-archive`
-- **Phase / Task**: Tasks written (T1 to T24, validate_tasks 0 errors), awaiting user approval
-- **Completed**: Specify, mocks (direction A), design.md (revised), spec.md re-validated (0 errors)
+- **Phase / Task**: Execute done, T1 to T24 complete; Verifier PASS at iteration 3 (`validation.md`, validate_state 0 errors)
+- **Completed**: all tasks, reviewer and fix rounds per batch, first live dataset in `data/` (314 records, 8 sources ok), Verifier gaps 1 and 2 of iteration 3 closed by `076d2ef` and `7e97dfb`
 - **In-progress** (file:line): none
-- **Next step**: On approval, Execute T1; offer 4 batch sub-agents (B1 T1-T7, B2 T8-T13, B3 T14-T21, B4 T22-T24).
-- **Blockers**: archive.org keys (`IA_S3_ACCESS`, `IA_S3_SECRET`) must be created by the user before the first CI run
-- **Uncommitted files**: project is not a git repo yet
-- **Branch**: none
+- **Next step**: needs the user's go-ahead for outward actions: create the GitHub repo `debates-checados/debates-checados`, rename `master` to `main`, push, set secrets `IA_S3_ACCESS`/`IA_S3_SECRET` (rotated keys), Pages source "GitHub Actions", run the `update` workflow once
+- **Open items**: 83 records await a Wayback snapshot (g1 Band, Aos Fatos Globo Escriba API); web.archive.org refused IPv4 connections from the dev machine after the first run, CI retries every 6 h. Iteration-3 minor gap: `fetchedAt` on silent changes is untested and unspecified (R04)
+- **Uncommitted files**: none
+- **Branch**: `master` (local only, workflow and site links expect `main`)
