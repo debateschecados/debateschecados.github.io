@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process'
-import { mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
@@ -16,9 +16,11 @@ import {
   signed,
   verdictOf,
 } from '../../../site/lean.js'
+import { assemble } from '../../../src/claims/assemble.ts'
 import { type Config, loadConfig } from '../../../src/config.ts'
 import { writeData } from '../../../src/pipeline/write.ts'
-import type { Band } from '../../../src/types.ts'
+import { repair, SOURCE } from '../../../src/repair/estadao-2026-10-24.ts'
+import type { Band, CheckRecord } from '../../../src/types.ts'
 import { LEAN_CLAIMS, leanFixture } from '../../fixtures/lean.ts'
 import { fixtureReport } from '../../fixtures/site.ts'
 
@@ -100,22 +102,37 @@ describe('lean (LEAN-01, LEAN-02)', () => {
   it('draws the 90% interval with the fixed generator, the same on every call', () => {
     const c1 = [-1, 0.5, -0.5, 1, 0, -2, 1.5, 0.25, -0.75, 2, 0.5]
     const c2 = [1, -0.5, 0.5, 2, -1, 0, 1.5, -0.25, 0.75, 1, -1.5, 0.5]
-    // The generator of the design, written out again: LCG from 42, u = s / 2^32.
-    let s = 42
-    const pick = (xs: number[]) => {
-      s = (s * 1664525 + 1013904223) % 2 ** 32
-      return xs[Math.floor((s / 2 ** 32) * xs.length)]
-    }
-    const avg = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length
-    const stats: number[] = []
-    for (let b = 0; b < 5000; b++) {
-      const m2 = avg(c2.map(() => pick(c2)))
-      stats.push(m2 - avg(c1.map(() => pick(c1))))
-    }
-    stats.sort((a, b) => a - b)
+    // Pinned: -279/528 and 474/528, the 251st and 4750th of 5000 sorted resamples.
     expect(B).toBe(5000)
-    expect(interval(c1, c2)).toEqual([stats[250], stats[4749]])
+    expect(interval(c1, c2)).toEqual([-0.5284090909090908, 0.8977272727272727])
     expect(interval(c1, c2)).toEqual(interval(c1, c2))
+  })
+
+  it('gives the pinned numbers on the frozen 2026-10-24 data', async () => {
+    // The records and groups of the 2026-10-24 run, repaired, so data updates leave this alone.
+    const read = async (path: string) =>
+      JSON.parse(await readFile(join(ROOT, path), 'utf8')) as CheckRecord[]
+    const before = await read('test/fixtures/claim-records-2026-10-24.json')
+    const after = await read('test/fixtures/estadao-globo-after-2026-10-24.json')
+    const current = [...before.filter((r) => r.sourceId !== SOURCE), ...after]
+    const { records } = repair(before, after, current, config)
+    const { file } = await assemble(join(ROOT, 'data/claim-curation/2026-10-24'))
+    const local = createContext({ ...config, records })
+    const round = (v: number | null) => (v === null ? null : Math.round(v * 100) / 100)
+    expect(
+      lean(local, createComparison(local, file, []).rows).map((r) => ({
+        outlet: r.outlet,
+        n: r.candidates.map((c) => c.n),
+        distance: round(r.distance),
+        interval: r.interval?.map(round),
+        verdict: r.verdict,
+      })),
+    ).toEqual([
+      { outlet: 'aosfatos', n: [28, 27], distance: 0.14, interval: [-0.08, 0.35], verdict: 'none' },
+      { outlet: 'estadao', n: [21, 20], distance: -0.2, interval: [-0.47, 0.06], verdict: 'none' },
+      { outlet: 'g1', n: [29, 30], distance: -0.04, interval: [-0.26, 0.18], verdict: 'none' },
+      { outlet: 'lupa', n: [23, 28], distance: 0.05, interval: [-0.15, 0.25], verdict: 'none' },
+    ])
   })
 })
 

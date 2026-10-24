@@ -211,7 +211,7 @@ Requirements: CMP-01, CMP-02, CMP-07, CMP-08, RIGOR-01, RIGOR-05, LEAN-01..08, D
 | ------ | ----- |
 | merge key history | `test/unit/merge.test.ts` |
 | repair | `test/unit/repair.test.ts` on copies of the pinned files |
-| lean | `test/unit/site/lean.test.ts`: hand-computed fixture, interval determinism, each sentence branch, small sample, headline |
+| lean | `test/unit/site/lean.test.ts`: hand-computed fixture, a pinned interval on fixed input and pinned per-agency results on the frozen 2026-10-24 data (fixture records repaired, the dated curation run), each sentence branch, small sample, headline |
 | drift | `test/unit/site/drift.test.ts`: versions from 0, 1, 2 entries, word diff, counts |
 | render/build | `test/unit/site/render.test.ts`, `test/unit/site/build.test.ts`: escaping of claim and label, shapes, no ordering by number |
 | browser | `test/e2e/compare.test.ts`: filters update axes, matrix and counts; detail by keyboard; 360 px |
