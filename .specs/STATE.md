@@ -16,7 +16,7 @@
 - **Trade-off**: New labels need a manual table update; no automatic grouping or summarizing of checks.
 - **Scope**: Ingestion, data model, site, any future comparator.
 - **Date**: 2026-10-24
-- **Status**: active
+- **Status**: active; partially superseded by AD-007 for claim grouping
 
 ### AD-003
 - **Decision**: The site uses no UI framework: static HTML, CSS and one ES module, pre-rendered by a small build script.
@@ -47,6 +47,14 @@
 - **Reason**: The user saw "#FAKE" and "falso" side by side and wanted one status vocabulary across agencies.
 - **Trade-off**: The band mapping is now visible on every item, so mapping choices (FALTA CONTEXTO and é enganoso as impreciso) weigh more; the label × candidate table and public `bands.json` stay the check on that. On touch screens the original label is reachable only through the agency link, the CSV and the methodology table.
 - **Scope**: Site item template, spec SITE-02, README, methodology page.
+- **Date**: 2026-10-24
+- **Status**: active
+
+### AD-007
+- **Decision**: Claim groups for the agency comparator are formed by AI agents and reviewed by the maintainer before commit. Agents see only record IDs, an agency letter, the quote and the excerpt (no agency name, label or band); three curators work independently per debate, a judge decides only where they disagree, an editor writes one neutral claim sentence per group and an adversarial reviewer checks neutrality. Every raw output is committed. AI never sets, changes or summarizes a verdict.
+- **Reason**: Deciding which checks evaluate the same assertion is editorial judgment the maintainer chose to delegate; blindness and independent votes keep that judgment from leaning on agency or verdict.
+- **Trade-off**: Partially supersedes AD-002: agency quotes and excerpts now pass through AI at curation time, which goes against the AI-crawler blocks of three agencies. The public rule "no text passes through AI" is replaced on the site and in the README.
+- **Scope**: Agency comparator, audit panel, methodology page, README.
 - **Date**: 2026-10-24
 - **Status**: active
 
