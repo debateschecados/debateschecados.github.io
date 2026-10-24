@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 17,
+  "next_id": 21,
   "lessons": [
     {
       "id": "L-001",
@@ -292,6 +292,78 @@
       ],
       "created": "2026-10-24T20:57:06Z",
       "last_seen": "2026-10-24T20:57:06Z"
+    },
+    {
+      "id": "L-017",
+      "key": "spec_precision_gap::turn a comparative visual ac such as at least as visible as into measurable properties like size and contrast",
+      "text": "Turn a comparative visual AC such as at least as visible as into measurable properties like size and contrast",
+      "signal": "spec_precision_gap",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "agency-comparator"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "LEAN-06 spec.md (validation.md iteration 2) (spec)"
+      ],
+      "created": "2026-10-24T21:01:08Z",
+      "last_seen": "2026-10-24T21:01:08Z"
+    },
+    {
+      "id": "L-018",
+      "key": "surviving_mutant::assert the property a visual ac constrains such as size or contrast not only the position of the mark",
+      "text": "Assert the property a visual AC constrains, such as size or contrast, not only the position of the mark",
+      "signal": "surviving_mutant",
+      "scope": "site",
+      "status": "candidate",
+      "features": [
+        "agency-comparator"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M17 site/style.css:1126, M18 site/render.js:345 (validation.md iteration 2) (site)"
+      ],
+      "created": "2026-10-24T21:01:08Z",
+      "last_seen": "2026-10-24T21:01:08Z"
+    },
+    {
+      "id": "L-019",
+      "key": "surviving_mutant::when a test checks a rendered color include every property that changes it such as opacity not only the color value",
+      "text": "When a test checks a rendered color, include every property that changes it, such as opacity, not only the color value",
+      "signal": "surviving_mutant",
+      "scope": "site",
+      "status": "candidate",
+      "features": [
+        "agency-comparator"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M20 site/style.css:1126, test/e2e/compare.test.ts:355 (validation.md iteration 3) (site)"
+      ],
+      "created": "2026-10-24T21:09:09Z",
+      "last_seen": "2026-10-24T21:09:09Z"
+    },
+    {
+      "id": "L-020",
+      "key": "surviving_mutant::when a test computes what a user sees include what ancestors contribute such as inherited opacity not only the element s own style",
+      "text": "When a test computes what a user sees, include what ancestors contribute, such as inherited opacity, not only the element's own style",
+      "signal": "surviving_mutant",
+      "scope": "site",
+      "status": "candidate",
+      "features": [
+        "agency-comparator"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M22 site/style.css:1126, test/e2e/compare.test.ts:357 (validation.md iteration 3b) (site)"
+      ],
+      "created": "2026-10-24T21:11:03Z",
+      "last_seen": "2026-10-24T21:11:03Z"
     }
   ]
 }

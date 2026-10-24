@@ -110,6 +110,30 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: DRIFT-03 site/render.js:413 (spec)
 - last seen: 2026-10-24T20:57:06Z
 
+### L-017 - Turn a comparative visual AC such as at least as visible as into measurable properties like size and contrast
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `spec` · harmful: 0
+- features: agency-comparator
+- evidence: LEAN-06 spec.md (validation.md iteration 2) (spec)
+- last seen: 2026-10-24T21:01:08Z
+
+### L-018 - Assert the property a visual AC constrains, such as size or contrast, not only the position of the mark
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `site` · harmful: 0
+- features: agency-comparator
+- evidence: M17 site/style.css:1126, M18 site/render.js:345 (validation.md iteration 2) (site)
+- last seen: 2026-10-24T21:01:08Z
+
+### L-019 - When a test checks a rendered color, include every property that changes it, such as opacity, not only the color value
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `site` · harmful: 0
+- features: agency-comparator
+- evidence: M20 site/style.css:1126, test/e2e/compare.test.ts:355 (validation.md iteration 3) (site)
+- last seen: 2026-10-24T21:09:09Z
+
+### L-020 - When a test computes what a user sees, include what ancestors contribute, such as inherited opacity, not only the element's own style
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `site` · harmful: 0
+- features: agency-comparator
+- evidence: M22 site/style.css:1126, test/e2e/compare.test.ts:357 (validation.md iteration 3b) (site)
+- last seen: 2026-10-24T21:11:03Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

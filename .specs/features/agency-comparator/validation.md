@@ -2,7 +2,160 @@
 
 No validation.md was committed for phases 1 and 2, so this file starts with phase 3.
 
-## Validation: Phase 3 (T9-T15 and review fixes) - FAIL
+## Validation: Phase 3 iteration 3b (closing check) - FAIL
+
+**Date**: 2026-10-24
+**Diff range**: `be54f3a..5a02f49` (`5a02f49` test(site): Count opacity in the interval bar contrast; test-only change)
+**Verifier**: independent sub-agent, fresh detached scratch worktree at `5a02f49`
+
+Final verdict for phase 3: FAIL, for a test gap only. Fix 5 works: M20 is killed. A neighbouring mutant of the same kind survives (M22), so the LEAN-06 contrast test still misses one way to fade the bar. The shipped page meets LEAN-06. On the real-data build, every `rect.ci` has fill `rgb(142, 142, 147)` and an effective opacity of 1 through all its ancestors, which gives 3.26:1.
+
+| Mutation | File:line | Description | Test file | Killed? |
+| -------- | --------- | ----------- | --------- | ------- |
+| M20 | `site/style.css:1126` | `opacity: 0.3` on the bar | e2e/compare.test.ts | ✅ Killed (1.36 < 3) |
+| M20b | `site/style.css:1126` | `fill-opacity: 0.3` on the bar | e2e/compare.test.ts | ✅ Killed (1.36 < 3) |
+| M17 | `site/style.css:1126` | bar fill transparent | e2e/compare.test.ts | ✅ Killed |
+| M22 | `site/style.css:1126` | `opacity: 0.3` on the `.track` svg that holds the bar | e2e/compare.test.ts | ❌ Survived |
+
+**Result**: 3/4 killed, 1 survived - FAIL
+
+Gate: `test/e2e/compare.test.ts` 11 passed at `5a02f49`. Scratch removed; `git status --porcelain` of the phase3 tree empty before and after.
+
+### Fix 6: count ancestor opacity in the LEAN-06 contrast test
+
+- **Root cause**: `test/e2e/compare.test.ts:357` multiplies only the bar's own `opacity` and `fillOpacity`. CSS opacity on any ancestor (the `.track` svg, `.lean-row`, `#balance`) also fades the bar, and the test cannot see it.
+- **Fix task**: in the probe, multiply `opacity` for the rect and every ancestor up to `document.documentElement`, then `fillOpacity` for the rect. M22 must then fail.
+- **Priority**: Minor (no ancestor of the bar has opacity below 1 today).
+
+---
+
+## Iteration 3: Phase 3 final verification - FAIL
+
+**Date**: 2026-10-24
+**Diff range**: `1cf9b04..75a4a40` (`75a4a40` fix(site): Give the interval bar the contrast of the point)
+**Verifier**: independent sub-agent, fresh detached scratch worktree at `75a4a40`
+
+Final verdict for phase 3: FAIL, for a test gap only. The behavior meets every AC in scope, including the amended LEAN-06. One sensor mutant on the new LEAN-06 contrast test survived (M20 below). This was the third and last fix-and-verify round, so the gap goes to the user rather than another loop. The fix is small (Fix 5).
+
+### LEAN-06 on the built page (real data)
+
+The amended AC (spec.md:135) asks for a bar at least as thick as the point's diameter, with a fill of at least 3:1 contrast against the page background. Measured in Chromium on `node src/site/build.ts` output, all four agencies, at 1280 px and 360 px:
+
+| Mark | Measured | Rule | Holds |
+| ---- | -------- | ---- | ----- |
+| bar (`rect.ci`, `site/render.js:345`) | 8 px tall, fill `rgb(142, 142, 147)`, opacity 1, fill-opacity 1; 116 to 271 px long | thickness ≥ point diameter | ✅ 8 ≥ 8 |
+| bar fill against `rgb(255, 255, 255)` | 3.26:1 (WCAG relative luminance) | ≥ 3:1 | ✅ |
+| point (`circle.pt`, `site/render.js:370`) | 8 px solid ink `rgb(29, 29, 31)`, no stroke, no halo | n/a | n/a |
+
+On screen the bar now reads as a solid grey band the width of the interval, with the point sitting inside it. LEAN-04 is unchanged: a small sample still draws neither point nor bar (`test/unit/site/render.test.ts:476`).
+
+### Tests for the amended AC
+
+- Thickness: `test/unit/site/render.test.ts:465` `expect(Number(rect.ci height)).toBeGreaterThanOrEqual(2 * Number(circle.pt r))`, the spec rule written as an assertion.
+- Contrast: `test/e2e/compare.test.ts:376` `expect((hi + 0.05) / (lo + 0.05)).toBeGreaterThanOrEqual(3)`, on a probe `rect.ci` styled by the page CSS. The fixture's agencies all have small samples and draw no bar, so the probe stands in. The probe reads only `getComputedStyle(rect).fill` (`:355`). The fill's own alpha is blended over the background, but the element's `opacity` and `fill-opacity` are ignored.
+
+### Sensor, iteration 3
+
+| Mutation | File:line | Description | Test file | Killed? |
+| -------- | --------- | ----------- | --------- | ------- |
+| M17 | `site/style.css:1126` | bar fill transparent | e2e/compare.test.ts | ✅ Killed (contrast 1) |
+| M17b | `site/style.css:1126` | the iteration 2 fill `rgba(29, 29, 31, 0.24)` | e2e/compare.test.ts | ✅ Killed (contrast 1.66) |
+| M18 | `site/render.js:345` | bar height 0 | render.test.ts | ✅ Killed (`expected 0 to be greater than or equal to 8`) |
+| M20 | `site/style.css:1126` | `opacity: 0.3` added to the bar (effective contrast about 1.3:1) | e2e/compare.test.ts | ❌ Survived |
+| M21 | `site/render.js:370` | point r 6, wider than the bar | render.test.ts | ✅ Killed (`expected 8 to be greater than or equal to 12`) |
+
+**Result**: 4/5 killed, 1 survived - FAIL
+
+### Gate, iteration 3
+
+One file per command in the scratch at `75a4a40`: `test/unit/site/render.test.ts` 26 passed, `test/unit/site/build.test.ts` 30 passed, `test/unit/site/lean.test.ts` 17 passed, `test/e2e/compare.test.ts` 11 passed. `node src/site/build.ts` exit 0. Mutants were restored by rewriting the original file content, not by `git checkout`. Scratch removed; `git status --porcelain` of the phase3 tree empty before and after.
+
+### Fix 5: count opacity in the LEAN-06 contrast test
+
+- **Root cause**: `test/e2e/compare.test.ts:355` reads only the computed `fill`. A bar faded with `opacity` or `fill-opacity` passes the test while failing the AC.
+- **Fix task**: in the probe, also return `getComputedStyle(rect).opacity` and `.fillOpacity`, and multiply both into the alpha before `over()`. M20 must then fail.
+- **Priority**: Minor (the shipped page meets the AC; the guard misses one regression path).
+
+### Traceability update
+
+| Requirement | Status |
+| ----------- | ------ |
+| LEAN-06 | ✅ Behavior verified on the built page; ⚠️ contrast test misses opacity (Fix 5) |
+| All other ACs in scope | ✅ Verified (iterations 1 and 2) |
+
+---
+
+## Iteration 2: Phase 3 re-verification - FAIL
+
+**Date**: 2026-10-24
+**Diff range**: `a621de8..f22d0a6` (`9a93406` style of the axes, `f22d0a6` tests for gaps 1-3 and the DRIFT-03 wording)
+**Verifier**: independent sub-agent, fresh detached scratch worktree at `f22d0a6`
+
+Final verdict for phase 3: FAIL. Gaps 1 to 4 of iteration 1 are closed. `9a93406` opened a new one: it makes the interval bar less visible than the point, against LEAN-06, and no test can see it.
+
+### Iteration 1 gaps
+
+| Gap | Evidence now | Mutant rerun | Status |
+| --- | ------------ | ------------ | ------ |
+| 1. CMP-08 shape | `test/e2e/compare.test.ts:354` `expect(new Set(shapes).size).toBe(5)` over border-radius, clip-path and fill of the legend dots | M16 killed (`expected 4 to be 5`) | ✅ Closed |
+| 2. quote diff escaping | `test/unit/site/render.test.ts:348` `expect($('.qdiff b, .qdiff i')).toHaveLength(0)`, plus `del`/`ins` text | M15 killed | ✅ Closed |
+| 3. repair `new` list | `test/unit/repair.test.ts:59` `report.new` equals the 7 ids derived from `after`, `before` and `merged` | M12 killed (`expected [] to deeply equal [ Array(7) ]`) | ✅ Closed |
+| 4. DRIFT-03 first version | spec.md:153 now names the three date forms; `test/unit/site/render.test.ts:721`, `:722`, `:729` assert "até 24/10", "de 24/10 a 25/10", "desde 26/10, versão atual" | n/a | ✅ Closed |
+
+### LEAN-04 and LEAN-06 after `9a93406`
+
+- LEAN-04 holds: a small sample still draws neither point nor bar (`test/unit/site/render.test.ts:476`, spec value "neither the point nor the bar"); M13 (point drawn for a small sample) killed.
+- LEAN-06 position and order hold: bar at `x="60%"` and point at `cx="75%"` on a ±0.5 domain (`test/unit/site/render.test.ts:460`, `:463`), zero line between bar and point in paint order (`:451` block); M19 (bar removed) killed.
+- LEAN-06 "the interval as a bar at least as visible as the point" no longer holds. Measured in Chromium on the built page with the real data (`site/render.js:345`, `:370`, `site/style.css:1126`):
+
+| Mark | Before `9a93406` | After `9a93406` |
+| ---- | ---------------- | --------------- |
+| bar (`rect.ci`) | 20 px tall, fill ink at 13% with a 1.5 px outline at 42% | 6 px tall, fill ink at 24%, no outline: about 1.7:1 against the white background |
+| point (`circle.pt`) | 14 px hollow ring, 3 px ink stroke | 12 px solid ink with a white halo: about 16.8:1 |
+
+  The bar is now thinner than the point's diameter and has about a tenth of its contrast; the point's white halo also cuts the bar where they meet. The goal at spec.md:10 asks for "the uncertainty drawn as large as the number", and LEAN-06 for a bar at least as visible as the point. On screen the point reads first and the interval reads as a light grey line. The 14 px end ticks (ink at 55%, about 3.9:1) help, but the AC is about the bar.
+- No test asserts the bar's size or contrast: M17 (bar fill transparent, `test/e2e/compare.test.ts`) and M18 (bar height 0, `test/unit/site/render.test.ts`) both survived.
+
+### Spec-precision gap
+
+LEAN-06 does not say how "at least as visible" is measured, so neither the author nor a test can check it. Fix: state it in the AC, for example "the bar is at least as thick as the point's diameter and its fill has at least 3:1 contrast against the background (WCAG 1.4.11)".
+
+### Sensor, iteration 2
+
+| Mutation | File:line | Description | Test file | Killed? |
+| -------- | --------- | ----------- | --------- | ------- |
+| M12 | `src/repair/estadao-2026-10-24.ts:104` | report `new` always empty | repair.test.ts | ✅ Killed |
+| M13 | `site/render.js:367` | point drawn for a small sample | render.test.ts | ✅ Killed |
+| M15 | `site/render.js:421` | removed words of the quote diff not escaped | render.test.ts | ✅ Killed |
+| M16 | `site/style.css:1258` | impreciso drawn as a circle | e2e/compare.test.ts | ✅ Killed |
+| M17 | `site/style.css:1126` | interval bar fill transparent | e2e/compare.test.ts | ❌ Survived |
+| M18 | `site/render.js:345` | interval bar height 0 | render.test.ts | ❌ Survived |
+| M19 | `site/render.js:345` | interval bar removed | render.test.ts | ✅ Killed |
+
+**Result**: 5/7 killed, 2 survived (both LEAN-06 visibility) - FAIL
+
+### Gate, iteration 2
+
+One file per command in the scratch at `f22d0a6`: `test/unit/site/render.test.ts` 26 passed, `test/unit/site/build.test.ts` 30 passed, `test/unit/site/lean.test.ts` 17 passed, `test/unit/repair.test.ts` 6 passed, `test/e2e/compare.test.ts` 10 passed. `node src/site/build.ts` exit 0. Scratch removed; `git status --porcelain` of the phase3 tree empty before and after.
+
+### Fix 4: make the bar at least as visible as the point (LEAN-06)
+
+- **Root cause**: `9a93406` thinned the bar to 6 px at 24% ink and filled the point solid ink (`site/render.js:345`, `:370`, `site/style.css:1126-1141`, legend keys `.k-ci`, `.k-pt`).
+- **Fix task**: first amend LEAN-06 with a measurable rule (above). Then either revert the bar to at least the point's diameter with a fill of at least 3:1 contrast, or go back to a hollow or lighter point. Add `test/unit/site/render.test.ts`: `rect.ci` height ≥ 2 × `circle.pt` r. Add `test/e2e/compare.test.ts`: computed bar fill contrast against the page background ≥ 3:1. M17 and M18 must then fail.
+- **Priority**: Major (LEAN-06 is the page's uncertainty display; the goal is that it reads as large as the number).
+
+### Traceability update
+
+| Requirement | Status |
+| ----------- | ------ |
+| CMP-08 | ✅ Verified |
+| DRIFT-02, DRIFT-03 | ✅ Verified |
+| LEAN-04 | ✅ Verified |
+| LEAN-06 | ❌ Needs fix (Fix 4) |
+
+---
+
+## Iteration 1: Phase 3 (T9-T15 and review fixes) - FAIL
 
 **Date**: 2026-10-24
 **Spec**: `.specs/features/agency-comparator/spec.md` (amendment of 2026-10-24: LEAN-01..08, DRIFT-01..05, CMP-01/02/07/08, RIGOR-01/05)
