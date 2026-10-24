@@ -310,7 +310,10 @@ export function leanHtml(ctx, result) {
   const domain = axisDomain(result)
   const x = scale(domain)
   const [c1, c2] = ctx.candidates
-  const grid = [-domain, -domain / 2, domain / 2, domain]
+  // Ticks every 0.25, or every 0.5 on a wide scale, so the labels stay readable on a phone.
+  const step = domain > 1 ? 0.5 : 0.25
+  const ticks = Array.from({ length: (2 * domain) / step + 1 }, (_, i) => -domain + i * step)
+  const grid = ticks.filter((v) => v !== 0)
   const rows = result
     .map((r) => {
       const name = ctx.outlets[r.outlet].name
@@ -357,7 +360,7 @@ export function leanHtml(ctx, result) {
             `<text class="end" x="${at}" y="64" text-anchor="${anchor(at)}">${text}</text>`,
           )
       }
-      parts.push('<line class="zero" x1="50%" x2="50%" y1="2" y2="62"></line>')
+      parts.push('<line class="zero" x1="50%" x2="50%" y1="18" y2="50"></line>')
       if (distance !== null) {
         const at = x(/** @type {number} */ (r.distance))
         parts.push(
@@ -373,7 +376,7 @@ export function leanHtml(ctx, result) {
 </li>`
     })
     .join('\n')
-  const ticks = [-domain, -domain / 2, 0, domain / 2, domain]
+  const labels = ticks
     .map(
       (v) =>
         `<text x="${x(v)}" y="14" text-anchor="${anchor(x(v))}"${v === 0 ? ' class="z"' : ''}>${v === 0 ? '0' : signed(v)}</text>`,
@@ -383,7 +386,7 @@ export function leanHtml(ctx, result) {
     `<div class="end ${side}"><img src="sprites/${esc(c.sprite)}.svg" alt=""><span><b>Mais dura com ${esc(c.short)}</b> do que as outras</span></div>`
   return `<div class="ends">${end(c1, 'left')}${end(c2, 'right')}</div>
 <ol class="lean-rows">${rows}</ol>
-<div class="axis"><svg class="ticks" width="100%" height="20" aria-hidden="true">${ticks}</svg><p class="cap">Zero: igual às outras agências. Escala: verdadeiro 0, impreciso 1, falso 2.</p></div>
+<div class="axis"><svg class="ticks" width="100%" height="20" aria-hidden="true">${labels}</svg><p class="cap">Zero: igual às outras agências. Escala: verdadeiro 0, impreciso 1, falso 2.</p></div>
 <div class="howto"><span class="k"><i class="k-pt"></i>distância medida</span><span class="k"><i class="k-ci"></i>intervalo de 90%</span><span class="k"><i class="k-z"></i>zero, sem diferença</span></div>`
 }
 

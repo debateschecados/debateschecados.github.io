@@ -227,11 +227,11 @@ The archive shows each agency's checks side by side, but it cannot answer the qu
 | CLAIM-06 | P1: Claim groups | Tasks: T4 | Implemented |
 | CMP-01 | P1: Compare agencies | Tasks: T6, T13 | Implemented |
 | CMP-02 | P1: Compare agencies | Tasks: T6, T13 | Implemented |
-| CMP-03 | P1: Compare agencies | Tasks: T5, T7 | Implemented |
+| CMP-03 | P1: Compare agencies | Tasks: T5, T7, T14 | Implemented |
 | CMP-04 | P1: Compare agencies | Tasks: T5 | Implemented |
 | CMP-05 | P1: Compare agencies | Tasks: T5 | Implemented |
 | CMP-06 | P1: Compare agencies | Tasks: T5, T6 | Implemented |
-| CMP-07 | P1: Compare agencies | Tasks: T7 | Implemented |
+| CMP-07 | P1: Compare agencies | Tasks: T7, T14 | Implemented |
 | RIGOR-01 | P1: Coverage and relative rigor | Tasks: T5, T13 | Implemented |
 | RIGOR-02 | P1: Coverage and relative rigor | Tasks: T5 | Superseded by LEAN-01, LEAN-02 |
 | RIGOR-03 | P1: Coverage and relative rigor | Tasks: T5, T6 | Implemented |
@@ -244,7 +244,7 @@ The archive shows each agency's checks side by side, but it cannot answer the qu
 | LEAN-03 | P1: Distance from the other agencies | Tasks: T11, T13 | Implemented |
 | LEAN-04 | P1: Distance from the other agencies | Tasks: T11, T13 | Implemented |
 | LEAN-05 | P1: Distance from the other agencies | Tasks: T11, T13 | Implemented |
-| LEAN-06 | P1: Distance from the other agencies | Tasks: T13 | Implemented |
+| LEAN-06 | P1: Distance from the other agencies | Tasks: T13, T14 | Implemented |
 | LEAN-07 | P1: Distance from the other agencies | Tasks: T11 | Implemented |
 | LEAN-08 | P1: Distance from the other agencies | Tasks: pending | Pending |
 | DRIFT-01 | P1: Verdicts that changed | Tasks: T9 | Implemented |

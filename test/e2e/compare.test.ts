@@ -4,12 +4,19 @@ import { createServer, type Server } from 'node:http'
 import type { AddressInfo } from 'node:net'
 import { tmpdir } from 'node:os'
 import { extname, join, normalize } from 'node:path'
-import { load } from 'cheerio'
 import { type Browser, type BrowserContextOptions, chromium, type Page } from 'playwright-core'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
-import { coverage, createComparison, emptyCompareState, visibleRows } from '../../site/compare.js'
+import {
+  coverage,
+  createComparison,
+  emptyCompareState,
+  inDebate,
+  visibleRows,
+} from '../../site/compare.js'
 import { createContext } from '../../site/core.js'
-import { coverageHtml } from '../../site/render.js'
+import { driftCounts } from '../../site/drift.js'
+import { headline, lean } from '../../site/lean.js'
+import { coverageHtml, driftCountsHtml, leanHtml } from '../../site/render.js'
 import { loadConfig } from '../../src/config.ts'
 import {
   buildFixture,
@@ -102,51 +109,95 @@ async function open(path = '/comparar.html', options: BrowserContextOptions = {}
 // Read in the page: page.url() can lag behind history.replaceState.
 const params = async (page: Page) => new URLSearchParams(await page.evaluate(() => location.search))
 
-// Rows actually on screen, not just rows without the hidden attribute.
+// Matrix columns actually on screen, not just buttons without the hidden attribute.
 const visibleIds = (page: Page) =>
-  page.$$eval('#rows > li.claim', (lis) =>
-    lis.filter((li) => li.checkVisibility()).map((li) => (li as HTMLElement).dataset.id),
+  page.$$eval('#matrix button.claim', (bs) =>
+    bs.filter((b) => b.checkVisibility()).map((b) => (b as HTMLElement).dataset.id),
   )
 
-// Cell texts of the coverage table, as the page shows them.
-const tables = (page: Page) => page.$$eval('#coverage td', (tds) => tds.map((td) => td.textContent))
-
-// The same cells, rendered from compare.js for the debate filter alone (RIGOR-06).
-const expectedTables = (debate: string | null) => {
-  const $ = load(coverageHtml(ctx, coverage(ctx, comparison, debate)))
-  return $('td')
-    .map((_, td) => $(td).text())
-    .get()
+// The matrix lists rows per debate, then per candidate, each in page order.
+const expectedIds = (over: Partial<ReturnType<typeof emptyCompareState>>) => {
+  const shown = visibleRows(comparison.rows, { ...emptyCompareState(), ...over })
+  return ctx.debates.flatMap((d) =>
+    ctx.candidates.flatMap((c) =>
+      shown.filter((r) => r.debate === d.id && r.speaker === c.id).map((r) => r.id),
+    ),
+  )
 }
 
-const expectedIds = (over: Partial<ReturnType<typeof emptyCompareState>>) =>
-  visibleRows(comparison.rows, { ...emptyCompareState(), ...over }).map((r) => r.id)
+// What the page shows in the parts the debate filter recounts.
+const counted = (page: Page) =>
+  page.evaluate(() => ({
+    answer: document.querySelector('#answer')?.textContent,
+    balance: document.querySelector('#balance')?.innerHTML,
+    coverage: document.querySelector('#coverage')?.innerHTML,
+    drift: document.querySelector('#drift')?.innerHTML,
+  }))
 
-describe('filters, tables and URL (CMP-03, RIGOR-06)', () => {
-  it('each filter changes the visible rows, and the debate filter the table numbers', async () => {
+// The same parts, computed by lean.js, compare.js and drift.js for the debate filter alone.
+const expectedCounts = (debate: string | null) => {
+  const distances = lean(ctx, inDebate(comparison.rows, debate))
+  return {
+    answer: headline(distances, ctx),
+    balance: leanHtml(ctx, distances),
+    coverage: coverageHtml(ctx, coverage(ctx, comparison, debate)),
+    drift: driftCountsHtml(ctx, driftCounts(ctx, debate)),
+  }
+}
+
+describe('filters, axes, matrix and counts (CMP-03, RIGOR-06, LEAN-06)', () => {
+  it('the debate filter recomputes the axes, the coverage and the change counts', async () => {
     const page = await open()
+    expect(await counted(page)).toEqual(expectedCounts(null))
     expect(await visibleIds(page)).toEqual(expectedIds({}))
-    expect(await tables(page)).toEqual(expectedTables(null))
 
-    await page.click('[data-debate="band-2026-10-18"]')
-    expect(await visibleIds(page)).toEqual(['A', 'I', 'B', 'C'].map(fixtureGroupId))
-    expect(await tables(page)).toEqual(expectedTables('band-2026-10-18'))
-    // Aos Fatos, Lula, Band: harsher than the three others on A.
-    expect(await page.textContent('#rigor tbody tr:first-child td:nth-of-type(1) .line')).toBe(
-      '3 mais dura',
+    // The fixture is too small for a clear verdict, so the headline reads the same for every
+    // debate: blank it to see the filter write it again.
+    await page.$eval('#answer', (p) => {
+      p.textContent = ''
+    })
+    await page.click('#debates [data-debate="band-2026-10-18"]')
+    expect(await counted(page)).toEqual(expectedCounts('band-2026-10-18'))
+    expect(await counted(page)).not.toEqual(expectedCounts(null))
+    expect(await visibleIds(page)).toEqual(['A', 'B', 'I', 'C'].map(fixtureGroupId))
+    expect(await page.isVisible('.staff[data-debate="globo-2026-10-23"]')).toBe(false)
+    // g1 5 (Band, Flávio) went from "#FAKE" to "#FATO".
+    expect(await page.textContent('#drift tbody tr:nth-child(3) td:nth-of-type(2)')).toBe(
+      '1 ficou mais branda',
     )
 
+    await page.click('#debates [data-debate="globo-2026-10-23"]')
+    expect(await counted(page)).toEqual(expectedCounts('globo-2026-10-23'))
+    expect(await page.$$eval('#drift td', (tds) => tds.map((td) => td.textContent))).toEqual(
+      Array(8).fill('nenhuma mudança'),
+    )
+    // The only change is from the other debate: its timeline hides and a note says so.
+    expect(await page.isVisible(`#changes li[data-id="${recordId(5)}"]`)).toBe(false)
+    expect(await page.textContent('#changes-none')).toBe(
+      'Nenhuma checagem deste debate mudou de rótulo nem de citação.',
+    )
+    expect(await page.isVisible('#changes-none')).toBe(true)
+    expect(Object.fromEntries(await params(page))).toEqual({ debate: 'globo-2026-10-23' })
+  })
+
+  it('the candidate and divergence filters change the matrix and its counts, not the axes', async () => {
+    const page = await open('/comparar.html?debate=band-2026-10-18')
+    const before = await counted(page)
     await page.selectOption('select[data-key="speaker"]', 'flavio')
     expect(await visibleIds(page)).toEqual(
       expectedIds({ debate: 'band-2026-10-18', speaker: 'flavio' }),
     )
-    expect(await tables(page)).toEqual(expectedTables('band-2026-10-18'))
-
+    expect(await page.textContent('#filters .count')).toBe('2 falas')
     await page.check('[data-div]')
     expect(await visibleIds(page)).toEqual([fixtureGroupId('I')])
-    expect(await page.textContent('#filters .count')).toBe('1 alegação')
-    expect(await tables(page)).toEqual(expectedTables('band-2026-10-18'))
-
+    expect(await page.textContent('#filters .count')).toBe('1 fala')
+    expect(
+      await page.textContent('.staff[data-debate="band-2026-10-18"] [data-speaker="flavio"] .n'),
+    ).toBe('1 de 2')
+    expect(
+      await page.isVisible('.staff[data-debate="band-2026-10-18"] [data-speaker="lula"]'),
+    ).toBe(false)
+    expect(await counted(page)).toEqual(before)
     expect(Object.fromEntries(await params(page))).toEqual({
       debate: 'band-2026-10-18',
       speaker: 'flavio',
@@ -154,23 +205,28 @@ describe('filters, tables and URL (CMP-03, RIGOR-06)', () => {
     })
   })
 
-  it('restores the view from a shared URL', async () => {
+  it('restores the view from a shared URL on reload', async () => {
     const page = await open('/comparar.html?debate=globo-2026-10-23&div=1')
+    await page.reload()
     expect(await visibleIds(page)).toEqual([fixtureGroupId('G')])
-    expect(await page.getAttribute('[data-debate="globo-2026-10-23"]', 'aria-pressed')).toBe('true')
+    expect(
+      await page.getAttribute('#debates [data-debate="globo-2026-10-23"]', 'aria-pressed'),
+    ).toBe('true')
     expect(await page.isChecked('[data-div]')).toBe(true)
     expect(await page.inputValue('select[data-key="speaker"]')).toBe('')
-    expect(await tables(page)).toEqual(expectedTables('globo-2026-10-23'))
+    expect(await counted(page)).toEqual(expectedCounts('globo-2026-10-23'))
   })
 
   it('shows the empty state and clears every filter from it, focus on the first filter', async () => {
     const page = await open('/comparar.html?debate=globo-2026-10-23&speaker=lula&div=1')
     expect(await visibleIds(page)).toEqual([])
-    const empty = page.locator('#rows .empty')
-    expect(await empty.textContent()).toBe('Nenhuma alegação com esses filtros. Limpar filtros')
+    const empty = page.locator('#empty')
+    expect(await empty.textContent()).toBe('Nenhuma fala com esses filtros. Limpar filtros')
+    expect(await empty.isVisible()).toBe(true)
     await empty.getByRole('button', { name: 'Limpar filtros' }).focus()
     await page.keyboard.press('Enter')
     expect(await visibleIds(page)).toEqual(expectedIds({}))
+    expect(await empty.isVisible()).toBe(false)
     expect(await page.evaluate(() => location.search)).toBe('')
     expect(
       await page.evaluate(() => (document.activeElement as HTMLElement).dataset.key ?? null),
@@ -196,8 +252,59 @@ describe('filters, tables and URL (CMP-03, RIGOR-06)', () => {
   })
 })
 
+describe('claim detail (CMP-02, DRIFT-05)', () => {
+  it('opens with Enter, shows each agency label as text, and closes with Escape', async () => {
+    const page = await open()
+    const button = `#matrix button[data-id="${fixtureGroupId('I')}"]`
+    expect(await page.isVisible('#detail')).toBe(false)
+    await page.focus(button)
+    await page.keyboard.press('Enter')
+    expect(await page.getAttribute(button, 'aria-expanded')).toBe('true')
+    expect(await page.isVisible('#detail')).toBe(true)
+    expect(await page.textContent('#detail blockquote')).toBe(
+      'Alegação de teste I, inventada para a suíte do site.',
+    )
+    expect(
+      await page.$$eval('#detail .verdicts li', (lis) =>
+        // biome-ignore lint/performance/useDomNodeTextContent: the text as read, with the gaps between parts.
+        lis.map((li) => (li as HTMLElement).innerText.replace(/\s+/g, ' ').trim()),
+      ),
+    ).toEqual([
+      'Aos Fatos não checou',
+      'Estadão Verifica impreciso rótulo da agência: é enganoso Ler a checagem',
+      'g1 Fato ou Fake verdadeiro rótulo da agência: #FATO faixa anterior: falso Ler a checagem',
+      'Lupa não checou',
+    ])
+    // Under the debate it belongs to, on desktop.
+    expect(
+      await page.$eval('#detail', (d) => d.closest('.staff')?.getAttribute('data-debate')),
+    ).toBe('band-2026-10-18')
+
+    await page.keyboard.press('Escape')
+    expect(await page.isVisible('#detail')).toBe(false)
+    expect(await page.getAttribute(button, 'aria-expanded')).toBe('false')
+    expect(await page.evaluate(() => (document.activeElement as HTMLElement).dataset.id)).toBe(
+      fixtureGroupId('I'),
+    )
+
+    // A click on another column switches the detail; the close button closes it.
+    await page.click(`#matrix button[data-id="${fixtureGroupId('A')}"]`)
+    expect(await page.textContent('#detail .gid')).toBe(fixtureGroupId('A'))
+    await page.click('#detail [data-close]')
+    expect(await page.isVisible('#detail')).toBe(false)
+  })
+
+  it('closes when a filter hides the selected claim', async () => {
+    const page = await open()
+    await page.click(`#matrix button[data-id="${fixtureGroupId('B')}"]`)
+    expect(await page.isVisible('#detail')).toBe(true)
+    await page.check('[data-div]')
+    expect(await page.isVisible('#detail')).toBe(false)
+  })
+})
+
 describe('layout (CMP-07)', () => {
-  it('has no horizontal scroll at 360 px, with rows stacked, and a grid on desktop', async () => {
+  it('has no horizontal scroll at 360 px, with the matrix as a list, and columns on desktop', async () => {
     const page = await open('/comparar.html', { viewport: { width: 360, height: 740 } })
     const overflow = () => page.evaluate(() => document.documentElement.scrollWidth - innerWidth)
     expect(await overflow()).toBeLessThanOrEqual(0)
@@ -205,33 +312,41 @@ describe('layout (CMP-07)', () => {
       els.map((e) => e.scrollWidth - e.clientWidth),
     )
     expect(wraps).toEqual([0, 0])
-    expect(await page.$eval('.claims-head', (h) => getComputedStyle(h).display)).toBe('none')
-    expect(await page.isVisible('#rows > li.claim .cells .agency')).toBe(true)
+    // One claim per line, its text visible, the dots of the four agencies on that line.
+    const first = page.locator('#matrix button.claim').first()
+    expect(await first.locator('.txt').isVisible()).toBe(true)
+    const box = await first.boundingBox()
+    expect(box?.width).toBeGreaterThan(300)
+    const tops = await first
+      .locator('.dot')
+      .evaluateAll((ds) => ds.map((d) => Math.round(d.getBoundingClientRect().top)))
+    expect(new Set(tops).size).toBe(1)
+    await first.click()
+    expect(
+      await page.$eval('#detail', (d) => d.previousElementSibling?.classList.contains('claim')),
+    ).toBe(true)
+    expect(await overflow()).toBeLessThanOrEqual(0)
     await page.check('[data-div]')
     expect(await overflow()).toBeLessThanOrEqual(0)
 
     const wide = await open()
-    expect(await wide.$eval('.claims-head', (h) => getComputedStyle(h).display)).toBe('grid')
-    // The four verdicts of a row sit on one line, under the four agency heads.
-    const tops = await wide.$$eval('#rows > li.claim:first-child .cells > li', (lis) =>
-      lis.map((li) => Math.round(li.getBoundingClientRect().top)),
-    )
-    expect(new Set(tops).size).toBe(1)
-    const heads = await wide.$$eval('.claims-head span', (ss) =>
-      ss.slice(1).map((s) => Math.round(s.getBoundingClientRect().left)),
-    )
-    const cells = await wide.$$eval('#rows > li.claim:first-child .cells > li', (lis) =>
-      lis.map((li) => Math.round(li.getBoundingClientRect().left)),
-    )
-    expect(cells).toEqual(heads)
+    const column = wide.locator('#matrix button.claim').first()
+    expect(await column.locator('.txt').isVisible()).toBe(false)
+    // The dots of one column stand one above the other, one lane per agency.
+    const lefts = await column
+      .locator('.dot')
+      .evaluateAll((ds) => ds.map((d) => Math.round(d.getBoundingClientRect().left)))
+    expect(new Set(lefts).size).toBe(1)
+    expect(await wide.$$eval('.staff:first-child .lanes span', (ss) => ss.length)).toBe(5)
   })
 })
 
 describe('privacy (SITE-07)', () => {
   it('requests nothing from another origin', async () => {
     const page = await open()
-    await page.click('[data-debate="globo-2026-10-23"]')
+    await page.click('#debates [data-debate="globo-2026-10-23"]')
     await page.check('[data-div]')
+    await page.click('#matrix button.claim >> visible=true')
     await page.evaluate(() => document.fonts.ready)
     expect(requests.length).toBeGreaterThan(3)
     expect(requests.filter((u) => !u.startsWith(`${origin}/`) && !u.startsWith('data:'))).toEqual(

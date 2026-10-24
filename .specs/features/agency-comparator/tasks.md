@@ -408,15 +408,17 @@ T13 → T15
 
 **Done when**:
 
-- [ ] e2e: each filter changes the axes numbers, the matrix and the counts as `lean.js` and `drift.js` compute; reload restores the view
-- [ ] e2e: the detail opens with Enter and shows each agency's label; no horizontal scroll at 360 px; no cross-origin request
-- [ ] Gate check passes: `pnpm vitest run test/e2e/compare.test.ts`
-- [ ] Test count: at least 6 tests pass
+- [x] e2e: each filter changes the axes numbers, the matrix and the counts as `lean.js` and `drift.js` compute; reload restores the view
+- [x] e2e: the detail opens with Enter and shows each agency's label; no horizontal scroll at 360 px; no cross-origin request
+- [x] Gate check passes: `pnpm vitest run test/e2e/compare.test.ts`
+- [x] Test count: at least 6 tests pass
 
 **Tests**: e2e
 **Gate**: full
 
 **Commit**: `feat(site): Filter the axes, matrix and changes in the browser`
+
+**Status**: ✅ Complete
 
 ---
 
