@@ -330,7 +330,7 @@ export function leanHtml(ctx, result) {
       const rule = `${said[0].toUpperCase()}${said.slice(1)}.`
       const distance = r.distance === null ? null : signed(r.distance)
       const nums = r.interval
-        ? `Distância ${distance}, intervalo de 90% de ${signed(r.interval[0])} a ${signed(r.interval[1])}.`
+        ? `Distância ${distance}, intervalo de 97,5% de ${signed(r.interval[0])} a ${signed(r.interval[1])}.`
         : distance === null
           ? 'Sem falas em comum para medir.'
           : `Distância ${distance}. Menos de ${MIN_N} falas de um dos candidatos, sem intervalo.`
@@ -390,7 +390,7 @@ export function leanHtml(ctx, result) {
   return `<div class="ends">${end(c1, 'left')}${end(c2, 'right')}</div>
 <ol class="lean-rows">${rows}</ol>
 <div class="axis"><svg class="ticks" width="100%" height="20" aria-hidden="true">${labels}</svg><p class="cap">Zero: igual às outras agências. Escala: verdadeiro 0, impreciso 1, falso 2.</p></div>
-<div class="howto"><span class="k"><i class="k-pt"></i>distância medida</span><span class="k"><i class="k-ci"></i>intervalo de 90%</span><span class="k"><i class="k-z"></i>zero, sem diferença</span></div>`
+<div class="howto"><span class="k"><i class="k-pt"></i>distância medida</span><span class="k"><i class="k-ci"></i>intervalo de 97,5%</span><span class="k"><i class="k-z"></i>zero, sem diferença</span></div>`
 }
 
 // Each change of a record, from the version before it: band direction, quote edit, new key.

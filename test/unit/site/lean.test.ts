@@ -99,12 +99,12 @@ describe('lean (LEAN-01, LEAN-02)', () => {
     expect(r.g1.distance).toBeNull()
   })
 
-  it('draws the 90% interval with the fixed generator, the same on every call', () => {
+  it('draws the 97.5% interval with the fixed generator, the same on every call', () => {
     const c1 = [-1, 0.5, -0.5, 1, 0, -2, 1.5, 0.25, -0.75, 2, 0.5]
     const c2 = [1, -0.5, 0.5, 2, -1, 0, 1.5, -0.25, 0.75, 1, -1.5, 0.5]
-    // Pinned: -279/528 and 474/528, the 251st and 4750th of 5000 sorted resamples.
+    // Pinned: -401/528 and 595/528, the 63rd and 4938th of 5000 sorted resamples.
     expect(B).toBe(5000)
-    expect(interval(c1, c2)).toEqual([-0.5284090909090908, 0.8977272727272727])
+    expect(interval(c1, c2)).toEqual([-0.759469696969697, 1.1268939393939394])
     expect(interval(c1, c2)).toEqual(interval(c1, c2))
   })
 
@@ -128,10 +128,10 @@ describe('lean (LEAN-01, LEAN-02)', () => {
         verdict: r.verdict,
       })),
     ).toEqual([
-      { outlet: 'aosfatos', n: [28, 27], distance: 0.14, interval: [-0.08, 0.35], verdict: 'none' },
-      { outlet: 'estadao', n: [21, 20], distance: -0.2, interval: [-0.47, 0.06], verdict: 'none' },
-      { outlet: 'g1', n: [29, 30], distance: -0.04, interval: [-0.26, 0.18], verdict: 'none' },
-      { outlet: 'lupa', n: [23, 28], distance: 0.05, interval: [-0.15, 0.25], verdict: 'none' },
+      { outlet: 'aosfatos', n: [28, 27], distance: 0.14, interval: [-0.15, 0.43], verdict: 'none' },
+      { outlet: 'estadao', n: [21, 20], distance: -0.2, interval: [-0.57, 0.15], verdict: 'none' },
+      { outlet: 'g1', n: [29, 30], distance: -0.04, interval: [-0.35, 0.26], verdict: 'none' },
+      { outlet: 'lupa', n: [23, 28], distance: 0.05, interval: [-0.22, 0.32], verdict: 'none' },
     ])
   })
 })
@@ -289,7 +289,7 @@ describe('pnpm lean (LEAN-07)', () => {
       const [c1, c2] = r.candidates
       const [lo, hi] = r.interval ?? [0, 0]
       expect(lines[i]).toBe(
-        `${config.outlets[r.outlet].name}: Lula ${signed(c1.mean ?? 0)} (n=${c1.n}), Flávio ${signed(c2.mean ?? 0)} (n=${c2.n}); distância ${signed(r.distance ?? 0)}, intervalo de 90% de ${signed(lo)} a ${signed(hi)}; ${sentence(r.verdict, local)}`,
+        `${config.outlets[r.outlet].name}: Lula ${signed(c1.mean ?? 0)} (n=${c1.n}), Flávio ${signed(c2.mean ?? 0)} (n=${c2.n}); distância ${signed(r.distance ?? 0)}, intervalo de 97,5% de ${signed(lo)} a ${signed(hi)}; ${sentence(r.verdict, local)}`,
       )
     })
     expect(lines.at(-1)).toBe(headline(result, local))

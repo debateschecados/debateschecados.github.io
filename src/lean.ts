@@ -25,7 +25,7 @@ export async function leanReport(dataDir: string, configDir = join(ROOT, 'config
     })
     const distance = r.distance === null ? 'sem dados' : signed(r.distance)
     const range = r.interval
-      ? `, intervalo de 90% de ${signed(r.interval[0])} a ${signed(r.interval[1])}`
+      ? `, intervalo de 97,5% de ${signed(r.interval[0])} a ${signed(r.interval[1])}`
       : ''
     const name = ctx.outlets[r.outlet].name
     return `${name}: ${means.join(', ')}; distância ${distance}${range}; ${sentence(r.verdict, ctx)}`
@@ -45,6 +45,6 @@ if (import.meta.main) {
 
 Prints each agency's distance from the other agencies on shared claims, as the comparison page
 shows it with no debate filter: the mean deviation per candidate, the distance (Flávio minus
-Lula), its 90% interval and the sentence of the fixed rule.`)
+Lula), its 97.5% interval and the sentence of the fixed rule.`)
   } else console.log(await leanReport(values['data-dir']))
 }

@@ -51,7 +51,7 @@
     <li>Para cada agência, o site tira a média dos desvios nas falas de cada candidato.</li>
     <li>A distância é a média nas falas de Flávio Bolsonaro menos a média nas falas de Lula. Positiva quer dizer mais dura com Flávio; negativa, mais dura com Lula; zero, igual às outras.</li>
   </ol>
-  <p>O intervalo de 90% vem de um bootstrap: o site sorteia de novo, com reposição, os desvios de cada candidato, recalcula a distância 5000 vezes e guarda os valores entre o 5º e o 95º percentil. O sorteio usa um gerador fixo, então os mesmos dados dão sempre os mesmos números.</p>
+  <p>O intervalo de 97,5% vem de um bootstrap: o site sorteia de novo, com reposição, os desvios de cada candidato, recalcula a distância 5000 vezes e guarda os valores do meio, deixando de fora 1,25% em cada ponta. O sorteio usa um gerador fixo, então os mesmos dados dão sempre os mesmos números. Usamos 97,5% para cada agência porque são quatro: assim, a chance de alguma aparecer como mais dura só por acaso fica perto de 1 em 10.</p>
   <p>A frase ao lado de cada agência segue uma regra fixa:</p>
   <ul>
     <li>intervalo que contém o zero: “sem diferença clara entre os candidatos”;</li>

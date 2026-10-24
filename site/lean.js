@@ -14,6 +14,10 @@ export const SCORE = /** @type {Record<string, number>} */ ({
 // Below this many deviations for either candidate, no interval and no sentence (LEAN-04).
 export const MIN_N = 10
 export const B = 5000
+// The interval is 97.5% per agency, so that with four agencies the chance that any one gets a
+// "mais dura" sentence by chance alone is about 1 in 10 (1 - 0.975^4). Each tail leaves out
+// 1.25% of the sorted resamples: sorted[62] to sorted[4937].
+const TAIL = Math.floor(B * 0.0125)
 
 // How the fixed sentences name each candidate; any other candidate goes by its short name.
 const NAMES = /** @type {Record<string, string>} */ ({ lula: 'Lula', flavio: 'Flávio Bolsonaro' })
@@ -37,7 +41,7 @@ export function deviations(rows) {
   })
 }
 
-// Percentile bootstrap of mean(c2) - mean(c1), 90%. The generator is a fixed LCG started at 42,
+// Percentile bootstrap of mean(c2) - mean(c1), 97.5%. The generator is a fixed LCG started at 42,
 // one per agency, so the same data always gives the same interval (LEAN-02).
 /** @param {number[]} c1 @param {number[]} c2 @returns {[number, number]} */
 export function interval(c1, c2) {
@@ -56,7 +60,7 @@ export function interval(c1, c2) {
     stats[b] = m2 - draw(c1)
   }
   stats.sort()
-  return [stats[Math.round(B * 0.05)], stats[Math.round(B * 0.95) - 1]]
+  return [stats[TAIL], stats[B - 1 - TAIL]]
 }
 
 // Per agency in name order: n and mean deviation per candidate in ballot order, the distance

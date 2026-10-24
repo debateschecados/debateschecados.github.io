@@ -294,7 +294,11 @@ describe('metodologia.html, distance and changed verdicts (LEAN-08)', () => {
       'A distância é a média nas falas de Flávio Bolsonaro menos a média nas falas de Lula.',
     )
     expect(text).toContain(`recalcula a distância ${B} vezes`)
-    expect(text).toContain('entre o 5º e o 95º percentil')
+    expect(text).toContain('O intervalo de 97,5% vem de um bootstrap')
+    expect(text).toContain('guarda os valores do meio, deixando de fora 1,25% em cada ponta')
+    expect(text).toContain(
+      'Usamos 97,5% para cada agência porque são quatro: assim, a chance de alguma aparecer como mais dura só por acaso fica perto de 1 em 10.',
+    )
     expect(text).toContain('gerador fixo, então os mesmos dados dão sempre os mesmos números')
     const ctx = createContext({ ...config, records: [] })
     for (const [rule, verdict] of [

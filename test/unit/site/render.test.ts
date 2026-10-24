@@ -392,8 +392,8 @@ describe('leanHtml, the axes (LEAN-03, LEAN-04, LEAN-06)', () => {
       'Amostra pequena.',
     ])
     expect(rows.map((_, li) => $(li).find('.nums').text()).get()).toEqual([
-      'Distância +0,25, intervalo de 90% de +0,10 a +0,40.',
-      'Distância −0,05, intervalo de 90% de −0,20 a +0,10.',
+      'Distância +0,25, intervalo de 97,5% de +0,10 a +0,40.',
+      'Distância −0,05, intervalo de 97,5% de −0,20 a +0,10.',
       'Distância −0,10. Menos de 10 falas de um dos candidatos, sem intervalo.',
       'Sem falas em comum para medir.',
     ])
@@ -406,7 +406,7 @@ describe('leanHtml, the axes (LEAN-03, LEAN-04, LEAN-06)', () => {
     ).toEqual(['com Lula −0,10, 12 falas', 'com Flávio +0,15, 11 falas'])
     expect(rows.eq(3).find('.sub span').first().text()).toBe('com Lula sem dados, 0 falas')
     expect(rows.eq(0).find('svg').attr('aria-label')).toBe(
-      'Aos Fatos: mais dura com Flávio Bolsonaro do que as outras agências. Distância +0,25, intervalo de 90% de +0,10 a +0,40.',
+      'Aos Fatos: mais dura com Flávio Bolsonaro do que as outras agências. Distância +0,25, intervalo de 97,5% de +0,10 a +0,40.',
     )
     expect(
       $('.ends .end')
