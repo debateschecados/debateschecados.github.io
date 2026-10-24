@@ -128,7 +128,10 @@ const writeConfig = (debates: ReturnType<typeof debate>[]) =>
     }),
     writeJson(join(configDir, 'debates.json'), { debates }),
     writeJson(join(configDir, 'bands.json'), {
-      alpha: [{ label: '#FATO', band: 'verdadeiro', definitionUrl: null }],
+      alpha: [
+        { label: '#FATO', band: 'verdadeiro', definitionUrl: null },
+        { label: '#INCONCLUSIVO', band: 'sem faixa', definitionUrl: null },
+      ],
       beta: [{ label: 'FALSO', band: 'falso', definitionUrl: null }],
     }),
     writeJson(join(configDir, 'id-links.json'), {}),
@@ -253,6 +256,17 @@ describe('ingest (INGEST-01, INGEST-02, INGEST-05, INGEST-09)', () => {
     const ids = (await published()).filter((r) => r.sourceId === `beta-${BAND}`).map((r) => r.id)
     expect(sources[`beta-${BAND}`].awaitingArchive).toEqual(ids.sort())
     expect(sources[`alpha-${BAND}`]).toMatchObject({ status: 'ok', items: 5, unmappedLabels: [] })
+  })
+
+  it('does not report a label mapped to "sem faixa" on purpose as unmapped (DATA-03)', async () => {
+    await writePage(`alpha-${BAND}`, {
+      items: [1, 2, 3, 4].map((n) => item(n)).concat(item(5, { label: '#INCONCLUSIVO' })),
+    })
+    await run(fakeClock())
+    const { sources } = await reported()
+    expect(sources[`alpha-${BAND}`]).toMatchObject({ status: 'ok', items: 5, unmappedLabels: [] })
+    const record = (await published()).find((r) => r.label === '#INCONCLUSIVO')
+    expect(record?.band).toBe('sem faixa')
   })
 
   it('excludes a speaker whose name only starts with a candidate alias (INGEST-05)', async () => {
