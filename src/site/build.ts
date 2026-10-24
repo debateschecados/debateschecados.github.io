@@ -29,17 +29,22 @@ export interface BuildOptions {
 
 type Context = ReturnType<typeof createContext>
 
-// Replaces every <!--name--> and {{name}} slot; a slot missing from the template is an error,
-// so template and build can't drift apart silently.
+// Replaces every <!--name--> and {{name}} slot in one pass over the template, so agency text
+// inside a filled value is never read as a slot. A template slot without a value, or a value
+// without a slot, is an error, so template and build can't drift apart silently.
 function fill(template: string, slots: Record<string, string>) {
-  let out = template
-  for (const [name, value] of Object.entries(slots)) {
-    const marks = [`<!--${name}-->`, `{{${name}}}`].filter((m) => out.includes(m))
-    if (!marks.length) throw new Error(`template has no slot "${name}"`)
-    for (const mark of marks) out = out.replaceAll(mark, () => value)
-  }
-  const left = out.match(/<!--[a-z]+-->|\{\{[a-zA-Z]+\}\}/)
-  if (left) throw new Error(`template slot ${left[0]} was not filled`)
+  const used = new Set<string>()
+  const out = template.replace(
+    /<!--([a-zA-Z]+)-->|\{\{([a-zA-Z]+)\}\}/g,
+    (mark, comment?: string, braces?: string) => {
+      const name = comment ?? braces ?? ''
+      if (!Object.hasOwn(slots, name)) throw new Error(`template slot ${mark} was not filled`)
+      used.add(name)
+      return slots[name]
+    },
+  )
+  const unused = Object.keys(slots).find((name) => !used.has(name))
+  if (unused) throw new Error(`template has no slot "${unused}"`)
   return out
 }
 

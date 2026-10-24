@@ -105,6 +105,23 @@ describe('index.html (SITE-01)', () => {
     expect(index('footer a[href="checks.csv"]')).toHaveLength(1)
     expect(index('footer a[href="metodologia.html"]')).toHaveLength(1)
   })
+
+  it('shows agency text that looks like a template slot as plain text', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'site-build-'))
+    try {
+      const quote = 'usou o termo {{fake}}, {{data}} e {{repo}} no debate'
+      const odd = { ...fixtureRecords()[0], quote, label: '{{list}}' }
+      const built = await buildFixture(dir, [odd, ...fixtureRecords().slice(1)])
+      const $ = load(await readFile(join(built.outDir, 'index.html'), 'utf8'))
+      const li = $(`#list li[data-id="${odd.id}"]`)
+      expect(li.find('.quote').text()).toBe(`“${quote}”`)
+      expect(li.find('.verdict h3').text()).toBe('{{list}}')
+      expect(JSON.parse($('script#data').text()).records[0]).toEqual(odd)
+      expect($('#list > li[data-id]')).toHaveLength(records.length)
+    } finally {
+      await rm(dir, { recursive: true, force: true })
+    }
+  })
 })
 
 describe('metodologia.html (DATA-03, DATA-07, AUDIT-08)', () => {
