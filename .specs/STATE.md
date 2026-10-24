@@ -69,11 +69,11 @@
 
 ## Handoff
 
-- **Feature**: `.specs/features/debate-archive`
-- **Phase / Task**: Execute done, T1 to T24 complete; Verifier PASS at iteration 3 (`validation.md`, validate_state 0 errors)
-- **Completed**: all tasks, reviewer and fix rounds per batch, first live dataset in `data/` (314 records, 8 sources ok), Verifier gaps 1 and 2 of iteration 3 closed by `076d2ef` and `7e97dfb`
+- **Feature**: `.specs/features/agency-comparator`
+- **Phase / Task**: Execute done, T1 to T15 complete (phase 3: T9 to T15 plus review fixes); Verifier PASS at iteration 3c (`validation.md`, validate_state 0 errors)
+- **Completed**: distance per agency with a 97.5% bootstrap interval (AD-008, LEAN-01..08), headline that leaves small samples out of the count, verdict changes as timelines (DRIFT-01..05), repair of the Estadão checks split by the 2026-10-24 run (`data/repairs/2026-10-24-estadao.json`), merge of `main` up to #9 (top bar link "Comparar", links without `.html`, GoatCounter on the page)
 - **In-progress** (file:line): none
-- **Next step**: needs the user's go-ahead for outward actions: create the GitHub repo `debates-checados/debates-checados`, rename `master` to `main`, push, set secrets `IA_S3_ACCESS`/`IA_S3_SECRET` (rotated keys), Pages source "GitHub Actions", run the `update` workflow once
-- **Open items**: 83 records await a Wayback snapshot (g1 Band, Aos Fatos Globo Escriba API); web.archive.org refused IPv4 connections from the dev machine after the first run, CI retries every 2 h. Iteration-3 minor gap: `fetchedAt` on silent changes is untested and unspecified (R04)
+- **Next step**: needs the user's go-ahead to push branch `phase3-merge` and open the PR into `main`; before that, confirm `origin/main` has no data commit after `bc3a25d` (the repair refuses otherwise)
+- **Open items**: two minor test gaps in the LEAN-06 contrast probe (M23 opacity on `.lean-row`, M24 CSS filter), see `validation.md` iteration 3c; `data/run-report.json` keeps the 19 stale Estadão `awaitingArchive` ids until the next ingest; `test/e2e/site.test.ts` was red on `main` (5 rules expected, 4 shipped), fixed on this branch; CI runs unit tests only
 - **Uncommitted files**: none
-- **Branch**: `master` (local only, workflow and site links expect `main`)
+- **Branch**: `phase3-merge` (local, worktree in the session scratchpad), based on `origin/main` `ee538ef`
