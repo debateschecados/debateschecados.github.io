@@ -161,6 +161,27 @@ describe('step 2: partial parse guard (INGEST-06)', () => {
     ])
   })
 
+  it('accepts the drop only for the named source and keeps the other one partial', () => {
+    const quote = (p: number) => `Fala da Lupa número ${p} sobre outro tema do debate`
+    const previous = first([
+      g1(range(10).map((p) => g1Item(p))),
+      lupa(range(10).map((p) => lupaItem(p, quote(p)))),
+    ])
+    const { records, events } = merge(
+      previous,
+      [g1(range(7).map((p) => g1Item(p))), lupa(range(7).map((p) => lupaItem(p, quote(p))))],
+      ctx({ acceptDrop: new Set([G1]) }),
+    )
+    expect(events.filter((e) => e.type === 'source')).toEqual([
+      { type: 'source', sourceId: G1, status: 'ok', reason: null },
+      { type: 'source', sourceId: LUPA, status: 'partial', reason: '7 items, 10 published' },
+    ])
+    expect(records.filter((r) => r.sourceId === LUPA)).toEqual(
+      previous.filter((r) => r.sourceId === LUPA),
+    )
+    expect(records.filter((r) => r.sourceId === G1 && r.missingSince)).toHaveLength(3)
+  })
+
   it('accepts exactly 80% and ignores the guard below 5 previous records', () => {
     const at80 = merge(ten(), [g1(range(8).map((p) => g1Item(p)))], ctx())
     expect(at80.events[0]).toMatchObject({ status: 'ok' })
