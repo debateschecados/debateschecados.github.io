@@ -154,7 +154,10 @@ describe('layout (SITE-06)', () => {
     const page = await open('/', { viewport: { width: 360, height: 740 } })
     const overflow = () => page.evaluate(() => document.documentElement.scrollWidth - innerWidth)
     expect(await overflow()).toBeLessThanOrEqual(0)
-    await page.check('[data-removed]')
+    await page.click('[data-tab="removed"]')
+    await settle(page)
+    expect(await overflow()).toBeLessThanOrEqual(0)
+    await page.fill('#q', 'teste')
     await settle(page)
     expect(await overflow()).toBeLessThanOrEqual(0)
     await page.click('.audit-fab')
@@ -234,7 +237,7 @@ describe('list, filters and URL (SITE-01, SITE-03, SHARE-01, SHARE-02)', () => {
     const focused = () =>
       page.evaluate(() => {
         const el = document.activeElement as HTMLElement
-        return el.dataset.key ?? (el.matches('[data-removed]') ? 'removed' : el.tagName)
+        return el.dataset.key ?? el.dataset.tab ?? el.tagName
       })
     const outlets = await page.$$eval('select[data-key="outlet"] option', (os) =>
       os.map((o) => (o as HTMLOptionElement).value),
@@ -250,13 +253,23 @@ describe('list, filters and URL (SITE-01, SITE-03, SHARE-01, SHARE-02)', () => {
     expect(await focused()).toBe('outlet')
 
     const all = await open()
-    await all.focus('[data-removed]')
+    await all.focus('[data-tab="removed"]')
     await all.keyboard.press('Space')
     await settle(all)
     expect(new URL(all.url()).searchParams.get('removed')).toBe('1')
     expect(
-      await all.evaluate(() => (document.activeElement as HTMLElement).matches('[data-removed]')),
+      await all.evaluate(() =>
+        (document.activeElement as HTMLElement).matches('[data-tab="removed"]'),
+      ),
     ).toBe(true)
+
+    // Typing in the search box keeps the caret and the focus while the list re-renders.
+    const typing = await open()
+    await typing.focus('#q')
+    await typing.keyboard.type('numero 12,')
+    await settle(typing)
+    expect(await typing.inputValue('#q')).toBe('numero 12,')
+    expect(await typing.evaluate(() => document.activeElement?.id)).toBe('q')
 
     // The clear button leaves with the empty state; focus moves to the first filter.
     const empty = await open('/?outlet=g1&band=sem+faixa')
@@ -293,29 +306,55 @@ describe('scoreboard numbers (SCORE-01, SCORE-02, SCORE-04)', () => {
 })
 
 describe('removed records (HIST-02)', () => {
-  it('shows tagged removed items behind the toggle, outside the scoreboard', async () => {
+  it('shows tagged removed items on their own tab, outside the scoreboard', async () => {
     const page = await open()
     const before = await totals(page)
-    const toggle = page.locator('label.toggle')
-    expect(await toggle.textContent()).toBe(`Mostrar removidos (${removed.length})`)
-    await page.check('[data-removed]')
+    expect(await page.textContent('[data-tab="removed"]')).toBe(`Removidas ${removed.length}`)
+    await page.click('[data-tab="removed"]')
     await settle(page)
     const ids = await listedIds(page)
-    expect(ids).toHaveLength(records.length)
+    expect(ids.sort()).toEqual(removed.map((r) => r.id).sort())
     const first = removed.find((r) => r.missingSince === '2026-10-25') as CheckRecord
     expect(await page.textContent(`#list li[data-id="${first.id}"] .gone`)).toBe(
       'não encontrado na fonte desde 25/10/2026',
     )
-    expect(await totals(page)).toEqual(before)
+    expect(await page.isHidden('#board')).toBe(true)
+    expect(await page.textContent('#notice')).toContain('tiraram do ar')
     expect(new URL(page.url()).searchParams.get('removed')).toBe('1')
     const shared = await open('/?removed=1')
-    expect(await listedIds(shared)).toEqual(ids)
-    expect(await shared.isChecked('[data-removed]')).toBe(true)
+    expect((await listedIds(shared)).sort()).toEqual(ids)
+    expect(await shared.getAttribute('[data-tab="removed"]', 'aria-pressed')).toBe('true')
+    await shared.click('[data-tab="live"]')
+    await settle(shared)
+    expect(await totals(shared)).toEqual(before)
+    expect(await shared.isVisible('#board')).toBe(true)
   })
 
-  it('hides the toggle when no removed record matches the filters', async () => {
+  it('keeps the removed tab, with zero, when the filters match none', async () => {
     const page = await open('/?outlet=aosfatos')
-    expect(await page.locator('[data-removed]').count()).toBe(0)
+    expect(await page.locator('[data-tab="removed"]').textContent()).toBe('Removidas 0')
+  })
+})
+
+describe('search', () => {
+  it('filters the list and the scoreboard as you type, and lives in the URL', async () => {
+    const page = await open()
+    await page.fill('#q', 'NUMERO 12,')
+    await settle(page)
+    expect(await listedIds(page)).toEqual(['00000000000c'])
+    expect(new URL(page.url()).searchParams.get('q')).toBe('NUMERO 12,')
+    const shared = await open('/?q=n%C3%BAmero+12%2C')
+    expect(await shared.inputValue('#q')).toBe('número 12,')
+    expect(await listedIds(shared)).toEqual(['00000000000c'])
+  })
+
+  it('shows the empty state and clears the box with the filters', async () => {
+    const page = await open('/?q=zzzz')
+    expect(await page.locator('#list .empty').count()).toBe(1)
+    await page.click('#list .empty [data-clear]')
+    await settle(page)
+    expect(await page.inputValue('#q')).toBe('')
+    expect(await listedIds(page)).toHaveLength(records.length - removed.length)
   })
 })
 

@@ -1,6 +1,6 @@
 // String templates shared by the build (pre-rendered page) and the browser.
 
-import { BANDS, optionCount, removedCount } from './core.js'
+import { BANDS, hasRemoved, liveCount, optionCount, removedCount } from './core.js'
 
 /** @typedef {import('./core.js').Context} Context */
 /** @typedef {import('./core.js').State} State */
@@ -105,13 +105,25 @@ const select = (ctx, state, key, label, all, values) => {
   return `<label>${label}<select data-key="${key}"><option value="">${all}</option>${opts}</select></label>`
 }
 
-// Filter bar. The removed toggle shows only when some removed record matches (HIST-02).
+// Tabs: live checks, and the ones the agencies took down (HIST-02). Counts follow the filters.
+/** @param {Context} ctx @param {State} state */
+export function tabsHtml(ctx, state) {
+  if (!hasRemoved(ctx)) return ''
+  const tab = (
+    /** @type {boolean} */ removed,
+    /** @type {string} */ name,
+    /** @type {number} */ n,
+  ) =>
+    `<button type="button" data-tab="${removed ? 'removed' : 'live'}" aria-pressed="${state.removed === removed}">${name} <span>${n}</span></button>`
+  return (
+    tab(false, 'Checagens', liveCount(ctx, state)) +
+    tab(true, 'Removidas', removedCount(ctx, state))
+  )
+}
+
+// Filter bar. The search box lives outside it so typing never loses focus.
 /** @param {Context} ctx @param {State} state @param {number} shown */
 export function filtersHtml(ctx, state, shown) {
-  const removed = removedCount(ctx, state)
-  const toggle = removed
-    ? `<label class="toggle"><input type="checkbox" data-removed${state.removed ? ' checked' : ''}>Mostrar removidos (${removed})</label>`
-    : ''
   return (
     select(
       ctx,
@@ -137,7 +149,6 @@ export function filtersHtml(ctx, state, shown) {
       'Todos',
       BANDS.map((b) => [b.id, b.name]),
     ) +
-    toggle +
     `<span class="count"><span class="n">${shown}</span> checagens</span>`
   )
 }

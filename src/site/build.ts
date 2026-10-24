@@ -11,6 +11,7 @@ import {
   filtersHtml,
   fullDate,
   itemHtml,
+  tabsHtml,
 } from '../../site/render.js'
 import { type Config, loadConfig } from '../config.ts'
 import { labelKey } from '../pipeline/normalize.ts'
@@ -160,8 +161,9 @@ export async function build({ siteDir, dataDir, configDir, outDir, repo }: Build
     debates: debatesHtml(ctx),
     board: boardHtml(scoreboard(ctx, items), state, ctx),
     notice: esc(notice(ctx, state)),
+    tabs: tabsHtml(ctx, state),
     filters: filtersHtml(ctx, state, items.length),
-    // Every record, removed ones included; CSS hides those until the toggle is on.
+    // Every record, removed ones included; CSS hides the removed ones until the browser takes over.
     list: ctx.records.map((r) => itemHtml(r, ctx)).join('\n'),
     auditPrompt: agents.auditPrompt,
     jsonLd: agents.jsonLd.replaceAll('<', '\\u003c'),
