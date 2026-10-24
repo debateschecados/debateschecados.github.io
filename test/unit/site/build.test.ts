@@ -6,11 +6,14 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import pkg from '../../../package.json' with { type: 'json' }
 import { createContext, emptyState, listed } from '../../../site/core.js'
 import { type Config, loadConfig } from '../../../src/config.ts'
+import { CSV_COLUMNS } from '../../../src/pipeline/write.ts'
+import { AGENT_FILES, auditPrompt } from '../../../src/site/agents.ts'
 import type { CheckRecord } from '../../../src/types.ts'
 import { buildFixture, fixtureRecords } from '../../fixtures/site.ts'
 
 const ROOT = join(import.meta.dirname, '../../..')
 const REPO = pkg.repository
+const ORIGIN = pkg.homepage.replace(/\/$/, '')
 
 let tmp: string
 let outDir: string
@@ -62,9 +65,9 @@ describe('index.html (SITE-01)', () => {
     expect(data.candidates).toEqual(config.candidates)
     expect(data.outlets).toEqual(config.outlets)
     expect(data.debates.map((d: { id: string }) => d.id)).toEqual(config.debates.map((d) => d.id))
-    // Only the data script and app.js close a script; the quote's "</script>" stays inert.
-    expect(indexHtml.match(/<\/script>/g)).toHaveLength(2)
-    expect(index('script')).toHaveLength(2)
+    // The data script, the dataset JSON-LD and app.js close a script. The quote's "</script>" stays inert.
+    expect(indexHtml.match(/<\/script>/g)).toHaveLength(3)
+    expect(index('script')).toHaveLength(3)
   })
 
   it('pre-renders the general scoreboard, notice and both sprites in ballot order', () => {
@@ -100,6 +103,7 @@ describe('index.html (SITE-01)', () => {
       `${REPO}/commits/main`,
     ])
     const prompt = index('#prompt').text()
+    expect(prompt).toBe(auditPrompt(REPO))
     expect(prompt).toContain(`Código e dados: ${REPO}\n`)
     expect(prompt).toContain(`Todas as checagens: ${REPO}/blob/main/data/checks.csv\n`)
     expect(prompt.match(/^\d\. /gm)).toEqual(['1. ', '2. ', '3. ', '4. ', '5. '])
@@ -292,11 +296,77 @@ describe('dist layout (DATA-01, DATA-05)', () => {
       .filter((d) => d.isFile())
       .map((d) => join(d.parentPath, d.name).slice(outDir.length + 1))
     expect(dist.sort()).toEqual(
-      [...site, 'checks.json', 'checks.csv', 'run-report.json', 'bands.json'].sort(),
+      [
+        ...site,
+        'checks.json',
+        'checks.csv',
+        'run-report.json',
+        'bands.json',
+        ...AGENT_FILES,
+      ].sort(),
     )
     expect(dist.filter((f) => f.endsWith('.html')).sort()).toEqual([
       'index.html',
       'metodologia.html',
     ])
+  })
+})
+
+describe('agent files', () => {
+  const read = (file: string) => readFile(join(outDir, file), 'utf8')
+
+  it('publishes an llms.txt index whose links resolve, and the same audit prompt', async () => {
+    const llms = await read('llms.txt')
+    expect(llms.startsWith('# Debates checados\n')).toBe(true)
+    expect(llms.split('\n')[2]).toMatch(/^> /)
+    const sections = llms.split(/^## /m).slice(1)
+    expect(sections.length).toBeGreaterThan(0)
+    for (const section of sections) {
+      const body = section
+        .split('\n')
+        .slice(1)
+        .filter((line) => line.trim())
+      expect(body.every((line) => line.startsWith('- ['))).toBe(true)
+    }
+    const links = [...llms.matchAll(/\]\(([^)]+)\)/g)].map((match) => match[1])
+    const local = links.filter((href) => href.startsWith(`${ORIGIN}/`))
+    expect(local.length).toBeGreaterThan(0)
+    for (const href of local) {
+      expect(await read(href.slice(ORIGIN.length + 1)), href).not.toMatch(/\{\{/)
+    }
+    expect(await read('auditoria.md')).toContain(index('#prompt').text())
+    expect(await read('llms-full.txt')).toContain(index('#prompt').text())
+    expect(await read('index.html.md')).toBe(await read('index.md'))
+    expect(index('link[rel="describedby"]').attr('href')).toBe('llms.txt')
+    expect(index('link[rel="alternate"][type="text/markdown"]').attr('href')).toBe('index.md')
+    expect(method('link[rel="alternate"][type="text/markdown"]').attr('href')).toBe(
+      'metodologia.md',
+    )
+    expect(index('footer a[href="llms.txt"]')).toHaveLength(1)
+  })
+
+  it('lets an agent read the site and refuses training', async () => {
+    const robots = await read('robots.txt')
+    expect(robots).toContain('Allow: /')
+    expect(robots).toContain('Content-Signal: search=yes, ai-input=yes, ai-train=no')
+    expect(robots).toContain(`Sitemap: ${ORIGIN}/sitemap.xml`)
+    expect(robots).not.toMatch(/^Disallow:/m)
+    const sitemap = await read('sitemap.xml')
+    expect(sitemap).toContain(`${ORIGIN}/llms.txt`)
+    expect(sitemap).toContain(`${ORIGIN}/checks.csv`)
+    expect(sitemap).toContain(`${ORIGIN}/auditoria.md`)
+  })
+
+  it('describes every csv column and the dataset', async () => {
+    const meta = JSON.parse(await read('checks.csv-metadata.json')) as {
+      tableSchema: { columns: { name: string }[] }
+    }
+    expect(meta.tableSchema.columns.map((column) => column.name)).toEqual([...CSV_COLUMNS])
+    const ld = JSON.parse(index('script[type="application/ld+json"]').text()) as {
+      '@graph': { '@type': string }[]
+    }
+    expect(ld['@graph'].map((node) => node['@type'])).toEqual(['WebSite', 'Dataset'])
+    expect(JSON.parse(await read('dataset.json'))).toEqual(ld)
+    expect(await read('metodologia.md')).toContain(config.outlets.lupa.name)
   })
 })

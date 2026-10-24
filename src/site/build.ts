@@ -15,6 +15,7 @@ import {
 import { type Config, loadConfig } from '../config.ts'
 import { labelKey } from '../pipeline/normalize.ts'
 import type { CheckRecord } from '../types.ts'
+import { agentBundle } from './agents.ts'
 
 const ROOT = join(import.meta.dirname, '../..')
 const DATA_FILES = ['checks.json', 'checks.csv', 'run-report.json']
@@ -143,6 +144,7 @@ export async function build({ siteDir, dataDir, configDir, outDir, repo }: Build
   const records = JSON.parse(await readFile(join(dataDir, 'checks.json'), 'utf8')) as CheckRecord[]
   const debates = config.debates.map(({ id, date, broadcaster }) => ({ id, date, broadcaster }))
   const ctx = createContext({ ...config, debates, records })
+  const agents = agentBundle({ origin: pkg.homepage.replace(/\/$/, ''), repo, config, ctx })
   const state = emptyState()
   const items = listed(ctx, state)
   const repoSlots = { repo: esc(repo), repoLabel: esc(repo.replace(/^https?:\/\//, '')) }
@@ -161,6 +163,8 @@ export async function build({ siteDir, dataDir, configDir, outDir, repo }: Build
     filters: filtersHtml(ctx, state, items.length),
     // Every record, removed ones included; CSS hides those until the toggle is on.
     list: ctx.records.map((r) => itemHtml(r, ctx)).join('\n'),
+    auditPrompt: agents.auditPrompt,
+    jsonLd: agents.jsonLd.replaceAll('<', '\\u003c'),
     data: jsonScript('data', {
       records,
       candidates: config.candidates,
@@ -178,6 +182,7 @@ export async function build({ siteDir, dataDir, configDir, outDir, repo }: Build
     order: ctx.candidates.map((c) => `${c.number}, ${esc(c.name)}`).join('; '),
   })
   await writeFile(join(outDir, 'metodologia.html'), method)
+  for (const [name, body] of Object.entries(agents.files)) await writeFile(join(outDir, name), body)
 }
 
 if (import.meta.main) {
