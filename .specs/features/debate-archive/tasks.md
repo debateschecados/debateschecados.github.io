@@ -417,6 +417,8 @@ T22 → T24
 
 **Commit**: `feat(adapters): Parse Estadão Verifica pages from embedded JSON`
 
+**Status**: ✅ Complete
+
 ---
 
 ### T12: Parse Aos Fatos pages and the Escriba API
