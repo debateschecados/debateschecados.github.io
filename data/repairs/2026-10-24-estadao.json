@@ -1,0 +1,97 @@
+{
+  "source": "estadao-globo-2026-10-23",
+  "before": "e13bac2",
+  "after": "bc3a25d",
+  "merged": [
+    {
+      "from": "1b17b7e00a30",
+      "into": "43b26241e33c"
+    },
+    {
+      "from": "1d23acc96c8f",
+      "into": "427606626ad3"
+    },
+    {
+      "from": "285efb55550d",
+      "into": "26eca3528f77"
+    },
+    {
+      "from": "4a96600fe438",
+      "into": "ba283740847c"
+    },
+    {
+      "from": "6952385310a6",
+      "into": "d5bca87d832d"
+    },
+    {
+      "from": "6f23703ca18a",
+      "into": "ffe180e99084"
+    },
+    {
+      "from": "79b92a3dbe26",
+      "into": "b80d13fea28a"
+    },
+    {
+      "from": "8ad28e1c3f86",
+      "into": "e84a6f94f449"
+    },
+    {
+      "from": "8ea83d9e258f",
+      "into": "2fbfdbe7c524"
+    },
+    {
+      "from": "8f39932dc0d6",
+      "into": "1db722ab7d1a"
+    },
+    {
+      "from": "8fe7235a13e9",
+      "into": "d9616142619b"
+    },
+    {
+      "from": "a4233402f41b",
+      "into": "9a394c68e8d9"
+    },
+    {
+      "from": "c5afd7814604",
+      "into": "fdc679ed7206"
+    },
+    {
+      "from": "c9d9d979f098",
+      "into": "673d8a46f845"
+    },
+    {
+      "from": "cc7d8d25a594",
+      "into": "df548ecb7998"
+    },
+    {
+      "from": "d381c464abc3",
+      "into": "cd25bcc68692"
+    },
+    {
+      "from": "d5bca87d832d",
+      "into": "dc327bf432c8"
+    },
+    {
+      "from": "d66535884747",
+      "into": "e6700dc918ab"
+    },
+    {
+      "from": "e8ecbe865d5d",
+      "into": "97dd907ad475"
+    },
+    {
+      "from": "e90042a6c321",
+      "into": "30c683088488"
+    }
+  ],
+  "new": [
+    "250b336d3ede",
+    "2c136b426d5c",
+    "35ffb6a8a59e",
+    "36f41645e2bc",
+    "84343acb4099",
+    "acf0629f0ba6",
+    "e7cfe3e76c20"
+  ],
+  "missing": []
+}

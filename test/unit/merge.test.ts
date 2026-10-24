@@ -415,8 +415,8 @@ describe('step 3: matching (INGEST-04)', () => {
     const moved = [g1Item(1, { quote: b.quote, speaker: 'flavio' }), g1Item(9, { quote: a.quote })]
     const { records, events } = merge(previous, [g1(moved)], ctx())
     expect(records.map((r) => [r.id, r.key, r.speaker, r.quote, r.history])).toEqual([
-      [b.id, 'chunk-1', 'flavio', b.quote, undefined],
-      [a.id, 'chunk-9', 'lula', a.quote, undefined],
+      [b.id, 'chunk-1', 'flavio', b.quote, [{ key: 'chunk-2', until: '2026-10-25' }]],
+      [a.id, 'chunk-9', 'lula', a.quote, [{ key: 'chunk-1', until: '2026-10-25' }]],
     ])
     expect(events.filter((e) => e.type === 'new' || e.type === 'missing')).toEqual([])
   })
@@ -556,6 +556,37 @@ describe('step 4: matched records (HIST-01)', () => {
     })
     expect(records[0].history).toBeUndefined()
     expect(records[0].evidence).toMatchObject({
+      archiveUrl: 'https://web.archive.org/web/1id_/x',
+      sha256: 'ab',
+    })
+  })
+
+  it('keeps the previous key in the same history entry as a label change (DRIFT-01)', () => {
+    const previous = first([g1([g1Item(1), g1Item(2)])])
+    const reissued = g1Item(9, { quote: previous[0].quote, label: '#FAKE' })
+    const { records } = merge(previous, [g1([reissued, g1Item(2)])], ctx())
+    expect(byId(records, previous[0].id)?.history).toEqual([
+      { label: '#FATO', key: 'chunk-1', until: '2026-10-25' },
+    ])
+  })
+
+  it('records a key-only change alone in history and keeps the archived copy (DRIFT-01)', () => {
+    const [record] = first([g1([g1Item(1)])])
+    const archived = {
+      ...record,
+      evidence: {
+        ...record.evidence,
+        archiveUrl: 'https://web.archive.org/web/1id_/x',
+        sha256: 'ab',
+      },
+    }
+    const reissued = g1Item(1, { key: 'chunk-77', fetchedAt: '2026-10-25T10:00:00Z' })
+    const { records } = merge([archived], [g1([reissued])], ctx())
+    expect(records[0]).toMatchObject({ id: record.id, key: 'chunk-77', label: '#FATO' })
+    expect(records[0].history).toEqual([{ key: 'chunk-1', until: '2026-10-25' }])
+    expect(records[0].evidence).toEqual({
+      url: PAGE,
+      fetchedAt: '2026-10-25T10:00:00Z',
       archiveUrl: 'https://web.archive.org/web/1id_/x',
       sha256: 'ab',
     })
