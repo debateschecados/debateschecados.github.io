@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { z } from 'zod'
-import { labelKey } from './pipeline/normalize.ts'
+import { labelKey, nameKey } from './pipeline/normalize.ts'
 import type { Adapter, SourceConfig } from './types.ts'
 
 const id = z.string().regex(/^[a-z0-9][a-z0-9-]*$/, 'expected a lowercase id (a-z, 0-9, -)')
@@ -116,9 +116,28 @@ export async function loadConfig(
   const bands = await readJson(dir, 'bands.json')
   const idLinks = await readJson(dir, 'id-links.json')
 
+  // resolveSpeaker compares nameKey(raw) with the aliases as written, first candidate wins.
+  const aliasOwner = new Map<string, string>()
+  candidates.forEach((candidate, c) => {
+    candidate.aliases.forEach((alias, a) => {
+      const path = [c, 'aliases', a]
+      const key = nameKey(alias)
+      if (key !== alias)
+        fail('candidates.json', path, `alias "${alias}" is not normalized, write "${key}"`)
+      const owner = aliasOwner.get(alias)
+      if (owner !== undefined && owner !== candidate.id)
+        fail('candidates.json', path, `alias "${alias}" is also an alias of "${owner}"`)
+      aliasOwner.set(alias, candidate.id)
+    })
+  })
+
   const candidateIds = new Set(candidates.map((c) => c.id))
+  const debateIds = new Set<string>()
   const sourceIds = new Set<string>()
   debates.forEach((debate, d) => {
+    if (debateIds.has(debate.id))
+      fail('debates.json', ['debates', d, 'id'], `duplicate debate id "${debate.id}"`)
+    debateIds.add(debate.id)
     debate.candidates.forEach((candidate, c) => {
       if (!candidateIds.has(candidate))
         fail('debates.json', ['debates', d, 'candidates', c], `unknown candidate "${candidate}"`)
@@ -139,6 +158,11 @@ export async function loadConfig(
       }
     })
   })
+
+  for (const sourceId of Object.keys(idLinks)) {
+    if (!sourceIds.has(sourceId))
+      fail('id-links.json', [sourceId], `unknown source "${sourceId}", not in debates.json`)
+  }
 
   for (const [outlet, entries] of Object.entries(bands)) {
     const seen = new Map<string, string>()

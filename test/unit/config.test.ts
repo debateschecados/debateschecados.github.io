@@ -75,6 +75,42 @@ describe('invalid config files fail naming file and field', () => {
     )
   })
 
+  it('rejects a duplicate debate id', async () => {
+    const dir = await configWith('debates.json', (json) => {
+      json.debates[1].id = json.debates[0].id
+    })
+    await expect(loadConfig(dir)).rejects.toThrow(
+      'debates.json: debates.1.id: duplicate debate id "band-2026-10-18"',
+    )
+  })
+
+  it('rejects an alias shared by two candidates', async () => {
+    const dir = await configWith('candidates.json', (json) => {
+      json[0].aliases.push('flavio')
+    })
+    await expect(loadConfig(dir)).rejects.toThrow(
+      'candidates.json: 1.aliases.0: alias "flavio" is also an alias of "lula"',
+    )
+  })
+
+  it('rejects an alias that is not written as its name key', async () => {
+    const dir = await configWith('candidates.json', (json) => {
+      json[1].aliases[1] = 'Flávio Bolsonaro'
+    })
+    await expect(loadConfig(dir)).rejects.toThrow(
+      'candidates.json: 1.aliases.1: alias "Flávio Bolsonaro" is not normalized, write "flavio bolsonaro"',
+    )
+  })
+
+  it('rejects an id-links.json entry for a source not in debates.json', async () => {
+    const dir = await configWith('id-links.json', (json) => {
+      json['lupa-sbt-2026-10-01'] = { 'o brasil voltou a crescer': '0123456789ab' }
+    })
+    await expect(loadConfig(dir)).rejects.toThrow(
+      'id-links.json: lupa-sbt-2026-10-01: unknown source "lupa-sbt-2026-10-01", not in debates.json',
+    )
+  })
+
   it('rejects a source whose outlet is not in outlets.json', async () => {
     const dir = await configWith('debates.json', (json) => {
       json.debates[0].sources[0].outlet = 'uol'
