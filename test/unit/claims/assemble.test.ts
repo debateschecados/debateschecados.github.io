@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 import { assemble, latestRun } from '../../../src/claims/assemble.ts'
+import type { BlindDebate } from '../../../src/claims/blind.ts'
 import {
   type ClaimGroup,
   type ClaimGroupsFile,
@@ -24,6 +25,10 @@ const REASON =
   'A checagem do g1 (5434697c0611) também avalia os 700 novos mercados; incluída na revisão do mantenedor em 2026-10-24.'
 
 const key = (refs: readonly string[]) => refs.toSorted().join(',')
+interface Judge {
+  components: { component: number; refs: string[] }[]
+  decisions: { component: number; groups: { refs: string[] }[] }[]
+}
 const records = async () => JSON.parse(await readFile(RECORDS, 'utf8')) as CheckRecord[]
 
 const dirs: string[] = []
@@ -100,6 +105,38 @@ describe('assemble the committed 2026-10-24 run (CLAIM-04, CLAIM-05, CLAIM-06)',
     const { file } = await assemble(run)
     expect(file.groups).toHaveLength(80)
     expect(file.groups.map((g) => key(g.records))).not.toContain('ab219f5a267e,d9d2cea5305a')
+  })
+
+  it('matches judge decisions to components by refs and drops refs from outside the component', async () => {
+    const dir = await dataCopy()
+    const run = join(dir, 'claim-curation/2026-10-24')
+    const judgePath = join(run, 'judge-band-2026-10-18.json')
+    const judge = JSON.parse(await readFile(judgePath, 'utf8')) as Judge
+    const expected = (await assemble(RUN)).file
+    // The adjudicated group gains a lula ref from another agency that no group uses.
+    const adjudicated = ['78fc2ef28ae7', 'b0c13289fb42']
+    const input = JSON.parse(await readFile(join(run, 'input.json'), 'utf8')) as BlindDebate[]
+    const lula = input
+      .flatMap((d) => d.partitions)
+      .find((p) => p.records.some((r) => r.ref === adjudicated[0])) as BlindDebate['partitions'][0]
+    const srcs = lula.records.filter((r) => adjudicated.includes(r.ref)).map((r) => r.src)
+    const used = new Set(expected.groups.flatMap((g) => g.records))
+    const outside = lula.records.find((r) => !srcs.includes(r.src) && !used.has(r.ref))
+    expect(outside).toBeDefined()
+    const group = judge.decisions
+      .flatMap((d) => d.groups)
+      .find((g) => key(g.refs) === key(adjudicated)) as Judge['decisions'][0]['groups'][0]
+    group.refs.push(String(outside?.ref))
+    // Reverse both lists and renumber, so neither position nor number lines up with before.
+    const last = judge.components.length - 1
+    judge.components = judge.components
+      .toReversed()
+      .map((c) => ({ ...c, component: last - c.component }))
+    judge.decisions = judge.decisions
+      .toReversed()
+      .map((d) => ({ ...d, component: last - d.component }))
+    await writeFile(judgePath, JSON.stringify(judge))
+    expect((await assemble(run)).file).toEqual(expected)
   })
 
   it('throws when a manual edit names a group that does not exist', async () => {
