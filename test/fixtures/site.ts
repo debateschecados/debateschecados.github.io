@@ -1,4 +1,10 @@
+import { join } from 'node:path'
+import pkg from '../../package.json' with { type: 'json' }
+import { writeData } from '../../src/pipeline/write.ts'
+import { build } from '../../src/site/build.ts'
 import type { CheckRecord, RunReport } from '../../src/types.ts'
+
+const ROOT = join(import.meta.dirname, '../..')
 
 // Small dataset for the site tests. Quotes are made up; labels and bands follow
 // config/bands.json. Records are listed out of display order on purpose.
@@ -108,4 +114,19 @@ export function fixtureReport(records: CheckRecord[]): RunReport {
     sources[r.sourceId].items++
   }
   return { sources }
+}
+
+// Writes the dataset files for `records` and builds the site from them into <dir>/dist.
+export async function buildFixture(dir: string, records = fixtureRecords()) {
+  const dataDir = join(dir, 'data')
+  const outDir = join(dir, 'dist')
+  await writeData(dataDir, records, fixtureReport(records))
+  await build({
+    siteDir: join(ROOT, 'site'),
+    dataDir,
+    configDir: join(ROOT, 'config'),
+    outDir,
+    repo: pkg.repository,
+  })
+  return { records, dataDir, outDir }
 }

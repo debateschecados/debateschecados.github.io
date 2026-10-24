@@ -240,7 +240,7 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 | INGEST-07 | P1: Collect the debate checks | Tasks: T8 | Implemented |
 | INGEST-08 | P1: Collect the debate checks | Tasks: T8 | Implemented |
 | INGEST-09 | P1: Collect the debate checks | Tasks: T7, T15 | Implemented |
-| SITE-01 | P1: Browse every check | Tasks: T20, T21 | Pending |
+| SITE-01 | P1: Browse every check | Tasks: T20, T21 | In Progress |
 | SITE-02 | P1: Browse every check | Tasks: T18 | Implemented |
 | SITE-03 | P1: Browse every check | Tasks: T17 | Implemented |
 | SITE-04 | P1: Browse every check | Tasks: T17 | Implemented |
@@ -252,13 +252,13 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 | SCORE-03 | P1: Scoreboards | Tasks: T17 | Implemented |
 | SCORE-04 | P1: Scoreboards | Tasks: T17 | Implemented |
 | SCORE-05 | P1: Scoreboards | Tasks: T17 | Implemented |
-| DATA-01 | P1: Open, auditable data | Tasks: T7, T20 | In Progress |
+| DATA-01 | P1: Open, auditable data | Tasks: T7, T20 | Implemented |
 | DATA-02 | P1: Open, auditable data | Tasks: T14 | Implemented |
-| DATA-03 | P1: Open, auditable data | Tasks: T3, T16, T20 | In Progress |
+| DATA-03 | P1: Open, auditable data | Tasks: T3, T16, T20 | Implemented |
 | DATA-04 | P1: Open, auditable data | Tasks: T7, T13 | Implemented |
-| DATA-05 | P1: Open, auditable data | Tasks: T1, T20 | In Progress |
+| DATA-05 | P1: Open, auditable data | Tasks: T1, T20 | Implemented |
 | DATA-06 | P1: Open, auditable data | Tasks: T14 | Implemented |
-| DATA-07 | P1: Open, auditable data | Tasks: T20, T23 | Pending |
+| DATA-07 | P1: Open, auditable data | Tasks: T20, T23 | In Progress |
 | AUDIT-01 | P1: Visible impartiality and self-service audit | Tasks: T21 | Pending |
 | AUDIT-02 | P1: Visible impartiality and self-service audit | Tasks: T21 | Pending |
 | AUDIT-03 | P1: Visible impartiality and self-service audit | Tasks: T19 | Implemented |
@@ -266,7 +266,7 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 | AUDIT-05 | P1: Visible impartiality and self-service audit | Tasks: T21 | Pending |
 | AUDIT-06 | P1: Visible impartiality and self-service audit | Tasks: T19 | Implemented |
 | AUDIT-07 | P1: Visible impartiality and self-service audit | Tasks: T21 | Pending |
-| AUDIT-08 | P1: Visible impartiality and self-service audit | Tasks: T19, T20 | In Progress |
+| AUDIT-08 | P1: Visible impartiality and self-service audit | Tasks: T19, T20 | Implemented |
 | HIST-01 | P2: Re-runs keep history | Tasks: T6 | Implemented |
 | HIST-02 | P2: Re-runs keep history | Tasks: T6, T17, T21 | In Progress |
 | SHARE-01 | P2: Shareable filters | Tasks: T17 | Implemented |

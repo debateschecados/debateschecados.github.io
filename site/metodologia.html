@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Como funciona · Debates checados</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="wrap doc">
+  <a class="back" href="./">← Voltar para as checagens</a>
+  <h1>Como funciona</h1>
+  <p>Este site reúne, sem alterar, as checagens que quatro agências publicaram sobre os debates do 2º turno de 2026. Esta página explica de onde vêm os dados, como eles são lidos e como os números são contados.</p>
+
+  <h2>Fontes e leitores</h2>
+  <p>Entra tudo o que cada agência publicou dentro da sua página de cobertura de cada debate, inclusive as falas verdadeiras. Cada formato de página tem um leitor próprio (o código em <code>src/adapters</code>), e o mesmo leitor vale para os dois candidatos. A versão do leitor fica gravada em cada registro.</p>
+  <div class="table-wrap"><!--sources--></div>
+
+  <h2>Rótulos e faixas</h2>
+  <p>O rótulo que aparece no site é sempre o original da agência. A faixa serve só para filtrar e contar. Rótulos que não cabem em verdadeiro, impreciso ou falso, como os que dizem que faltam dados para decidir, ficam em “Sem faixa”. Um rótulo novo, que ainda não está na tabela, também entra como “Sem faixa” até ser classificado em um commit público. A tabela completa está em <a href="bands.json">bands.json</a>.</p>
+  <div class="table-wrap"><!--bands--></div>
+
+  <h2>Rótulos por candidato</h2>
+  <p>A escolha da faixa de um rótulo pesa de forma diferente para cada candidato. Por isso a contagem de cada rótulo fica à vista, calculada a partir dos mesmos dados do site. Checagens que não estão mais na página da agência ficam de fora, como no placar.</p>
+  <div class="table-wrap"><!--counts--></div>
+
+  <h2>Ordem dos candidatos</h2>
+  <p>Os candidatos aparecem sempre em ordem crescente do número de urna: <!--order-->. É uma regra fixa, para que a posição à esquerda ou à direita não indique preferência.</p>
+
+  <h2>Placares</h2>
+  <p>Com uma agência escolhida, o placar conta só as checagens dela. Sem agência escolhida, o placar soma as checagens de todas. Cada agência escolhe o que checar, e a mesma fala pode aparecer uma vez por agência, então o placar geral soma checagens, não falas.</p>
+
+  <h2>Dados abertos</h2>
+  <p>Todas as checagens estão em <a href="checks.csv">checks.csv</a> e <a href="checks.json">checks.json</a> (CC BY 4.0). Cada registro tem o link da agência, a cópia arquivada na Wayback Machine quando ela já foi conferida, o SHA-256 dessa cópia, a data da coleta e a versão do leitor. O histórico de cada mudança fica nos <a href="{{repo}}/commits/main">commits do repositório</a>.</p>
+
+  <h2>Encontrou um erro?</h2>
+  <p>Abra uma issue em <a href="{{repo}}/issues">{{repoLabel}}/issues</a> dizendo qual é a checagem (o campo <code>id</code> do CSV) e o que está errado. Toda correção vira um commit público, com data.</p>
+
+  <h2>Créditos</h2>
+  <ul>
+    <li>Vereditos, falas e trechos: Aos Fatos, Estadão Verifica, g1 Fato ou Fake e Lupa. Cada checagem leva para a página original.</li>
+    <li>Ilustrações desenhadas a partir dos retratos oficiais: Luiz Inácio Lula da Silva, por Palácio do Planalto (CC BY 2.0); Flávio Bolsonaro, por Agência Senado. Os dois retratos estão no Wikimedia Commons.</li>
+    <li>Logos dos partidos e das emissoras: Wikimedia Commons. São marcas dos seus donos, usadas só para identificar.</li>
+    <li>Fontes Inter e Inter Tight, licença SIL Open Font License 1.1.</li>
+    <li>Código sob AGPL-3.0, dados sob CC BY 4.0.</li>
+  </ul>
+</main>
+<footer class="foot">
+  <div class="wrap">
+    <nav><a href="checks.csv">Baixar os dados</a><a href="./">Checagens</a><a href="{{repo}}">Código no GitHub</a></nav>
+    <p>Os vereditos são das agências. Este site só reúne e organiza o que elas publicaram. Ilustrações feitas a partir de retratos oficiais: Palácio do Planalto (CC BY 2.0) e Agência Senado. Logos dos partidos e das emissoras: Wikimedia Commons.</p>
+  </div>
+</footer>
+</body>
+</html>

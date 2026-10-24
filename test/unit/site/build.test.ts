@@ -1,0 +1,245 @@
+import { mkdtemp, readdir, readFile, rm } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { type CheerioAPI, load } from 'cheerio'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import pkg from '../../../package.json' with { type: 'json' }
+import { createContext, emptyState, listed } from '../../../site/core.js'
+import { type Config, loadConfig } from '../../../src/config.ts'
+import type { CheckRecord } from '../../../src/types.ts'
+import { buildFixture, fixtureRecords } from '../../fixtures/site.ts'
+
+const ROOT = join(import.meta.dirname, '../../..')
+const REPO = pkg.repository
+
+let tmp: string
+let outDir: string
+let dataDir: string
+let records: CheckRecord[]
+let config: Config
+let index: CheerioAPI
+let method: CheerioAPI
+let indexHtml: string
+
+beforeAll(async () => {
+  tmp = await mkdtemp(join(tmpdir(), 'site-build-'))
+  ;({ outDir, dataDir, records } = await buildFixture(tmp))
+  config = await loadConfig(join(ROOT, 'config'))
+  indexHtml = await readFile(join(outDir, 'index.html'), 'utf8')
+  index = load(indexHtml)
+  method = load(await readFile(join(outDir, 'metodologia.html'), 'utf8'))
+})
+afterAll(() => rm(tmp, { recursive: true, force: true }))
+
+const found = () => records.filter((r) => !r.missingSince)
+
+describe('index.html (SITE-01)', () => {
+  it('pre-renders one <li data-id> per record, in display order, without JavaScript', () => {
+    const items = index('#list > li[data-id]')
+    expect(items).toHaveLength(records.length)
+    const ctx = createContext({ ...config, records })
+    expect(items.map((_, li) => li.attribs['data-id']).get()).toEqual(ctx.records.map((r) => r.id))
+    const removed = index('#list > li.removed')
+    expect(
+      removed
+        .map((_, li) => li.attribs['data-id'])
+        .get()
+        .sort(),
+    ).toEqual(
+      records
+        .filter((r) => r.missingSince)
+        .map((r) => r.id)
+        .sort(),
+    )
+    expect(index('#list li[data-id="000000000012"] .verdict h3').text()).toBe(records[17].label)
+  })
+
+  it('inlines records and config as JSON that a quote cannot break out of', () => {
+    const data = JSON.parse(index('script#data[type="application/json"]').text())
+    expect(data.records).toEqual(records)
+    expect(data.candidates).toEqual(config.candidates)
+    expect(data.outlets).toEqual(config.outlets)
+    expect(data.debates.map((d: { id: string }) => d.id)).toEqual(config.debates.map((d) => d.id))
+    // Only the data script and app.js close a script; the quote's "</script>" stays inert.
+    expect(indexHtml.match(/<\/script>/g)).toHaveLength(2)
+    expect(index('script')).toHaveLength(2)
+  })
+
+  it('pre-renders the general scoreboard, notice and both sprites in ballot order', () => {
+    const totals = index('#board .cand')
+      .map((_, c) => [[c.attribs['data-speaker'], index(c).find('.total .n').text()]])
+      .get()
+    expect(totals).toEqual([
+      ['lula', String(found().filter((r) => r.speaker === 'lula').length)],
+      ['flavio', String(found().filter((r) => r.speaker === 'flavio').length)],
+    ])
+    expect(index('#notice').text()).toBe(
+      'Cada agência escolhe o que checar. A mesma fala pode aparecer uma vez por agência, então este placar soma checagens, não falas.',
+    )
+    const fighters = index('#duel .fighter')
+    expect(fighters.map((_, f) => `${f.attribs['data-sprite']}:${f.attribs.class}`).get()).toEqual([
+      'lula:fighter left',
+      'flavio:fighter right',
+    ])
+    expect(fighters.find('g.m-a')).toHaveLength(2)
+    expect(index('#filters .count .n').text()).toBe(
+      String(listed(createContext({ ...config, records }), emptyState()).length),
+    )
+  })
+
+  it('links the audit panel to the repository, data, band table and history', () => {
+    const links = index('dialog#audit .links a')
+      .map((_, a) => a.attribs.href)
+      .get()
+    expect(links).toEqual([
+      REPO,
+      `${REPO}/tree/main/data`,
+      `${REPO}/blob/main/config/bands.json`,
+      `${REPO}/commits/main`,
+    ])
+    const prompt = index('#prompt').text()
+    expect(prompt).toContain(`Código e dados: ${REPO}\n`)
+    expect(prompt).toContain(`Todas as checagens: ${REPO}/blob/main/data/checks.csv\n`)
+    expect(prompt.match(/^\d\. /gm)).toEqual(['1. ', '2. ', '3. ', '4. ', '5. '])
+    expect(indexHtml).not.toMatch(/\{\{|<!--[a-z]+-->/)
+    expect(index('footer a[href="checks.csv"]')).toHaveLength(1)
+    expect(index('footer a[href="metodologia.html"]')).toHaveLength(1)
+  })
+})
+
+describe('metodologia.html (DATA-03, DATA-07, AUDIT-08)', () => {
+  const tables = () => method('table')
+
+  it('lists all 21 labels of config/bands.json with their bands', () => {
+    const rows = tables()
+      .eq(1)
+      .find('tbody tr')
+      .map((_, tr) => [
+        method(tr)
+          .find('td')
+          .map((_, td) => method(td).text())
+          .get(),
+      ])
+      .get()
+    const expected = Object.entries(config.bands).flatMap(([outlet, entries]) =>
+      entries.map((e) => [
+        config.outlets[outlet].name,
+        e.label,
+        {
+          verdadeiro: 'Verdadeiro',
+          impreciso: 'Impreciso',
+          falso: 'Falso',
+          'sem faixa': 'Sem faixa',
+        }[e.band],
+      ]),
+    )
+    expect(rows).toHaveLength(21)
+    expect(new Set(rows.map((r) => r.join('|')))).toEqual(new Set(expected.map((r) => r.join('|'))))
+  })
+
+  it('counts each label per candidate from the data, leaving removed records out', () => {
+    const head = tables()
+      .eq(2)
+      .find('thead th')
+      .map((_, th) => method(th).text())
+      .get()
+    expect(head).toEqual(['Agência', 'Rótulo', 'Faixa', 'Lula', 'Flávio'])
+    const rows = tables()
+      .eq(2)
+      .find('tbody tr')
+      .map((_, tr) => [
+        method(tr)
+          .find('td')
+          .map((_, td) => method(td).text())
+          .get(),
+      ])
+      .get() as string[][]
+    expect(rows).toHaveLength(21)
+    for (const [outletName, label, , lula, flavio] of rows) {
+      const outlet = Object.keys(config.outlets).find((o) => config.outlets[o].name === outletName)
+      const count = (speaker: string) =>
+        found().filter((r) => r.outlet === outlet && r.label === label && r.speaker === speaker)
+          .length
+      expect([label, Number(lula), Number(flavio)]).toEqual([label, count('lula'), count('flavio')])
+    }
+    const lupaFalta = rows.find((r) => r[0] === 'Lupa' && r[1] === 'FALTA CONTEXTO')
+    // Fixture: one FALTA CONTEXTO for Lula, one for Flávio that was removed.
+    expect(lupaFalta?.slice(3)).toEqual(['1', '0'])
+    expect(rows.find((r) => r[1] === 'é subestimado')?.slice(3)).toEqual(['0', '0'])
+  })
+
+  it('adds a label found in the data but missing from the table as Sem faixa', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'site-build-'))
+    try {
+      const extra = {
+        ...fixtureRecords()[0],
+        id: 'ffffffffffff',
+        label: 'AINDA É CEDO',
+        band: 'sem faixa' as const,
+      }
+      const built = await buildFixture(dir, [...fixtureRecords(), extra])
+      const $ = load(await readFile(join(built.outDir, 'metodologia.html'), 'utf8'))
+      const row = $('table')
+        .eq(2)
+        .find('tbody tr')
+        .filter((_, tr) => $(tr).find('td').eq(1).text() === 'AINDA É CEDO')
+      expect(
+        row
+          .find('td')
+          .map((_, td) => $(td).text())
+          .get(),
+      ).toEqual(['Lupa', 'AINDA É CEDO', 'Sem faixa', '0', '1'])
+      expect($('table').eq(1).find('tbody tr')).toHaveLength(21)
+    } finally {
+      await rm(dir, { recursive: true, force: true })
+    }
+  })
+
+  it('states the candidate order rule, how to report an error and the credits', () => {
+    const text = method('main').text().replace(/\s+/g, ' ')
+    expect(text).toContain(
+      'ordem crescente do número de urna: 13, Luiz Inácio Lula da Silva; 22, Flávio Nantes Bolsonaro.',
+    )
+    expect(method(`a[href="${REPO}/issues"]`)).toHaveLength(1)
+    expect(text).toContain('Abra uma issue')
+    expect(text).toContain('Palácio do Planalto (CC BY 2.0)')
+    expect(text).toContain('Agência Senado')
+    expect(text).toContain('Wikimedia Commons')
+    expect(text).toContain('SIL Open Font License')
+    const sources = tables().eq(0).find('tbody tr')
+    expect(sources).toHaveLength(8)
+    expect(
+      sources
+        .first()
+        .find('td')
+        .map((_, td) => method(td).text())
+        .get(),
+    ).toEqual(['Globo, 23/10/2026', 'Aos Fatos', 'página da agência', 'aosfatos'])
+  })
+})
+
+describe('dist layout (DATA-01, DATA-05)', () => {
+  it('holds the dataset files and the band table, and nothing else besides site/', async () => {
+    for (const [file, source] of [
+      ['checks.json', join(dataDir, 'checks.json')],
+      ['checks.csv', join(dataDir, 'checks.csv')],
+      ['run-report.json', join(dataDir, 'run-report.json')],
+      ['bands.json', join(ROOT, 'config/bands.json')],
+    ]) {
+      expect(await readFile(join(outDir, file), 'utf8'), file).toBe(await readFile(source, 'utf8'))
+    }
+    const site = (await readdir(join(ROOT, 'site'), { recursive: true, withFileTypes: true }))
+      .filter((d) => d.isFile() && !d.name.endsWith('.py'))
+      .map((d) => join(d.parentPath, d.name).slice(join(ROOT, 'site').length + 1))
+    const dist = (await readdir(outDir, { recursive: true, withFileTypes: true }))
+      .filter((d) => d.isFile())
+      .map((d) => join(d.parentPath, d.name).slice(outDir.length + 1))
+    expect(dist.sort()).toEqual(
+      [...site, 'checks.json', 'checks.csv', 'run-report.json', 'bands.json'].sort(),
+    )
+    expect(dist.filter((f) => f.endsWith('.html')).sort()).toEqual([
+      'index.html',
+      'metodologia.html',
+    ])
+  })
+})

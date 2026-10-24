@@ -4,6 +4,7 @@
   "private": true,
   "description": "Public archive of fact-checks of the 2026 presidential runoff debates",
   "license": "AGPL-3.0-only",
+  "repository": "https://github.com/debates-checados/debates-checados",
   "type": "module",
   "packageManager": "pnpm@11.22.0",
   "engines": {

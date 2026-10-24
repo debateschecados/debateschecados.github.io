@@ -681,6 +681,8 @@ T22 → T24
 
 **Commit**: `feat(site): Build index and methodology pages from data`
 
+**Status**: ✅ Complete
+
 ---
 
 ### T21: Wire the browser app and check it in a real browser
