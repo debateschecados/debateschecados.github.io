@@ -2,7 +2,7 @@
 
 Arquivo público das checagens que quatro agências (Aos Fatos, Estadão Verifica, g1 Fato ou Fake e Lupa) publicaram sobre os debates do 2º turno de 2026 entre Lula e Flávio Bolsonaro, na Band (18/10) e na Globo (23/10).
 
-Um script lê a página de cobertura de cada agência a cada seis horas, grava as checagens em `data/` e publica um site estático no GitHub Pages. Não há servidor nem banco de dados. O histórico do git é o registro de tudo o que mudou.
+Um script lê a página de cobertura de cada agência a cada duas horas, grava as checagens em `data/` e publica um site estático no GitHub Pages. Não há servidor nem banco de dados. O histórico do git é o registro de tudo o que mudou.
 
 ## O que é e o que não é
 
@@ -107,7 +107,7 @@ Um rótulo que não está em `config/bands.json` é publicado como "sem faixa", 
 
 ## Configuração no GitHub
 
-O workflow `.github/workflows/update.yml` roda a cada seis horas (minuto 17), a cada push em `main` e quando alguém dispara pela aba Actions. Ele testa, coleta, faz commit de `data/` só quando algo mudou, monta o site e publica no Pages, tudo no mesmo job. Antes da primeira execução:
+O workflow `.github/workflows/update.yml` roda a cada duas horas (minuto 17), a cada push em `main` e quando alguém dispara pela aba Actions. Ele testa, coleta, faz commit de `data/` só quando algo mudou, monta o site e publica no Pages, tudo no mesmo job. Antes da primeira execução:
 - [ ] Repositório público, com o código em `main`.
 - [ ] Em Settings > Pages, Source em "GitHub Actions".
 - [ ] Uma conta gratuita no archive.org. As chaves ficam em https://archive.org/account/s3.php.
