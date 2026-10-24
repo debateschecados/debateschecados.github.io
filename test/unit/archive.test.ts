@@ -25,6 +25,16 @@ const candidates: Candidate[] = [
     partyLogo: 'logos/pt.svg',
     sprite: 'lula',
   },
+  {
+    id: 'flavio',
+    name: 'Flávio Nantes Bolsonaro',
+    short: 'Flávio',
+    party: 'PL',
+    number: 22,
+    aliases: ['flavio bolsonaro'],
+    partyLogo: 'logos/pl.svg',
+    sprite: 'flavio',
+  },
 ]
 
 // A page is a JSON list of parsed items, so a test can say exactly what a snapshot holds.
@@ -59,7 +69,7 @@ const page = (...records: CheckRecord[]) =>
       doc: 0,
       pos: r.pos,
       anchor: null,
-      speakerRaw: 'LULA (PT)',
+      speakerRaw: r.speaker === 'flavio' ? 'FLÁVIO BOLSONARO (PL)' : 'LULA (PT)',
       quote: `“${r.quote}”`,
       label: r.label,
       explanation: '',
@@ -327,16 +337,23 @@ describe('archive (DATA-02, DATA-06)', () => {
     expect(saves[1].at - saves[0].at).toBeGreaterThanOrEqual(CAPTURE_SPACING_MS)
   })
 
-  it('rejects a snapshot whose label or speaker differs from the record', async () => {
-    const records = [record(1)]
-    const relabeled = page({ ...records[0], label: 'FAKE' })
+  // Same key and position, one field changed: the snapshot is not the statement the record holds.
+  it.each<[string, Partial<CheckRecord>]>([
+    ['label', { label: 'FAKE' }],
+    ['speaker', { speaker: 'flavio' }],
+    ['quote', { quote: 'Outra fala sobre a economia' }],
+  ])('rejects a snapshot whose %s differs from the record', async (_, change) => {
+    const records = [record(1), record(2, { key: null })]
+    const changed = page(...records.map((r) => ({ ...r, ...change })))
     const { run } = setup(
-      { [lookupUrl(PAGE)]: available('20261019120000'), [idUrl('20261019120000')]: relabeled },
+      { [lookupUrl(PAGE)]: available('20261019120000'), [idUrl('20261019120000')]: changed },
       null,
     )
     const result = await run(records)
     expect(result.records).toEqual(records)
-    expect(result.attempts[0].steps).toContain('snapshot 20261019120000: 0 of 1 records, rejected')
+    expect(result.records.map((r) => r.evidence.archiveUrl)).toEqual([null, null])
+    expect(result.attempts).toMatchObject([{ url: PAGE, outcome: 'waiting', archiveUrl: null }])
+    expect(result.attempts[0].steps).toContain('snapshot 20261019120000: 0 of 2 records, rejected')
   })
 
   describe('identical keyless quotes (the "#2" duplicate)', () => {
