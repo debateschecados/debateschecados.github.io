@@ -94,7 +94,7 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 4. The system SHALL order records by debate newest first, then agency alphabetically, then their order on the agency page. (SITE-04)
 5. IF a filter combination matches no record THEN the system SHALL show the message "Nenhuma checagem com esses filtros." and a control that clears all filters. (SITE-05)
 6. The system SHALL render without horizontal scrolling at a 360 px viewport width. (SITE-06)
-7. The system SHALL NOT set tracking cookies, load third-party analytics, or load fonts, scripts or images from another origin. (SITE-07)
+7. The system SHALL NOT set tracking cookies or load fonts, scripts or images from another origin. The one exception is the cookieless GoatCounter page view script (`gc.zgo.at/count.js`). (SITE-07)
 
 **Independent Test**: Load the site with the fixture dataset, apply each filter alone and combined, and compare counts with the dataset.
 

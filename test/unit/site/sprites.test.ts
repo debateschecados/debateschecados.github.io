@@ -79,14 +79,18 @@ describe('sprites (AUDIT-06)', () => {
   })
 })
 
+// The one third-party request, cookieless page view counting added on purpose.
+const GOATCOUNTER =
+  '<script data-goatcounter="https://debateschecados.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>'
+
 describe('site assets (SITE-07)', () => {
-  it('loads no font, script, style or image from another origin', async () => {
+  it('loads no font, script, style or image from another origin but GoatCounter', async () => {
     const files = (await readdir(SITE, { recursive: true })).filter((f) =>
       /\.(html|css|js)$/.test(f),
     )
     expect(files).toEqual(expect.arrayContaining(['index.html', 'style.css']))
     for (const file of files) {
-      const text = await read(file)
+      const text = (await read(file)).replace(GOATCOUNTER, '')
       expect(text, file).not.toContain('fonts.googleapis.com')
       expect(text, file).not.toMatch(/\bsrc="(https?:)?\/\//)
       expect(text, file).not.toMatch(/<link[^>]+href="(https?:)?\/\//)

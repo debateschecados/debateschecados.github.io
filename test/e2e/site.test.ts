@@ -83,6 +83,10 @@ async function open(path = '/', options: BrowserContextOptions = {}, init?: () =
   })
   page.on('pageerror', (e) => errors.push(e.message))
   page.on('request', (r) => requests.push(r.url()))
+  // Keep the tests off the network and out of the real page view count.
+  await page.route('**/gc.zgo.at/count.js', (route) =>
+    route.fulfill({ contentType: 'text/javascript', body: '' }),
+  )
   await page.goto(`${origin}${path}`)
   await settle(page)
   return page
@@ -500,16 +504,16 @@ describe('illustrations (AUDIT-06, AUDIT-07)', () => {
 })
 
 describe('privacy (SITE-07)', () => {
-  it('requests nothing from another origin and uses the self-hosted fonts', async () => {
+  it('requests nothing from another origin but GoatCounter and uses the self-hosted fonts', async () => {
     const page = await open()
     await page.click('[data-debate="band-2026-10-18"]')
     await choose(page, 'outlet', 'g1')
     await page.click('.topbar .audit-btn')
     await page.evaluate(() => document.fonts.ready)
     expect(requests.length).toBeGreaterThan(5)
-    expect(requests.filter((u) => !u.startsWith(`${origin}/`) && !u.startsWith('data:'))).toEqual(
-      [],
-    )
+    expect(requests.filter((u) => !u.startsWith(`${origin}/`) && !u.startsWith('data:'))).toEqual([
+      'http://gc.zgo.at/count.js',
+    ])
     expect(requests.some((u) => u.endsWith('.woff2'))).toBe(true)
     expect(await page.evaluate(() => document.fonts.check('600 24px "Inter Tight"'))).toBe(true)
     expect(await page.evaluate(() => document.cookie)).toBe('')
