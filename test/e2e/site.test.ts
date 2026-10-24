@@ -299,6 +299,12 @@ describe('illustrations (AUDIT-06, AUDIT-07)', () => {
         gs.map((g) => getComputedStyle(g).animationName),
       ),
     ).toEqual(Array(4).fill('none'))
+    // No entrance slide either: both illustrations stand still from the first frame.
+    expect(
+      await still.$$eval('#duel .fighter', (fs) =>
+        fs.map((f) => `${(f as HTMLElement).dataset.sprite} ${getComputedStyle(f).animationName}`),
+      ),
+    ).toEqual(['lula none', 'flavio none'])
   })
 })
 

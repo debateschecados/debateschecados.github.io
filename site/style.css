@@ -1038,7 +1038,8 @@ textarea:focus-visible {
   .segmented.ready .seg-thumb {
     transition: none;
   }
-  .fighter,
+  .fighter.left,
+  .fighter.right,
   .audit[open],
   .duel.talking .fighter [class^="m-"] {
     animation: none;
