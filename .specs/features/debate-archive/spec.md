@@ -154,7 +154,7 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 6. The system SHALL render both candidate illustrations from the same body template, at the same size and pose, mirrored so they face each other, with talk animations of equal length and an equal number of mouth frames. (AUDIT-06)
 7. The system SHALL NOT change a candidate illustration based on any verdict or count. (AUDIT-07)
 8. The system SHALL credit the official portraits used as drawing references (Palácio do Planalto, CC BY 2.0; Agência Senado) and the source of the party and broadcaster logos (Wikimedia Commons) in the footer and on the methodology page. (AUDIT-08)
-9. WHEN the audit panel opens THEN the system SHALL list what the site does not promise: the scoreboard counts checks, not false statements; agencies can disagree; four bands simplify; a parser can fail; and how many records have a verified archived copy, counted from the data. (AUDIT-09)
+9. WHEN the audit panel opens THEN the system SHALL list what the site does not promise: the scoreboard counts checks, not false statements; agencies can disagree; four bands simplify; a parser can fail; and whether every record has a verified archived copy, read from the data and worded without counts. (AUDIT-09)
 
 **Independent Test**: Open the site, open the panel from both entry points, copy the prompt, paste it into a text editor and check the URLs and steps; diff the two sprite grids and confirm only head rows and mouth frames differ, with the same frame count and animation length.
 

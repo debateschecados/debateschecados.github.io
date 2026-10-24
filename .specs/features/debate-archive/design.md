@@ -340,7 +340,7 @@ Per-run details (HTTP status and SHA-256 of each fetch, timings, archive attempt
 
 ```yaml
 on:
-  schedule: [{ cron: '17 */6 * * *' }]
+  schedule: [{ cron: '17 */2 * * *' }]
   workflow_dispatch:
     inputs:
       accept_drop: { description: 'Source id allowed to shrink by more than 20%', required: false }
