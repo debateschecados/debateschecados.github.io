@@ -231,7 +231,7 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| INGEST-01 | P1: Collect the debate checks | Tasks: T15, T22 | In Progress |
+| INGEST-01 | P1: Collect the debate checks | Tasks: T15, T22 | Implemented |
 | INGEST-02 | P1: Collect the debate checks | Tasks: T2, T9, T10, T11, T12, T15 | Implemented |
 | INGEST-03 | P1: Collect the debate checks | Tasks: T9, T10, T11, T12, T13 | Implemented |
 | INGEST-04 | P1: Collect the debate checks | Tasks: T5, T6 | Implemented |
@@ -252,7 +252,7 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 | SCORE-03 | P1: Scoreboards | Tasks: T17 | Implemented |
 | SCORE-04 | P1: Scoreboards | Tasks: T17 | Implemented |
 | SCORE-05 | P1: Scoreboards | Tasks: T17 | Implemented |
-| DATA-01 | P1: Open, auditable data | Tasks: T7, T20 | Implemented |
+| DATA-01 | P1: Open, auditable data | Tasks: T7, T20, T22 | Implemented |
 | DATA-02 | P1: Open, auditable data | Tasks: T14 | Implemented |
 | DATA-03 | P1: Open, auditable data | Tasks: T3, T16, T20 | Implemented |
 | DATA-04 | P1: Open, auditable data | Tasks: T7, T13 | Implemented |

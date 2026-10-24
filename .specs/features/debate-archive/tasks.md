@@ -731,14 +731,16 @@ T22 → T24
 
 **Done when**:
 
-- [ ] `actionlint` passes on the file
-- [ ] Steps match the design order; deploy is in the same job; `check:labels` is last
+- [x] `actionlint` passes on the file
+- [x] Steps match the design order; deploy is in the same job; `check:labels` is last
 - [ ] Setup checklist written in the README section of T23
 
 **Tests**: none
 **Gate**: build
 
 **Commit**: `ci(update): Scrape, commit and deploy in one workflow`
+
+**Status**: ✅ Complete
 
 ---
 

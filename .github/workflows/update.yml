@@ -1,0 +1,91 @@
+name: update
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      accept_drop:
+        description: "Source id allowed to shrink by more than 20%"
+        required: false
+        default: ""
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Typecheck, lint and unit tests
+        run: pnpm typecheck && pnpm lint && pnpm test:unit
+
+      - name: Load the real module graph with Node
+        run: node src/ingest.ts --help
+
+      - name: Ingest
+        run: pnpm ingest --accept-drop="$ACCEPT_DROP"
+        env:
+          ACCEPT_DROP: ${{ inputs.accept_drop }}
+          IA_S3_ACCESS: ${{ secrets.IA_S3_ACCESS }}
+          IA_S3_SECRET: ${{ secrets.IA_S3_SECRET }}
+
+      - name: Commit data/ if it changed
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data
+          if git diff --cached --quiet; then
+            echo 'data/ unchanged, nothing to commit'
+          else
+            git commit -m 'chore(data): Update checks'
+            git pull --rebase
+            git push
+          fi
+
+      - run: pnpm build
+
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: dist
+
+      - id: deploy
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+
+      - name: Upload the run log
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: run-log
+          path: .cache/run-log.json
+          include-hidden-files: true # .cache/ is a hidden directory, skipped by default
+          retention-days: 90
+
+      # Last on purpose: data and site are already published with the label as "sem faixa";
+      # the red run is the notification (DATA-03).
+      - name: Fail on labels without a band
+        run: pnpm check:labels
