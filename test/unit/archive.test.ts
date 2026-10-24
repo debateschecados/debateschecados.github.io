@@ -300,6 +300,65 @@ describe('archive (DATA-02, DATA-06)', () => {
     expect(result.attempts[0].steps).toContain('snapshot 20261019120000: 0 of 1 records, rejected')
   })
 
+  describe('identical keyless quotes (the "#2" duplicate)', () => {
+    const repeat = (n: number, over: Partial<CheckRecord> = {}) =>
+      record(n, { key: null, quote: 'A mesma fala repetida na página', ...over })
+    const archivedEvidence = {
+      url: PAGE,
+      fetchedAt: '2026-10-24T10:00:00.000Z',
+      archiveUrl: idUrl('20261019120000'),
+      sha256: 'ab'.repeat(32),
+    }
+
+    it('rejects a snapshot holding one occurrence for two new records', async () => {
+      const records = [repeat(1), repeat(2)]
+      const { run } = setup(
+        {
+          [lookupUrl(PAGE)]: available('20261019120000'),
+          [idUrl('20261019120000')]: page(records[0]),
+        },
+        null,
+      )
+      const result = await run(records)
+      expect(result.records).toEqual(records)
+      expect(result.attempts).toMatchObject([{ outcome: 'waiting', archiveUrl: null }])
+    })
+
+    it('does not give a new repeat the snapshot of an archived one taken before it', async () => {
+      const old = repeat(1, { evidence: archivedEvidence })
+      const added = repeat(2)
+      const { run } = setup(
+        {
+          [lookupUrl(PAGE)]: available('20261019120000'),
+          [idUrl('20261019120000')]: page(old), // taken before the repeat was added
+          ...spn([{ status: 'success', timestamp: '20261025090000' }]),
+          [idUrl('20261025090000')]: page(old, added),
+        },
+        KEYS,
+      )
+      const result = await run([old, added])
+      expect(result.records.map((r) => r.evidence.archiveUrl)).toEqual([
+        idUrl('20261019120000'),
+        idUrl('20261025090000'),
+      ])
+      expect(result.attempts).toMatchObject([{ records: 1, outcome: 'captured' }])
+    })
+
+    it('does not count a repeat gone from its source', async () => {
+      const gone = repeat(1, { missingSince: '2026-10-25' })
+      const kept = repeat(2)
+      const { run } = setup(
+        {
+          [lookupUrl(PAGE)]: available('20261019120000'),
+          [idUrl('20261019120000')]: page(kept),
+        },
+        null,
+      )
+      const result = await run([gone, kept])
+      expect(result.records[1].evidence.archiveUrl).toBe(idUrl('20261019120000'))
+    })
+  })
+
   it('never writes the keys into the attempts', async () => {
     const records = [record(1)]
     const { run } = setup({

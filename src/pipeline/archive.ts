@@ -52,6 +52,9 @@ const snapshotUrl = (timestamp: string, url: string) =>
 
 const message = (error: unknown) => (error as Error).message
 
+const content = (x: { quote: string | null; speaker: string | null; label: string }) =>
+  JSON.stringify([x.quote, x.speaker, x.label])
+
 // Sets evidence.archiveUrl and evidence.sha256 on records whose evidence doc has a Wayback snapshot
 // that parses to the same items (DATA-02, DATA-06). Records are returned in the same order;
 // any failure leaves the record as it was, to be retried on the next run.
@@ -63,12 +66,16 @@ export async function archive(
   const fetchFn = options.fetch ?? fetch
   let lastCapture = Number.NEGATIVE_INFINITY
 
+  // Per evidence doc, the records to archive and the ones already archived. A record to archive
+  // with the same quote as an archived one needs its own occurrence in the snapshot.
   const groups = new Map<string, CheckRecord[]>()
+  const archived = new Map<string, CheckRecord[]>()
   for (const record of records) {
-    if (!needsArchive(record)) continue
-    const group = groups.get(record.evidence.url) ?? []
+    if (record.missingSince !== undefined) continue
+    const into = needsArchive(record) ? groups : archived
+    const group = into.get(record.evidence.url) ?? []
     group.push(record)
-    groups.set(record.evidence.url, group)
+    into.set(record.evidence.url, group)
   }
 
   // Timestamp of the closest snapshot the archive answered with HTTP 200, or null.
@@ -114,14 +121,20 @@ export async function archive(
       speaker: resolveSpeaker(item.speakerRaw, options.candidates),
       label: item.label,
     }))
+    // Keyless records with the same quote, speaker and label (the "#2" case) each need their own
+    // occurrence: one snapshot item serves at most one record, archived records of the doc first.
+    const left = new Map<string, number>()
+    for (const item of found) left.set(content(item), (left.get(content(item)) ?? 0) + 1)
+    const take = (record: CheckRecord) => {
+      const n = left.get(content(record)) ?? 0
+      left.set(content(record), n - 1)
+      return n > 0
+    }
+    for (const record of archived.get(url) ?? []) if (record.key === null) take(record)
     const holds = (record: CheckRecord) =>
-      found.some(
-        (item) =>
-          (record.key === null || item.key === record.key) &&
-          item.quote === record.quote &&
-          item.speaker === record.speaker &&
-          item.label === record.label,
-      )
+      record.key === null
+        ? take(record)
+        : found.some((item) => item.key === record.key && content(item) === content(record))
     const held = group.filter(holds).length
     if (held === group.length) {
       steps.push(`snapshot ${timestamp}: verified ${held} records`)
