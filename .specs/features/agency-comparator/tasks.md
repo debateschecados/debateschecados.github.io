@@ -309,16 +309,18 @@ T13 → T15
 
 **Done when**:
 
-- [ ] On the pinned files: no record of the source is missing, `d5bca87d832d` is Lula's hunger claim again, the report lists the merged IDs, and other sources are byte-identical
-- [ ] Refuses to write when the current source records differ from the `after` ones
-- [ ] `pnpm check:claims` and the build pass on the repaired data
-- [ ] Gate check passes: `pnpm vitest run test/unit/repair.test.ts`
-- [ ] Test count: at least 3 tests pass
+- [x] On the pinned files: no record of the source is missing, `d5bca87d832d` is Lula's hunger claim again, the report lists the merged IDs, and other sources are byte-identical
+- [x] Refuses to write when the current source records differ from the `after` ones
+- [x] `pnpm check:claims` and the build pass on the repaired data
+- [x] Gate check passes: `pnpm vitest run test/unit/repair.test.ts`
+- [x] Test count: at least 3 tests pass
 
 **Tests**: unit
 **Gate**: quick
 
 **Commit**: `fix(data): Repair the Estadão checks split by the 2026-10-24 run`
+
+**Status**: ✅ Complete
 
 ---
 

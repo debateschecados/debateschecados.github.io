@@ -1012,7 +1012,7 @@
     }
   },
   {
-    "id": "cc7d8d25a594",
+    "id": "df548ecb7998",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
     "outlet": "estadao",
@@ -1029,35 +1029,18 @@
     "evidence": {
       "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "fetchedAt": "2026-10-24T19:11:44.580Z",
-      "archiveUrl": null,
-      "sha256": null
-    }
-  },
-  {
-    "id": "df548ecb7998",
-    "sourceId": "estadao-globo-2026-10-23",
-    "debate": "globo-2026-10-23",
-    "outlet": "estadao",
-    "key": "DLNBOZ2VVJGVNKQMTY7OE5LVR4",
-    "pos": 1,
-    "anchor": null,
-    "speaker": "lula",
-    "quote": "que, quando assumiu o governo em 2023, encontrou 6 mil obras paralisadas.",
-    "label": "é subestimado",
-    "band": "impreciso",
-    "excerpt": "O Tribunal de Contas da União (TCU) faz o acompanhamento periódico de obras paralisadas no País. Não há um dado específico para janeiro de 2023, e sim para abril daquele ano, quando o número de obras paralisadas era de 8.603, de um total de 21.005 obras em andamento. A maior…",
-    "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-    "adapter": "estadao-page@2",
-    "evidence": {
-      "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "fetchedAt": "2026-10-24T08:34:56.864Z",
       "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
     },
-    "missingSince": "2026-10-24"
+    "history": [
+      {
+        "key": "DLNBOZ2VVJGVNKQMTY7OE5LVR4",
+        "until": "2026-10-24"
+      }
+    ]
   },
   {
-    "id": "d381c464abc3",
+    "id": "cd25bcc68692",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
     "outlet": "estadao",
@@ -1074,35 +1057,18 @@
     "evidence": {
       "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "fetchedAt": "2026-10-24T19:11:44.580Z",
-      "archiveUrl": null,
-      "sha256": null
-    }
-  },
-  {
-    "id": "e6700dc918ab",
-    "sourceId": "estadao-globo-2026-10-23",
-    "debate": "globo-2026-10-23",
-    "outlet": "estadao",
-    "key": "LSWFX7HVZVDVZNJFTWEYLQ3U5U",
-    "pos": 2,
-    "anchor": null,
-    "speaker": "flavio",
-    "quote": "que o ex-presidente Jair Bolsonaro definiu que todas as concessões de rodovias teriam pedágio zero para motociclistas.",
-    "label": "é enganoso",
-    "band": "impreciso",
-    "excerpt": "Em agosto de 2021, o Ministério da Infraestrutura sob Jair Bolsonaro publicou uma portaria estabelecendo a isenção do pedágio para motocicletas em rodovias federais que já estavam em fase de licitação, ou seja, somente em novas concessões federais. A medida não valia para todas…",
-    "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-    "adapter": "estadao-page@2",
-    "evidence": {
-      "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "fetchedAt": "2026-10-24T08:34:56.864Z",
       "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
     },
-    "missingSince": "2026-10-24"
+    "history": [
+      {
+        "key": "NDXK4OLN4NHI7OMUBOMKHVWEZM",
+        "until": "2026-10-24"
+      }
+    ]
   },
   {
-    "id": "8ad28e1c3f86",
+    "id": "e84a6f94f449",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
     "outlet": "estadao",
@@ -1119,12 +1085,18 @@
     "evidence": {
       "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "fetchedAt": "2026-10-24T19:11:44.580Z",
-      "archiveUrl": null,
-      "sha256": null
-    }
+      "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
+      "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
+    },
+    "history": [
+      {
+        "key": "HWMT3TDR6RE7DCBPADKW6TOGIA",
+        "until": "2026-10-24"
+      }
+    ]
   },
   {
-    "id": "6952385310a6",
+    "id": "d5bca87d832d",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
     "outlet": "estadao",
@@ -1141,12 +1113,18 @@
     "evidence": {
       "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "fetchedAt": "2026-10-24T19:11:44.580Z",
-      "archiveUrl": null,
-      "sha256": null
-    }
+      "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
+      "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
+    },
+    "history": [
+      {
+        "key": "3HXGVVRTJJDFPBCV44Y5VBUIGQ",
+        "until": "2026-10-24"
+      }
+    ]
   },
   {
-    "id": "c9d9d979f098",
+    "id": "673d8a46f845",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
     "outlet": "estadao",
@@ -1163,35 +1141,18 @@
     "evidence": {
       "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "fetchedAt": "2026-10-24T19:11:44.580Z",
-      "archiveUrl": null,
-      "sha256": null
-    }
-  },
-  {
-    "id": "cd25bcc68692",
-    "sourceId": "estadao-globo-2026-10-23",
-    "debate": "globo-2026-10-23",
-    "outlet": "estadao",
-    "key": "NDXK4OLN4NHI7OMUBOMKHVWEZM",
-    "pos": 5,
-    "anchor": null,
-    "speaker": "lula",
-    "quote": "que nunca se exportou tanto quanto em seu governo.",
-    "label": "é verdadeiro",
-    "band": "verdadeiro",
-    "excerpt": "As exportações brasileiras alcançaram recorde histórico em 2025, somando US$ 348,7 bilhões, segundo dados do Ministério do Desenvolvimento, Indústria, Comércio e Serviços. A alta foi de 3,5% em relação a 2024 e cerca de US$ 9 bilhões acima do recorde anterior, registrado em 2023,…",
-    "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-    "adapter": "estadao-page@2",
-    "evidence": {
-      "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "fetchedAt": "2026-10-24T08:34:56.864Z",
       "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
     },
-    "missingSince": "2026-10-24"
+    "history": [
+      {
+        "key": "DRQRN3EAMZCQHBWPHYUS5OQQPE",
+        "until": "2026-10-24"
+      }
+    ]
   },
   {
-    "id": "285efb55550d",
+    "id": "26eca3528f77",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
     "outlet": "estadao",
@@ -1210,10 +1171,17 @@
       "fetchedAt": "2026-10-24T19:11:44.580Z",
       "archiveUrl": null,
       "sha256": null
-    }
+    },
+    "history": [
+      {
+        "label": "é verdadeiro",
+        "key": "V7HOENSBZZAKTNVZBDB5O3GY7E",
+        "until": "2026-10-24"
+      }
+    ]
   },
   {
-    "id": "8fe7235a13e9",
+    "id": "d9616142619b",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
     "outlet": "estadao",
@@ -1230,35 +1198,18 @@
     "evidence": {
       "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "fetchedAt": "2026-10-24T19:11:44.580Z",
-      "archiveUrl": null,
-      "sha256": null
-    }
-  },
-  {
-    "id": "e84a6f94f449",
-    "sourceId": "estadao-globo-2026-10-23",
-    "debate": "globo-2026-10-23",
-    "outlet": "estadao",
-    "key": "HWMT3TDR6RE7DCBPADKW6TOGIA",
-    "pos": 7,
-    "anchor": null,
-    "speaker": "lula",
-    "quote": "que quem está colocando dinheiro no túnel de Santos é o governo federal, inclusive com financiamento do BNDES.",
-    "label": "é enganoso",
-    "band": "impreciso",
-    "excerpt": "O governo federal não paga a obra sozinho. Dos R$ 6,8 bilhões estimados para a conclusão do túnel, R$ 5,1 bilhões virão de aportes públicos divididos igualmente entre a União e o Estado de São Paulo. O restante será coberto pela iniciativa privada. O governo do Estado de São…",
-    "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-    "adapter": "estadao-page@2",
-    "evidence": {
-      "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "fetchedAt": "2026-10-24T08:34:56.864Z",
       "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
     },
-    "missingSince": "2026-10-24"
+    "history": [
+      {
+        "key": "NCLH4WMBOREKHI77FQD3LMUVX4",
+        "until": "2026-10-24"
+      }
+    ]
   },
   {
-    "id": "1b17b7e00a30",
+    "id": "43b26241e33c",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
     "outlet": "estadao",
@@ -1275,12 +1226,18 @@
     "evidence": {
       "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "fetchedAt": "2026-10-24T19:11:44.580Z",
-      "archiveUrl": null,
-      "sha256": null
-    }
+      "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
+      "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
+    },
+    "history": [
+      {
+        "key": "JJ6TWZEBOJHJFIAIK6Q3QVSHAE",
+        "until": "2026-10-24"
+      }
+    ]
   },
   {
-    "id": "4a96600fe438",
+    "id": "ba283740847c",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
     "outlet": "estadao",
@@ -1297,35 +1254,18 @@
     "evidence": {
       "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "fetchedAt": "2026-10-24T19:11:44.580Z",
-      "archiveUrl": null,
-      "sha256": null
-    }
-  },
-  {
-    "id": "dc327bf432c8",
-    "sourceId": "estadao-globo-2026-10-23",
-    "debate": "globo-2026-10-23",
-    "outlet": "estadao",
-    "key": "CTY723KA5FBGLJNBW55NCWVTMQ",
-    "pos": 9,
-    "anchor": null,
-    "speaker": "flavio",
-    "quote": "que o presidente Lula implementou a carga tributária mais alta da história.",
-    "label": "é verdadeiro",
-    "band": "verdadeiro",
-    "excerpt": "A carga tributária bruta do governo geral (governo central, Estados e municípios) cresceu de 32,22% para 32,40% do Produto Interno Bruto (PIB), entre 2024 e 2025. As estimativas são do Tesouro Nacional e indicam o maior nível da série histórica disponibilizada pelo órgão, que vai…",
-    "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-    "adapter": "estadao-page@2",
-    "evidence": {
-      "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "fetchedAt": "2026-10-24T08:34:56.864Z",
       "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
     },
-    "missingSince": "2026-10-24"
+    "history": [
+      {
+        "key": "MO3DWWZ4QVC6TK5MHFPCKYWOJU",
+        "until": "2026-10-24"
+      }
+    ]
   },
   {
-    "id": "e8ecbe865d5d",
+    "id": "97dd907ad475",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
     "outlet": "estadao",
@@ -1344,10 +1284,17 @@
       "fetchedAt": "2026-10-24T19:11:44.580Z",
       "archiveUrl": null,
       "sha256": null
-    }
+    },
+    "history": [
+      {
+        "label": "é enganoso",
+        "key": "GICUMOCGGNFFRPQCYTZKOZQEYU",
+        "until": "2026-10-24"
+      }
+    ]
   },
   {
-    "id": "8ea83d9e258f",
+    "id": "2fbfdbe7c524",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
     "outlet": "estadao",
@@ -1364,12 +1311,18 @@
     "evidence": {
       "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "fetchedAt": "2026-10-24T19:11:44.580Z",
-      "archiveUrl": null,
-      "sha256": null
-    }
+      "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
+      "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
+    },
+    "history": [
+      {
+        "key": "KI4NGSMKFBFEZOBP6HSW3ZZNGE",
+        "until": "2026-10-24"
+      }
+    ]
   },
   {
-    "id": "e90042a6c321",
+    "id": "30c683088488",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
     "outlet": "estadao",
@@ -1388,33 +1341,17 @@
       "fetchedAt": "2026-10-24T19:11:44.580Z",
       "archiveUrl": null,
       "sha256": null
-    }
-  },
-  {
-    "id": "673d8a46f845",
-    "sourceId": "estadao-globo-2026-10-23",
-    "debate": "globo-2026-10-23",
-    "outlet": "estadao",
-    "key": "DRQRN3EAMZCQHBWPHYUS5OQQPE",
-    "pos": 13,
-    "anchor": null,
-    "speaker": "lula",
-    "quote": "que Flávio Bolsonaro chamou o Bolsa Família de “bolsa-farelo”",
-    "label": "é verdadeiro",
-    "band": "verdadeiro",
-    "excerpt": "Em junho deste ano, o Estadão mostrou que um levantamento da AP Exata Inteligência a partir de publicações de Flávio no X (antigo Twitter) indicou que o parlamentar mudou suas manifestações sobre o Bolsa Família após a chegada do pai, Jair Bolsonaro (PL), à Presidência. Em 2013,…",
-    "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-    "adapter": "estadao-page@2",
-    "evidence": {
-      "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "fetchedAt": "2026-10-24T08:34:56.864Z",
-      "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
     },
-    "missingSince": "2026-10-24"
+    "history": [
+      {
+        "quote": "que seu governo herdou taxa de juros em 13%.",
+        "key": "AEB2NWWR4JD2HIJQ2BJNPYHY2Q",
+        "until": "2026-10-24"
+      }
+    ]
   },
   {
-    "id": "c5afd7814604",
+    "id": "fdc679ed7206",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
     "outlet": "estadao",
@@ -1431,12 +1368,18 @@
     "evidence": {
       "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "fetchedAt": "2026-10-24T19:11:44.580Z",
-      "archiveUrl": null,
-      "sha256": null
-    }
+      "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
+      "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
+    },
+    "history": [
+      {
+        "key": "6GX7WIBJWFHCDL4BSE3ST7XFIU",
+        "until": "2026-10-24"
+      }
+    ]
   },
   {
-    "id": "8f39932dc0d6",
+    "id": "1db722ab7d1a",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
     "outlet": "estadao",
@@ -1453,35 +1396,18 @@
     "evidence": {
       "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "fetchedAt": "2026-10-24T19:11:44.580Z",
-      "archiveUrl": null,
-      "sha256": null
-    }
-  },
-  {
-    "id": "26eca3528f77",
-    "sourceId": "estadao-globo-2026-10-23",
-    "debate": "globo-2026-10-23",
-    "outlet": "estadao",
-    "key": "V7HOENSBZZAKTNVZBDB5O3GY7E",
-    "pos": 15,
-    "anchor": null,
-    "speaker": "lula",
-    "quote": "que o Nordeste, em 2003, era a região com mais pobres, desnutridos, evasão escolar, e menos faculdade, menos doutores e mestres.",
-    "label": "é verdadeiro",
-    "band": "verdadeiro",
-    "excerpt": "De acordo com o Mapa da Pobreza e Desigualdade, lançado em 2003 pelo Instituto Brasileiro de Geografia e Estatística (IBGE), 77% dos municípios nordestinos tinham mais da metade de sua população vivendo na pobreza naquele ano. Além disso, o Mapa da Exclusão, elaborado pelo…",
-    "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-    "adapter": "estadao-page@2",
-    "evidence": {
-      "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "fetchedAt": "2026-10-24T08:34:56.864Z",
       "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
     },
-    "missingSince": "2026-10-24"
+    "history": [
+      {
+        "key": "KRB4EYFACZA4PI7GVDGW2MG3GE",
+        "until": "2026-10-24"
+      }
+    ]
   },
   {
-    "id": "79b92a3dbe26",
+    "id": "b80d13fea28a",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
     "outlet": "estadao",
@@ -1498,12 +1424,18 @@
     "evidence": {
       "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "fetchedAt": "2026-10-24T19:11:44.580Z",
-      "archiveUrl": null,
-      "sha256": null
-    }
+      "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
+      "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
+    },
+    "history": [
+      {
+        "key": "TLMTN3OMTZGJNEAQ4AOJD65YPM",
+        "until": "2026-10-24"
+      }
+    ]
   },
   {
-    "id": "6f23703ca18a",
+    "id": "ffe180e99084",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
     "outlet": "estadao",
@@ -1520,12 +1452,18 @@
     "evidence": {
       "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "fetchedAt": "2026-10-24T19:11:44.580Z",
-      "archiveUrl": null,
-      "sha256": null
-    }
+      "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
+      "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
+    },
+    "history": [
+      {
+        "key": "SUX43N72LFBORP6S46ZEYTO2RU",
+        "until": "2026-10-24"
+      }
+    ]
   },
   {
-    "id": "a4233402f41b",
+    "id": "9a394c68e8d9",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
     "outlet": "estadao",
@@ -1542,35 +1480,18 @@
     "evidence": {
       "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "fetchedAt": "2026-10-24T19:11:44.580Z",
-      "archiveUrl": null,
-      "sha256": null
-    }
-  },
-  {
-    "id": "d9616142619b",
-    "sourceId": "estadao-globo-2026-10-23",
-    "debate": "globo-2026-10-23",
-    "outlet": "estadao",
-    "key": "NCLH4WMBOREKHI77FQD3LMUVX4",
-    "pos": 17,
-    "anchor": null,
-    "speaker": "lula",
-    "quote": "que o Ceará é o estado que mais aprova alunos para o ITA (Instituto Tecnológico de Aeronáutica).",
-    "label": "é verdadeiro",
-    "band": "verdadeiro",
-    "excerpt": "Considerando as cidades com mais estudantes aprovados na primeira fase do vestibular do Instituto Tecnológico de Aeronáutica (ITA) neste ano, Fortaleza, capital do estado do Ceará, ocupa a primeira posição, com 281 aprovados. Em segundo lugar está São José dos Campos (SP),…",
-    "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-    "adapter": "estadao-page@2",
-    "evidence": {
-      "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "fetchedAt": "2026-10-24T08:34:56.864Z",
       "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
     },
-    "missingSince": "2026-10-24"
+    "history": [
+      {
+        "key": "7RITG7ZDFZF3JCS7IPHKDQRAUI",
+        "until": "2026-10-24"
+      }
+    ]
   },
   {
-    "id": "1d23acc96c8f",
+    "id": "427606626ad3",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
     "outlet": "estadao",
@@ -1587,9 +1508,15 @@
     "evidence": {
       "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "fetchedAt": "2026-10-24T19:11:44.580Z",
-      "archiveUrl": null,
-      "sha256": null
-    }
+      "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
+      "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
+    },
+    "history": [
+      {
+        "key": "3XSD5WVXSNBVDEK45RAYPQ2BNU",
+        "until": "2026-10-24"
+      }
+    ]
   },
   {
     "id": "36f41645e2bc",
@@ -1614,29 +1541,6 @@
     }
   },
   {
-    "id": "43b26241e33c",
-    "sourceId": "estadao-globo-2026-10-23",
-    "debate": "globo-2026-10-23",
-    "outlet": "estadao",
-    "key": "JJ6TWZEBOJHJFIAIK6Q3QVSHAE",
-    "pos": 19,
-    "anchor": null,
-    "speaker": "lula",
-    "quote": "que o Brasil só teve a primeira universidade em 1920.",
-    "label": "falta contexto",
-    "band": "impreciso",
-    "excerpt": "A primeira universidade federal do país foi instituída, de fato, em 1920, por meio do Decreto 14.343, que fundou a Universidade do Rio de Janeiro. No Brasil daquela época, porém, já havia atividades de instituições consideradas de ensino superior que, depois, deram origem às…",
-    "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-    "adapter": "estadao-page@2",
-    "evidence": {
-      "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "fetchedAt": "2026-10-24T08:34:56.864Z",
-      "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
-    },
-    "missingSince": "2026-10-24"
-  },
-  {
     "id": "250b336d3ede",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
@@ -1657,29 +1561,6 @@
       "archiveUrl": null,
       "sha256": null
     }
-  },
-  {
-    "id": "ba283740847c",
-    "sourceId": "estadao-globo-2026-10-23",
-    "debate": "globo-2026-10-23",
-    "outlet": "estadao",
-    "key": "MO3DWWZ4QVC6TK5MHFPCKYWOJU",
-    "pos": 20,
-    "anchor": null,
-    "speaker": "lula",
-    "quote": "que Flávio Bolsonaro foi o único deputado estadual a votar contra aumento da licença-maternidade no Rio.",
-    "label": "é verdadeiro",
-    "band": "verdadeiro",
-    "excerpt": "Conforme mostrou o Estadão (aqui), em 2009, Flávio Bolsonaro foi o único deputado estadual a votar contra a proposta que estendia de quatro para seis meses a licença-maternidade para servidoras públicas do Rio de Janeiro. O então deputado pelo PP afirmou que “bastava se colocar…",
-    "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-    "adapter": "estadao-page@2",
-    "evidence": {
-      "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "fetchedAt": "2026-10-24T08:34:56.864Z",
-      "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
-    },
-    "missingSince": "2026-10-24"
   },
   {
     "id": "acf0629f0ba6",
@@ -1726,29 +1607,6 @@
     }
   },
   {
-    "id": "97dd907ad475",
-    "sourceId": "estadao-globo-2026-10-23",
-    "debate": "globo-2026-10-23",
-    "outlet": "estadao",
-    "key": "GICUMOCGGNFFRPQCYTZKOZQEYU",
-    "pos": 22,
-    "anchor": null,
-    "speaker": "lula",
-    "quote": "que a economia não crescia 3% desde 2010, quando ele deixou a Presidência.",
-    "label": "é enganoso",
-    "band": "impreciso",
-    "excerpt": "Antes de Lula retornar ao cargo para um terceiro mandato, o PIB cresceu 4,6% em 2021, no governo de Jair Bolsonaro.",
-    "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-    "adapter": "estadao-page@2",
-    "evidence": {
-      "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "fetchedAt": "2026-10-24T08:34:56.864Z",
-      "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
-    },
-    "missingSince": "2026-10-24"
-  },
-  {
     "id": "2c136b426d5c",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
@@ -1771,7 +1629,7 @@
     }
   },
   {
-    "id": "d66535884747",
+    "id": "e6700dc918ab",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
     "outlet": "estadao",
@@ -1788,9 +1646,15 @@
     "evidence": {
       "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "fetchedAt": "2026-10-24T19:11:44.580Z",
-      "archiveUrl": null,
-      "sha256": null
-    }
+      "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
+      "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
+    },
+    "history": [
+      {
+        "key": "LSWFX7HVZVDVZNJFTWEYLQ3U5U",
+        "until": "2026-10-24"
+      }
+    ]
   },
   {
     "id": "5f7a88d195d1",
@@ -1843,52 +1707,6 @@
     }
   },
   {
-    "id": "2fbfdbe7c524",
-    "sourceId": "estadao-globo-2026-10-23",
-    "debate": "globo-2026-10-23",
-    "outlet": "estadao",
-    "key": "KI4NGSMKFBFEZOBP6HSW3ZZNGE",
-    "pos": 26,
-    "anchor": null,
-    "speaker": "lula",
-    "quote": "que o governo do ex-presidente Jair Bolsonaro anulou o Fundo Amazônia, e que sua gestão retomou a iniciativa.",
-    "label": "é verdadeiro",
-    "band": "verdadeiro",
-    "excerpt": "O Fundo Amazônia, criado em 2008 como um mecanismo de captação de doações para prevenir, monitorar e combater o desmatamento na região amazônica, foi abandonado pelo governo do ex-presidente Jair Bolsonaro em 2019, após um “revogaço” de 250 decretos acabar com o Comitê Orientador…",
-    "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-    "adapter": "estadao-page@2",
-    "evidence": {
-      "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "fetchedAt": "2026-10-24T08:34:56.864Z",
-      "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
-    },
-    "missingSince": "2026-10-24"
-  },
-  {
-    "id": "30c683088488",
-    "sourceId": "estadao-globo-2026-10-23",
-    "debate": "globo-2026-10-23",
-    "outlet": "estadao",
-    "key": "AEB2NWWR4JD2HIJQ2BJNPYHY2Q",
-    "pos": 27,
-    "anchor": null,
-    "speaker": "lula",
-    "quote": "que seu governo herdou taxa de juros em 13%.",
-    "label": "é impreciso",
-    "band": "impreciso",
-    "excerpt": "A taxa Selic se manteve no patamar de 13,75% no segundo semestre de 2022, último ano do governo Bolsonaro, por determinação do Comitê de Política Monetária (Copom) do Banco Central.",
-    "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-    "adapter": "estadao-page@2",
-    "evidence": {
-      "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "fetchedAt": "2026-10-24T08:34:56.864Z",
-      "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
-    },
-    "missingSince": "2026-10-24"
-  },
-  {
     "id": "8fdf51d3165f",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
@@ -1911,7 +1729,7 @@
     }
   },
   {
-    "id": "d5bca87d832d",
+    "id": "dc327bf432c8",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
     "outlet": "estadao",
@@ -1928,14 +1746,12 @@
     "evidence": {
       "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "fetchedAt": "2026-10-24T19:11:44.580Z",
-      "archiveUrl": null,
-      "sha256": null
+      "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
+      "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
     },
     "history": [
       {
-        "label": "falta contexto",
-        "quote": "que o Brasil acabou com a fome em 2012, e que e 2023 havia 33 milhões de pessoas passando fome.",
-        "speaker": "lula",
+        "key": "CTY723KA5FBGLJNBW55NCWVTMQ",
         "until": "2026-10-24"
       }
     ]
@@ -1985,29 +1801,6 @@
     }
   },
   {
-    "id": "fdc679ed7206",
-    "sourceId": "estadao-globo-2026-10-23",
-    "debate": "globo-2026-10-23",
-    "outlet": "estadao",
-    "key": "6GX7WIBJWFHCDL4BSE3ST7XFIU",
-    "pos": 30,
-    "anchor": null,
-    "speaker": "lula",
-    "quote": "que levou um computador quântico para a Paraíba.",
-    "label": "é verdadeiro",
-    "band": "verdadeiro",
-    "excerpt": "A Paraíba recebeu um centro de computação quântica, fruto de uma parceria entre os governos estadual e federal. O centro tem o primeiro computador quântico do Brasil e o acesso inicial será destinado a pesquisadores da Universidade Federal da Paraíba (UFPB), da Universidade…",
-    "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-    "adapter": "estadao-page@2",
-    "evidence": {
-      "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "fetchedAt": "2026-10-24T08:34:56.864Z",
-      "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
-    },
-    "missingSince": "2026-10-24"
-  },
-  {
     "id": "d26d5b66e3e2",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
@@ -2028,29 +1821,6 @@
       "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
     }
-  },
-  {
-    "id": "1db722ab7d1a",
-    "sourceId": "estadao-globo-2026-10-23",
-    "debate": "globo-2026-10-23",
-    "outlet": "estadao",
-    "key": "KRB4EYFACZA4PI7GVDGW2MG3GE",
-    "pos": 32,
-    "anchor": null,
-    "speaker": "lula",
-    "quote": "que, sem reajuste do salário mínimo acima da inflação, ele seria hoje de R$ 900.",
-    "label": "falta contexto",
-    "band": "impreciso",
-    "excerpt": "A fala do presidente remete ao valor do salário mínimo no início do seu primeiro mandato, em janeiro de 2003, quando era de R$ 200. Com a correção apenas pela inflação (IGP-M), segundo a Calculadora do Cidadão, do Banco Central, o montante atualizado seria de R$ 905,13.",
-    "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-    "adapter": "estadao-page@2",
-    "evidence": {
-      "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "fetchedAt": "2026-10-24T08:34:56.864Z",
-      "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
-    },
-    "missingSince": "2026-10-24"
   },
   {
     "id": "69fd931392f0",
@@ -2119,29 +1889,6 @@
     }
   },
   {
-    "id": "b80d13fea28a",
-    "sourceId": "estadao-globo-2026-10-23",
-    "debate": "globo-2026-10-23",
-    "outlet": "estadao",
-    "key": "TLMTN3OMTZGJNEAQ4AOJD65YPM",
-    "pos": 34,
-    "anchor": null,
-    "speaker": "lula",
-    "quote": "que Flávio comprou uma casa de R$ 10 milhões.",
-    "label": "é exagerado",
-    "band": "impreciso",
-    "excerpt": "Ao registrar sua candidatura à Presidência, Flávio Bolsonaro declarou patrimônio de R$ 8,1 milhões em bens. Dentre eles, consta uma mansão de R$ 6,2 milhões no Lago Sul, área nobre em Brasília.",
-    "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-    "adapter": "estadao-page@2",
-    "evidence": {
-      "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "fetchedAt": "2026-10-24T08:34:56.864Z",
-      "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
-    },
-    "missingSince": "2026-10-24"
-  },
-  {
     "id": "a33b7d467b5a",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
@@ -2164,29 +1911,6 @@
     }
   },
   {
-    "id": "ffe180e99084",
-    "sourceId": "estadao-globo-2026-10-23",
-    "debate": "globo-2026-10-23",
-    "outlet": "estadao",
-    "key": "SUX43N72LFBORP6S46ZEYTO2RU",
-    "pos": 35,
-    "anchor": null,
-    "speaker": "lula",
-    "quote": "que, na Argentina, o povo está comendo carne de burro.",
-    "label": "falta contexto",
-    "band": "impreciso",
-    "excerpt": "Há registros de argentinos consumindo carne de burro em um momento de pressão nos preços, sobretudo da carne e derivados, mas essa não é uma prática generalizada. Em abril deste ano, o consumo da carne de burro na Patagônia ganhou o noticiário na Argentina e no exterior após um…",
-    "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-    "adapter": "estadao-page@2",
-    "evidence": {
-      "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "fetchedAt": "2026-10-24T08:34:56.864Z",
-      "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
-    },
-    "missingSince": "2026-10-24"
-  },
-  {
     "id": "590abbb7ae76",
     "sourceId": "estadao-globo-2026-10-23",
     "debate": "globo-2026-10-23",
@@ -2207,52 +1931,6 @@
       "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
       "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
     }
-  },
-  {
-    "id": "9a394c68e8d9",
-    "sourceId": "estadao-globo-2026-10-23",
-    "debate": "globo-2026-10-23",
-    "outlet": "estadao",
-    "key": "7RITG7ZDFZF3JCS7IPHKDQRAUI",
-    "pos": 36,
-    "anchor": null,
-    "speaker": "lula",
-    "quote": "que Willer Tomaz é sócio de Flávio.",
-    "label": "é inconclusivo",
-    "band": "sem faixa",
-    "excerpt": "A Polícia Federal solicitou ao Supremo Tribunal Federal (STF) a abertura de um inquérito para investigar a suspeita de que Flávio seja sócio oculto da BestBet, uma casa de apostas online licenciada pelo governo de Cláudio Castro (PL-RJ). A informação foi publicada pela revista…",
-    "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-    "adapter": "estadao-page@2",
-    "evidence": {
-      "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "fetchedAt": "2026-10-24T08:34:56.864Z",
-      "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
-    },
-    "missingSince": "2026-10-24"
-  },
-  {
-    "id": "427606626ad3",
-    "sourceId": "estadao-globo-2026-10-23",
-    "debate": "globo-2026-10-23",
-    "outlet": "estadao",
-    "key": "3XSD5WVXSNBVDEK45RAYPQ2BNU",
-    "pos": 37,
-    "anchor": null,
-    "speaker": "lula",
-    "quote": "que há fotos de Flávio com Daniel Vorcaro.",
-    "label": "é falso",
-    "band": "falso",
-    "excerpt": "Não há registro de fotos de Flávio Bolsonaro com o ex-banqueiro Daniel Vorcaro. Em julho deste ano, o site ICL Notícias publicou uma foto de Flávio ao lado de Luiz Phillipi Machado de Moraes Mourão, o “Sicário” de Daniel Vorcaro. A foto teria sido feita em um hotel no Rio de…",
-    "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-    "adapter": "estadao-page@2",
-    "evidence": {
-      "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "fetchedAt": "2026-10-24T08:34:56.864Z",
-      "archiveUrl": "https://web.archive.org/web/20261024083625id_/https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/",
-      "sha256": "a8e736eafbccba81fd097caa2eb9ed305b3bd496046615103e11a7f9164be3c3"
-    },
-    "missingSince": "2026-10-24"
   },
   {
     "id": "8143529f813c",
