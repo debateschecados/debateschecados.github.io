@@ -449,7 +449,8 @@ body:has(dialog[open]) .audit-fab {
   letter-spacing: -0.025em;
   margin: 0;
 }
-.audit h3 {
+.audit h3,
+.doc h3 {
   font-family: "Inter Tight", sans-serif;
   font-size: 19px;
   letter-spacing: -0.01em;
@@ -948,6 +949,172 @@ textarea:focus-visible {
   background: var(--c);
 }
 
+/* Comparison page */
+.doc.cmp {
+  max-width: 980px;
+  --cell: 108px;
+}
+.cmp .lede {
+  font-size: 19px;
+  line-height: 1.42;
+  max-width: 62ch;
+}
+.cmp .segmented {
+  margin-top: 12px;
+}
+.pending {
+  display: inline-block;
+  font-size: 13px;
+  color: var(--muted);
+  background: var(--surface);
+  border-radius: 999px;
+  padding: 4px 12px;
+  margin: 14px 0 0;
+}
+.pending:empty {
+  display: none;
+}
+.caveat {
+  background: var(--surface);
+  border-radius: 14px;
+  padding: 14px 18px;
+  font-size: 15px;
+}
+.doc .caveat {
+  color: var(--ink);
+}
+.cmp table {
+  table-layout: fixed;
+}
+.cmp thead th:first-child {
+  width: 34%;
+}
+.cmp tbody th {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.cmp td .line {
+  display: block;
+}
+.cmp td b {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.small {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--muted);
+  background: var(--surface);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+.cmp .filters {
+  padding-top: 16px;
+}
+.claims {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.claims > li[hidden] {
+  display: none;
+}
+.claim {
+  padding: 18px 0;
+  border-bottom: 1px solid #e8e8ed;
+}
+.claim .who {
+  margin-bottom: 2px;
+}
+.doc .claim .said p {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.38;
+  font-weight: 500;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.gid {
+  display: inline-block;
+  margin-top: 4px;
+  font:
+    12px / 1.4 ui-monospace,
+    "SF Mono",
+    Menlo,
+    monospace;
+  color: var(--muted);
+}
+.cells {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.doc .cells li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  color: var(--muted);
+}
+.doc .cells a.chip {
+  color: var(--c);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.doc .cells a.chip:hover {
+  text-decoration: underline;
+}
+.cells .none {
+  font-size: 14px;
+  color: var(--muted);
+}
+.claims-head {
+  display: none;
+}
+@media (min-width: 721px) {
+  /* One column per agency, in the same place on every row, like a table. */
+  .claims-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) repeat(4, var(--cell));
+    gap: 16px;
+    font-size: 13px;
+    color: var(--muted);
+    padding: 16px 0 8px;
+    border-bottom: 1px solid #e8e8ed;
+  }
+  .claim {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) calc(4 * var(--cell) + 48px);
+    gap: 16px;
+    align-items: start;
+  }
+  .cells {
+    margin: 0;
+    grid-template-columns: repeat(4, var(--cell));
+    gap: 16px;
+  }
+  .doc .cells li {
+    display: block;
+  }
+  /* The column head names the agency; the name stays for screen readers. */
+  .cells .agency {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
 @media (max-width: 720px) {
   /* Every candidate column must fit without scrolling, so none is hidden off screen. */
   .doc table {
@@ -963,6 +1130,17 @@ textarea:focus-visible {
   .doc td:last-child,
   .doc th:last-child {
     padding-right: 0;
+  }
+  .cmp .lede {
+    font-size: 17px;
+  }
+  .cmp thead th:first-child {
+    width: 30%;
+  }
+  .small {
+    font-size: 11px;
+    padding: 0 6px;
+    white-space: nowrap;
   }
   .board {
     grid-template-columns: 1fr;

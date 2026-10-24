@@ -220,15 +220,17 @@ T6 → T8
 
 **Done when**:
 
-- [ ] e2e: each filter changes visible rows and table numbers as `compare.js` computes; reload with the URL restores the view
-- [ ] e2e: no horizontal scroll at 360 px; no cross-origin request
-- [ ] Gate check passes: `pnpm vitest run test/e2e/compare.test.ts`
-- [ ] Test count: at least 4 tests pass
+- [x] e2e: each filter changes visible rows and table numbers as `compare.js` computes; reload with the URL restores the view
+- [x] e2e: no horizontal scroll at 360 px; no cross-origin request
+- [x] Gate check passes: `pnpm vitest run test/e2e/compare.test.ts`
+- [x] Test count: at least 4 tests pass
 
 **Tests**: e2e
 **Gate**: full
 
 **Commit**: `feat(site): Filter the comparison page in the browser`
+
+**Status**: ✅ Complete
 
 ---
 
