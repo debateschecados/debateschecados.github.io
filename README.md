@@ -10,7 +10,7 @@ Um script lê a página de cobertura de cada agência a cada seis horas, grava a
 - Entra tudo o que a agência publicou na página de cobertura do debate, com qualquer veredito. Não é uma lista de mentiras de ninguém.
 - O placar conta checagens, não falas. Cada agência escolhe o que checar, então um candidato com mais "falso" pode simplesmente ter tido mais falas checadas. No placar geral, a mesma fala checada por duas agências conta duas vezes.
 - Rótulos sem correspondência clara (`INSUSTENTÁVEL` da Lupa, `é inconclusivo` do Estadão) ficam em "sem faixa", que aparece em todo placar, mesmo zerado.
-- Nenhum texto das agências passa por IA. Os leitores de página (`src/adapters/`) são código comum, o mesmo para os dois candidatos.
+- A IA só agrupa checagens da mesma alegação, sem saber a agência nem o veredito. Ela nunca define veredito. Os leitores de página (`src/adapters/`) são código comum, o mesmo para os dois candidatos.
 - O repositório não guarda o HTML das agências. Cada checagem aponta para a página original e, quando já existe, para uma cópia arquivada na Wayback Machine.
 - Uma checagem que some da página da agência continua publicada, marcada com a data em que deixou de ser encontrada. Fica fora dos placares e escondida da lista até alguém ligar "Mostrar removidos".
 
@@ -87,6 +87,51 @@ curl -s --compressed "<archive_url>" | sha256sum
 Sem `--compressed` o hash sai diferente. Depois passe o arquivo pelo leitor indicado em `adapter` (`<tipo>@<versão>`), na versão do código daquele commit.
 
 Achou um erro? Abra uma issue dizendo o `id` da checagem e o que está errado. Toda correção vira um commit público, com data.
+
+## Grupos de alegações
+
+A página "Comparar agências" (`comparar.html`) lê `data/claim-groups.json`, que junta as checagens de agências diferentes que avaliam a mesma alegação de um candidato no mesmo debate. Os grupos são propostos por agentes de IA e revisados à mão antes do commit. A curadoria não roda no workflow, só quando alguém a dispara.
+1. Gere a entrada cega da rodada, com a data como nome:
+
+   ```sh
+   pnpm claims:input --run 2026-10-24
+   ```
+
+   O comando grava `data/claim-curation/<data>/input.json` só com o id de cada checagem, uma letra no lugar da agência, a fala e o trecho. Não sobrescreve uma rodada que já existe.
+2. Rode a curadoria no Claude Code com o roteiro `data/claim-curation/<data>/workflow.js` (o da rodada anterior serve de ponto de partida): três curadores por debate, um juiz só onde eles discordam, um editor das frases e um revisor de neutralidade. A saída de cada um vai para a mesma pasta, como `curator-<debate>-<n>.json`, `judge-<debate>.json`, `editor.json` e `review.json`. O roteiro entra no mesmo commit.
+3. Monte o arquivo de grupos:
+
+   ```sh
+   pnpm claims:assemble
+   ```
+
+   Sem argumento, usa a rodada mais recente. `pnpm claims:assemble <data>` escolhe outra. O comando falha se algum grupo quebrar uma regra, e o build também: checagem que não existe, debate ou candidato misturados, agência repetida, menos de duas checagens, checagem em dois grupos, frase vazia ou com mais de 120 caracteres.
+4. Confira que o arquivo bate com as saídas commitadas:
+
+   ```sh
+   pnpm check:claims
+   ```
+
+   O comando refaz os grupos, sai com erro se `data/claim-groups.json` estiver diferente e lista cada mudança feita à mão, com o motivo. O workflow do GitHub roda essa conferência depois de `check:labels`.
+
+Mudança à mão vai em `data/claim-curation/<data>/manual.json`, nunca direto no arquivo de grupos:
+
+```json
+{
+  "edits": [
+    {
+      "from": ["92e3caa21ac1", "df250d7b4df0"],
+      "to": {
+        "records": ["5434697c0611", "92e3caa21ac1", "df250d7b4df0"],
+        "claim": "O governo Lula abriu 700 novos mercados"
+      },
+      "reason": "A checagem do g1 (5434697c0611) também avalia os 700 novos mercados; incluída na revisão do mantenedor em 2026-10-24."
+    }
+  ]
+}
+```
+
+`from` lista as checagens do grupo que sai (`null` para só criar um grupo), `to` traz as checagens e a frase do grupo que entra (`null` para só remover) e `reason` é obrigatório. As edições valem na ordem do arquivo, e o grupo criado assim fica com origem `manual`. Um `from` que não bate com nenhum grupo faz o `claims:assemble` falhar.
 
 ## Como adicionar um debate
 

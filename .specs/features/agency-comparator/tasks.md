@@ -244,15 +244,17 @@ T6 → T8
 
 **Done when**:
 
-- [ ] Built site contains the DISC-01 sentence and no longer contains "Nenhum texto passa por inteligência artificial"
-- [ ] README contains the DISC-01 sentence
-- [ ] Gate check passes: `pnpm vitest run test/unit/site/build.test.ts`
-- [ ] Test count: at least 2 new tests pass
+- [x] Built site contains the DISC-01 sentence and no longer contains "Nenhum texto passa por inteligência artificial"
+- [x] README contains the DISC-01 sentence
+- [x] Gate check passes: `pnpm vitest run test/unit/site/build.test.ts`
+- [x] Test count: at least 2 new tests pass
 
 **Tests**: unit
 **Gate**: build
 
 **Commit**: `docs(site): Disclose that AI groups claims blind to agency and verdict`
+
+**Status**: ✅ Complete
 
 ---
 

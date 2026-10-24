@@ -186,10 +186,10 @@ The archive shows each agency's checks side by side, but it cannot answer the qu
 | RIGOR-04 | P1: Coverage and relative rigor | Tasks: T6 | Implemented |
 | RIGOR-05 | P1: Coverage and relative rigor | Tasks: T6 | Implemented |
 | RIGOR-06 | P1: Coverage and relative rigor | Tasks: T5, T7 | Implemented |
-| DISC-01 | P1: Honest AI disclosure | Tasks: T8 | In Tasks |
-| DISC-02 | P1: Honest AI disclosure | Tasks: T6, T8 | In Progress (T6 done, T8 pending) |
+| DISC-01 | P1: Honest AI disclosure | Tasks: T8 | Implemented |
+| DISC-02 | P1: Honest AI disclosure | Tasks: T6, T8 | Implemented |
 | DISC-03 | P1: Honest AI disclosure | Tasks: T6 | Implemented |
-| DISC-04 | P1: Honest AI disclosure | Tasks: T8 | In Tasks |
+| DISC-04 | P1: Honest AI disclosure | Tasks: T8 | Implemented |
 | REPRO-01 | P2: Reproducible consensus | Tasks: T4 | Implemented |
 | REPRO-02 | P2: Reproducible consensus | Tasks: T4 | Implemented |
 

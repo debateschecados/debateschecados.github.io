@@ -448,3 +448,49 @@ describe('comparar.html (CMP-01, CMP-02, CMP-06)', () => {
     }
   })
 })
+
+describe('AI disclosure (DISC-01, DISC-02, DISC-04)', () => {
+  const DISC =
+    'A IA só agrupa checagens da mesma alegação, sem saber a agência nem o veredito. Ela nunca define veredito.'
+  const text = ($: CheerioAPI) => $('body').text().replace(/\s+/g, ' ')
+
+  it('states the new rule in the audit panel, and no page keeps the old one (DISC-01)', () => {
+    const rules = index('dialog#audit .rules li')
+    expect(rules).toHaveLength(5)
+    const ai = rules.filter((_, li) => index(li).text().includes('IA'))
+    expect(ai).toHaveLength(1)
+    expect(ai.text().replace(/\s+/g, ' ')).toContain(DISC)
+    for (const page of [index, method, compare]) {
+      expect(text(page)).not.toContain('Nenhum texto passa por inteligência artificial')
+    }
+  })
+
+  it('explains on the methodology page how the groups are made, with both links (DISC-02)', () => {
+    const section = method('h2')
+      .filter((_, h) => method(h).text() === 'Comparação entre agências')
+      .nextUntil('h2')
+    const how = section.text().replace(/\s+/g, ' ')
+    expect(how).toContain(DISC)
+    for (const step of [
+      'com a agência trocada por uma letra',
+      'Três agentes agrupam as checagens de cada debate',
+      'um juiz decide só aqueles casos',
+      'Um revisor lê a frase de cada alegação',
+      'O mantenedor revisa o resultado antes de publicar',
+    ]) {
+      expect(how).toContain(step)
+    }
+    expect(
+      section
+        .find('a')
+        .map((_, a) => a.attribs.href)
+        .get(),
+    ).toEqual(['comparar.html', 'claim-groups.json', `${REPO}/tree/main/data/claim-curation`])
+  })
+
+  it('puts the same sentence in the README impartiality rules (DISC-04)', async () => {
+    const readme = await readFile(join(ROOT, 'README.md'), 'utf8')
+    expect(readme).toContain(`- ${DISC}`)
+    expect(readme).not.toContain('Nenhum texto das agências passa por IA')
+  })
+})
