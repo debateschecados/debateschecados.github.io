@@ -733,7 +733,7 @@ T22 → T24
 
 - [x] `actionlint` passes on the file
 - [x] Steps match the design order; deploy is in the same job; `check:labels` is last
-- [ ] Setup checklist written in the README section of T23
+- [x] Setup checklist written in the README section of T23
 
 **Tests**: none
 **Gate**: build
@@ -759,13 +759,15 @@ T22 → T24
 
 **Done when**:
 
-- [ ] Every command in the README runs as written
-- [ ] No em dash in the text
+- [x] Every command in the README runs as written
+- [x] No em dash in the text
 
 **Tests**: none
 **Gate**: build
 
 **Commit**: `docs(readme): Explain running, auditing and adding a debate`
+
+**Status**: ✅ Complete
 
 ---
 
