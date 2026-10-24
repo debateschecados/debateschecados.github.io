@@ -1,0 +1,35 @@
+debates-checados
+Copyright (C) 2026 Gabriel Andreello
+
+Code
+----
+The source code in this repository is licensed under the GNU Affero General
+Public License, version 3 only (AGPL-3.0-only). See LICENSE.
+
+Data
+----
+The structured dataset in data/ (checks.json, checks.csv, run-report.json) and
+the label-to-band table in config/bands.json are licensed under the Creative
+Commons Attribution 4.0 International license (CC BY 4.0):
+https://creativecommons.org/licenses/by/4.0/
+
+Quoted statements, labels and explanation excerpts remain the work of the
+fact-checking outlets that published them (g1 Fato ou Fake, Agencia Lupa,
+Aos Fatos, Estadao Verifica). They are cited with a link to the original page
+and are not covered by the licenses above.
+
+Third-party material
+--------------------
+Party and broadcaster logos (site/logos/): trademarks of their owners, taken
+from Wikimedia Commons. Used only to identify the party or broadcaster; not
+covered by the licenses above.
+
+Candidate illustrations (site/sprites/): drawn by the project, using official
+portraits as reference:
+- Luiz Inacio Lula da Silva: Palacio do Planalto, CC BY 2.0
+  (Wikimedia Commons, "Foto oficial de Luiz Inacio Lula da Silva (ombros).jpg")
+- Flavio Bolsonaro: Agencia Senado
+  (Wikimedia Commons, "Foto oficial do senador Flavio Bolsonaro (v. AgSen).jpg")
+
+Fonts (site/fonts/): Inter and Inter Tight by Rasmus Andersson and The Inter
+Project Authors, SIL Open Font License 1.1 (https://openfontlicense.org).

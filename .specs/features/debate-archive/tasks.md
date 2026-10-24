@@ -124,6 +124,8 @@ T22 → T24
 
 **Commit**: `build(repo): Scaffold Node 24, TypeScript 7, vitest and Biome`
 
+**Status**: ✅ Complete
+
 ---
 
 ### T2: Define shared types

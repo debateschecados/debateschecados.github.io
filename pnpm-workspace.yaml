@@ -1,0 +1,2 @@
+# Own workspace root, so pnpm does not attach to a workspace in a parent directory.
+packages: []
