@@ -106,6 +106,15 @@ describe('index.html (SITE-01)', () => {
     expect(index('footer a[href="metodologia.html"]')).toHaveLength(1)
   })
 
+  it('puts the trust line and the audit control right below the subtitle (AUDIT-01)', () => {
+    const trust = index('.hero > h1 + p + p.trust')
+    expect(trust).toHaveLength(1)
+    expect(trust.text().replace(/\s+/g, ' ').trim()).toBe(
+      'O veredito é sempre da agência. Código e dados são abertos. Veja como auditar',
+    )
+    expect(trust.children().last().is('button[data-open-audit]')).toBe(true)
+  })
+
   it('shows agency text that looks like a template slot as plain text', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'site-build-'))
     try {
@@ -232,6 +241,35 @@ describe('metodologia.html (DATA-03, DATA-07, AUDIT-08)', () => {
         .map((_, td) => method(td).text())
         .get(),
     ).toEqual(['Globo, 23/10/2026', 'Aos Fatos', 'página da agência', 'aosfatos'])
+  })
+})
+
+describe('credits (AUDIT-08)', () => {
+  const credits = [
+    'Ilustrações feitas a partir de retratos oficiais: Palácio do Planalto (CC BY 2.0) e Agência Senado.',
+    'Logos dos partidos e das emissoras: Wikimedia Commons.',
+  ]
+
+  it.each(['index.html', 'metodologia.html'])(
+    'credits portraits and logos in the %s footer',
+    (file) => {
+      const page = file === 'index.html' ? index : method
+      const text = page('footer').text().replace(/\s+/g, ' ')
+      for (const credit of credits) expect(text).toContain(credit)
+    },
+  )
+
+  it('names each portrait source, the logo source and the font license on the methodology page', () => {
+    const items = method('main li')
+      .map((_, li) => method(li).text().replace(/\s+/g, ' ').trim())
+      .get()
+    expect(items).toContain(
+      'Ilustrações desenhadas a partir dos retratos oficiais: Luiz Inácio Lula da Silva, por Palácio do Planalto (CC BY 2.0); Flávio Bolsonaro, por Agência Senado. Os dois retratos estão no Wikimedia Commons.',
+    )
+    expect(items).toContain(
+      'Logos dos partidos e das emissoras: Wikimedia Commons. São marcas dos seus donos, usadas só para identificar.',
+    )
+    expect(items).toContain('Fontes Inter e Inter Tight, licença SIL Open Font License 1.1.')
   })
 })
 

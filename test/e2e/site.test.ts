@@ -264,6 +264,16 @@ describe('audit panel (AUDIT-01, AUDIT-02, AUDIT-04, AUDIT-05)', () => {
     expect(await page.evaluate(() => document.activeElement?.textContent)).toBe('Veja como auditar')
   })
 
+  it('shows the trust line and its control in the first screen on mobile and desktop', async () => {
+    for (const width of [360, 1280]) {
+      const page = await open('/', { viewport: { width, height: 740 } })
+      const box = await page.getByRole('button', { name: 'Veja como auditar' }).boundingBox()
+      expect(box).not.toBeNull()
+      expect((box?.y ?? Infinity) + (box?.height ?? 0)).toBeLessThanOrEqual(740)
+      expect(await page.evaluate(() => scrollY)).toBe(0)
+    }
+  })
+
   it('opens from the fixed "Como auditar" button on mobile and desktop', async () => {
     for (const width of [360, 1280]) {
       const page = await open('/', { viewport: { width, height: 740 } })
