@@ -80,6 +80,14 @@ export function createHttp(options: HttpOptions): Http {
     return run
   }
 
+  // The timeout signal also covers reading the body, so both paths map errors the same way.
+  const failure = (url: URL, error: unknown) => {
+    const name = (error as Error).name
+    if (name === 'TimeoutError' || name === 'AbortError')
+      return new HttpError('timeout', url.href, `no response after ${timeoutMs} ms`)
+    return new HttpError('network', url.href, (error as Error).message)
+  }
+
   const send = (url: URL) =>
     polite(url.hostname, async () => {
       try {
@@ -89,12 +97,17 @@ export function createHttp(options: HttpOptions): Http {
           signal: AbortSignal.timeout(timeoutMs),
         })
       } catch (error) {
-        const name = (error as Error).name
-        if (name === 'TimeoutError' || name === 'AbortError')
-          throw new HttpError('timeout', url.href, `no response after ${timeoutMs} ms`)
-        throw new HttpError('network', url.href, (error as Error).message)
+        throw failure(url, error)
       }
     })
+
+  const read = async <T>(url: URL, body: () => Promise<T>) => {
+    try {
+      return await body()
+    } catch (error) {
+      throw failure(url, error)
+    }
+  }
 
   // Redirects are followed by hand so every hop passes the allowlist, `check` and its host's spacing.
   const follow = async (start: URL, check?: (url: URL) => Promise<void>) => {
@@ -118,7 +131,7 @@ export function createHttp(options: HttpOptions): Http {
     const robotsUrl = new URL('/robots.txt', origin)
     const { url, response } = await follow(robotsUrl)
     let text = ''
-    if (response.status === 200) text = await response.text()
+    if (response.status === 200) text = await read(url, () => response.text())
     else if (response.status < 400 || response.status >= 500)
       throw new HttpError('robots', url.href, 'robots.txt unavailable', response.status)
     return robotsParser(robotsUrl.href, text)
@@ -143,7 +156,7 @@ export function createHttp(options: HttpOptions): Http {
       })
       if (response.status !== 200)
         throw new HttpError('status', url.href, `HTTP ${response.status}`, response.status)
-      const bytes = new Uint8Array(await response.arrayBuffer())
+      const bytes = new Uint8Array(await read(url, () => response.arrayBuffer()))
       return {
         url: url.href,
         body: new TextDecoder().decode(bytes),

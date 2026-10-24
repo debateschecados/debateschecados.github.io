@@ -224,6 +224,45 @@ describe('errors and allowlist', () => {
     expect(error.kind).toBe('timeout')
   })
 
+  it('throws a timeout error when the body stalls after the headers', async () => {
+    const clock = fakeClock()
+    // Like undici: the body stream errors with the signal's reason when the timeout fires.
+    const stall = async (init: RequestInit) =>
+      new Response(
+        new ReadableStream({
+          start(controller) {
+            controller.enqueue(new TextEncoder().encode('partial'))
+            init.signal?.addEventListener('abort', () => controller.error(init.signal?.reason))
+          },
+        }),
+      )
+    const fake = fakeFetch(clock, { 'https://a.test/stall': stall })
+    const http = createHttp({
+      hosts: ['a.test'],
+      repoUrl: REPO,
+      clock,
+      fetch: fake.fetch,
+      timeoutMs: 20,
+    })
+    const error = await http.get('https://a.test/stall').catch((e) => e)
+    expect(error).toBeInstanceOf(HttpError)
+    expect(error).toMatchObject({ kind: 'timeout', url: 'https://a.test/stall' })
+  })
+
+  it('throws a network error when the body breaks for another reason', async () => {
+    const broken = new Response(
+      new ReadableStream({
+        start(controller) {
+          controller.error(new TypeError('terminated'))
+        },
+      }),
+    )
+    const { http } = setup({ 'https://a.test/broken': broken })
+    const error = await http.get('https://a.test/broken').catch((e) => e)
+    expect(error).toBeInstanceOf(HttpError)
+    expect(error.kind).toBe('network')
+  })
+
   it('refuses a host outside the allowlist before any request', async () => {
     const { http, calls } = setup({ 'https://evil.test/x': 'x' })
     const error = await http.get('https://evil.test/x').catch((e) => e)
