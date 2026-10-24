@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, it } from 'vitest'
 import { registry } from '../../src/adapters/index.ts'
 import { type Config, loadConfig } from '../../src/config.ts'
 import { mappedBand, resolveSpeaker } from '../../src/pipeline/normalize.ts'
-import type { ParseNote } from '../../src/types.ts'
+import type { ParsedItem, ParseNote } from '../../src/types.ts'
 import { loadFixture } from './fixtures.ts'
 
 export interface Expected {
@@ -11,6 +11,8 @@ export interface Expected {
   quotes?: number // distinct quotes, when a quote can carry several verdicts
   labels: Record<string, number>
   unrated?: number
+  // Whole items checked by hand against the page; must include the first and the last.
+  pinned: ParsedItem[]
 }
 
 const countBy = (values: string[]) => {
@@ -19,8 +21,8 @@ const countBy = (values: string[]) => {
   return counts
 }
 
-// Golden checks for real pages of one outlet: counts and labels from the design table,
-// every item resolvable, and two parses byte-identical (INGEST-03, DATA-04).
+// Golden checks for real pages of one outlet: counts and labels from the design table, unique
+// keys, hand-checked items, every item resolvable, and two parses byte-identical (INGEST-03, DATA-04).
 export function describeGolden(outlet: string, expected: Record<string, Expected>) {
   let config: Config
   beforeAll(async () => {
@@ -48,6 +50,19 @@ export function describeGolden(outlet: string, expected: Record<string, Expected
       expect(items.map((i) => i.pos)).toEqual(items.map((_, n) => n + 1))
       expect(notes.filter((n) => n.kind !== 'unrated')).toEqual([])
       expect(notes.filter((n) => n.kind === 'unrated')).toHaveLength(want.unrated ?? 0)
+    })
+
+    it('gives every keyed item a unique key', () => {
+      const { adapter } = source(id)
+      const keys = adapter.parse(loadFixture(id)).flatMap((i) => (i.key === null ? [] : [i.key]))
+      expect(new Set(keys).size).toBe(keys.length)
+    })
+
+    it('reads the pinned items field by field', () => {
+      const { adapter } = source(id)
+      const items = adapter.parse(loadFixture(id))
+      expect(want.pinned.map((p) => p.pos)).toEqual(expect.arrayContaining([1, want.items]))
+      for (const pinned of want.pinned) expect(items[pinned.pos - 1]).toEqual(pinned)
     })
 
     it('resolves every speaker to a candidate and every label to a band', () => {
