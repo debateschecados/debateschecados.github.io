@@ -170,6 +170,15 @@ describe('step 2: partial parse guard (INGEST-06)', () => {
     expect(small.records.filter((r) => r.missingSince)).toHaveLength(3)
   })
 
+  it('applies the guard at exactly 5 previous records', () => {
+    const five = first([g1(range(5).map((p) => g1Item(p)))])
+    const { records, events } = merge(five, [g1(range(3).map((p) => g1Item(p)))], ctx())
+    expect(records).toEqual(five)
+    expect(events).toEqual([
+      { type: 'source', sourceId: G1, status: 'partial', reason: '3 items, 5 published' },
+    ])
+  })
+
   it('counts only records not already missing', () => {
     const missing = merge(
       ten(),
@@ -214,6 +223,15 @@ describe('step 3: matching (INGEST-04)', () => {
     expect(records[0].quote).toBe(after)
     expect(records[0].history).toEqual([{ quote: before, until: '2026-10-25' }])
     expect(events).toContainEqual({ type: 'changed', sourceId: LUPA, id: previous[0].id })
+  })
+
+  it('matches a similar quote at exactly Jaccard 0.6', () => {
+    const before = 'casa bola fogo agua vento terra pedra livro'
+    const after = 'casa bola fogo agua vento terra porta janela'
+    expect(jaccard(before, after)).toBe(0.6) // 6 shared of 10 tokens
+    const previous = first([lupa([lupaItem(1, before)])])
+    const { records } = merge(previous, [lupa([lupaItem(1, after)])], ctx())
+    expect(records.map((r) => [r.id, r.quote])).toEqual([[previous[0].id, after]])
   })
 
   it('does not match two distinct quotes with Jaccard 0.35', () => {
@@ -314,6 +332,27 @@ describe('step 3: matching (INGEST-04)', () => {
     const third = merge(second.records, [page], ctx({ date: '2026-10-26' }))
     expect(third.records).toEqual(second.records)
     expect(third.events.filter((e) => e.type !== 'source')).toEqual([])
+  })
+
+  it('gives a new item a fresh id when its quote hashes to an id already taken', () => {
+    const before = 'O salário mínimo subiu acima da inflação em todos os anos do meu governo'
+    const after = 'O salário mínimo subiu acima da inflação em quase os anos do meu governo'
+    const previous = first([lupa([lupaItem(1, before)])])
+    const edited = merge(previous, [lupa([lupaItem(1, after)])], ctx()).records
+    expect(edited.map((r) => r.id)).toEqual([previous[0].id])
+    // `before` comes back as a new item and hashes to "<quoteKey>#1", the id `after` now holds.
+    const { records } = merge(
+      edited,
+      [lupa([lupaItem(1, after), lupaItem(2, before)])],
+      ctx({ date: '2026-10-26' }),
+    )
+    const ids = records.map((r) => r.id)
+    expect(ids).toHaveLength(2)
+    expect(new Set(ids).size).toBe(2)
+    expect(records.find((r) => r.quote === after)?.id).toBe(previous[0].id)
+    expect(records.find((r) => r.quote === before)?.id).toBe(
+      recordId(LUPA, `${quoteKey(before)}#2`),
+    )
   })
 
   it('matches a rewritten quote through config/id-links.json', () => {
