@@ -95,6 +95,26 @@ describe('spacing (INGEST-07)', () => {
     expect(b[0]).toMatchObject({ url: 'https://b.test/robots.txt', at: before })
   })
 
+  it('spaces archive.org and web.archive.org as one service', async () => {
+    const { http, calls } = setup({
+      'https://web.archive.org/web/1id_/https://a.test/': 'snap',
+      'https://archive.org/wayback/available?url=a.test': '{}',
+    })
+    await Promise.all([
+      http.get('https://web.archive.org/web/1id_/https://a.test/'),
+      http.get('https://archive.org/wayback/available?url=a.test'),
+    ])
+    expect(calls.map((c) => new URL(c.url).hostname).sort()).toEqual([
+      'archive.org',
+      'archive.org',
+      'web.archive.org',
+      'web.archive.org',
+    ])
+    const starts = calls.map((c) => c.at).sort((x, y) => x - y)
+    for (let i = 1; i < starts.length; i++)
+      expect(starts[i] - starts[i - 1]).toBeGreaterThanOrEqual(SPACING_MS)
+  })
+
   it('reads robots.txt once per domain', async () => {
     const { http, calls } = setup({ 'https://a.test/1': 'x', 'https://a.test/2': 'y' })
     await http.get('https://a.test/1')

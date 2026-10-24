@@ -66,15 +66,17 @@ export function createHttp(options: HttpOptions): Http {
   const robots = new Map<string, Promise<Robot>>()
 
   // Requests to one host run one after another, each starting at least SPACING_MS after the last.
+  // The archive hosts are one service and share one lane.
   const polite = <T>(host: string, task: () => Promise<T>) => {
-    const run = (lanes.get(host) ?? Promise.resolve()).then(async () => {
-      const wait = (lastStart.get(host) ?? Number.NEGATIVE_INFINITY) + SPACING_MS - clock.now()
+    const lane = ARCHIVE_HOSTS.includes(host) ? ARCHIVE_HOSTS[0] : host
+    const run = (lanes.get(lane) ?? Promise.resolve()).then(async () => {
+      const wait = (lastStart.get(lane) ?? Number.NEGATIVE_INFINITY) + SPACING_MS - clock.now()
       if (wait > 0) await clock.sleep(wait)
-      lastStart.set(host, clock.now())
+      lastStart.set(lane, clock.now())
       return task()
     })
     lanes.set(
-      host,
+      lane,
       run.catch(() => {}),
     )
     return run
