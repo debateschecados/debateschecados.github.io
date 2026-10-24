@@ -93,7 +93,7 @@ function fromEscriba(blocks: EscribaBlock[], doc: number, notes: ParseNote[]): R
       raws.push({
         key: node.id,
         doc,
-        anchor: null,
+        anchor: node.id, // the page renders each comment as <p id="<comment id>">
         speaker,
         quote,
         stamp,
@@ -104,13 +104,16 @@ function fromEscriba(blocks: EscribaBlock[], doc: number, notes: ParseNote[]): R
   return raws
 }
 
-// Each doc is either a page (server HTML) or an Escriba transcript (JSON array).
+const isEscriba = (doc: Doc) => doc.body.trimStart().startsWith('[')
+
+// Each doc is either a page (server HTML) or an Escriba transcript (JSON array). When a transcript
+// is present it is the only item source: a rendered page shows the same checks again.
 export function parseAosFatos(docs: Doc[], notes: ParseNote[] = []): ParsedItem[] {
-  const raws = docs.flatMap((d, i) =>
-    d.body.trimStart().startsWith('[')
-      ? fromEscriba(JSON.parse(d.body) as EscribaBlock[], i, notes)
-      : fromHtml(d.body, i, notes),
-  )
+  const escriba = docs.some(isEscriba)
+  const raws = docs.flatMap((d, i) => {
+    if (isEscriba(d)) return fromEscriba(JSON.parse(d.body) as EscribaBlock[], i, notes)
+    return escriba ? [] : fromHtml(d.body, i, notes)
+  })
   const items: ParsedItem[] = []
   for (const raw of raws) {
     const quote = cleanQuote(raw.quote)
@@ -139,7 +142,7 @@ export function parseAosFatos(docs: Doc[], notes: ParseNote[] = []): ParsedItem[
 
 export const aosfatos: Adapter = {
   kind: 'aosfatos',
-  version: 1,
+  version: 2,
   configSchema,
   async load(source, io) {
     const page = await io.get(configSchema.parse(source).url)

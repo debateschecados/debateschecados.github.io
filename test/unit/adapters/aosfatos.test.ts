@@ -128,7 +128,6 @@ describe('aosfatos parse, Escriba API (INGEST-03)', () => {
     ])
     expect(items[0]).toMatchObject({
       doc: 0,
-      anchor: null,
       quote: 'Plantamos mil árvores na praça central.',
     })
   })
@@ -152,6 +151,27 @@ describe('aosfatos parse, Escriba API (INGEST-03)', () => {
     const both = aosfatos.parse([doc(PAGE_URL, GLOBO_PAGE), doc(API_URL, ESCRIBA)])
     expect(both.map((i) => i.doc)).toEqual([1, 1, 1])
     expect(both.map(({ doc, ...rest }) => rest)).toEqual(items.map(({ doc, ...rest }) => rest))
+  })
+
+  it('anchors each item at the comment id, which the page uses as <p id>', () => {
+    expect(items.map((i) => i.anchor)).toEqual([U(5), U(6), U(8)])
+  })
+
+  it('ignores stamps in a rendered page when the transcript is present', () => {
+    const rendered = page(
+      speaker('Candidata Um'),
+      said(U(5), 'Plantamos mil árvores na praça central.'),
+      stamp('verdadeiro', 'Registro confirma.'),
+      said(U(6), 'A ponte custou dez vezes o previsto.'),
+      stamp('falso', 'Custo menor.'),
+    )
+    const both = aosfatos.parse([doc(PAGE_URL, rendered), doc(API_URL, ESCRIBA)])
+    expect(both.map((i) => [i.key, i.doc])).toEqual([
+      [U(5), 1],
+      [U(6), 1],
+      [U(8), 1],
+    ])
+    expect(aosfatos.parse([doc(PAGE_URL, rendered)])).toHaveLength(2)
   })
 
   it('is pure: the same docs give byte-identical items (DATA-04)', () => {
