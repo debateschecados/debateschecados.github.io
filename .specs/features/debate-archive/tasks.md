@@ -361,6 +361,8 @@ T22 → T24
 
 **Commit**: `feat(adapters): Parse g1 Fato ou Fake debate pages`
 
+**Status**: ✅ Complete
+
 ---
 
 ### T10: Parse Lupa debate pages
