@@ -445,6 +445,8 @@ T22 → T24
 
 **Commit**: `feat(adapters): Parse Aos Fatos HTML and Escriba transcripts`
 
+**Status**: ✅ Complete
+
 ---
 
 ### T13: Register adapters and pin golden counts
