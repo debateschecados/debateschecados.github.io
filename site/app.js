@@ -9,7 +9,7 @@ import {
   scoreboard,
   writeState,
 } from './core.js'
-import { filtersHtml } from './render.js'
+import { filtersHtml, tabsHtml } from './render.js'
 
 const $ = (/** @type {string} */ sel) => /** @type {HTMLElement} */ (document.querySelector(sel))
 
@@ -212,9 +212,12 @@ function render() {
   renderSegmented()
   renderBoard(items)
   $('#notice').textContent = notice(ctx, state)
+  // Removed records never count in the scoreboard, so that tab hides it.
+  board.hidden = state.removed
+  $('#tabs').innerHTML = tabsHtml(ctx, state)
   // The controls are rebuilt, so keyboard focus goes back to the one the visitor was using.
   const focused = /** @type {HTMLElement | null} */ (filters.querySelector(':focus'))
-  const again = focused?.dataset.key ? `[data-key="${focused.dataset.key}"]` : '[data-removed]'
+  const again = focused?.dataset.key ? `[data-key="${focused.dataset.key}"]` : 'select'
   filters.innerHTML = filtersHtml(ctx, state, items.length)
   if (focused) /** @type {HTMLElement | null} */ (filters.querySelector(again))?.focus()
   const count = /** @type {HTMLElement} */ (filters.querySelector('.count .n'))
@@ -223,6 +226,9 @@ function render() {
   shownCount = items.length
   renderList(items)
 }
+
+const search = /** @type {HTMLInputElement} */ ($('#q'))
+search.value = state.q
 
 function update() {
   history.replaceState(null, '', writeState(state) || location.pathname)
@@ -236,8 +242,20 @@ document.addEventListener('click', (e) => {
     state.debate = debate.dataset.debate || null
     update()
   }
+  const tab = /** @type {HTMLElement | null} */ (target.closest('[data-tab]'))
+  if (tab) {
+    state.removed = tab.dataset.tab === 'removed'
+    update()
+    // The tabs were rebuilt, so focus goes back to the one just pressed.
+    const again = /** @type {HTMLElement | null} */ (
+      $('#tabs').querySelector(`[data-tab="${tab.dataset.tab}"]`)
+    )
+    again?.focus()
+  }
   if (target.closest('[data-clear]')) {
     state = emptyState()
+    clearTimeout(typing)
+    search.value = ''
     update()
     // The button left with the empty state; focus moves to the first filter.
     filters.querySelector('select')?.focus()
@@ -249,10 +267,17 @@ document.addEventListener('change', (e) => {
     state[/** @type {'outlet'} */ (target.dataset.key)] = target.value || null
     update()
   }
-  if (target.matches('[data-removed]')) {
-    state.removed = target.checked
+})
+// Each keystroke would filter every record, redraw the board and animate the list, so the
+// search waits until the visitor pauses typing.
+const TYPING_PAUSE = 200
+let typing = 0
+search.addEventListener('input', () => {
+  clearTimeout(typing)
+  typing = setTimeout(() => {
+    state.q = search.value
     update()
-  }
+  }, TYPING_PAUSE)
 })
 
 render()

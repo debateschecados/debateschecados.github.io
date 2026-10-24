@@ -59,6 +59,16 @@ describe('index.html (SITE-01)', () => {
     )
   })
 
+  it('pre-renders the tabs with both counts and an empty search box', () => {
+    const tabs = index('#tabs button')
+    expect(tabs.map((_, b) => index(b).text().replace(/\s+/g, ' ')).get()).toEqual([
+      `Checagens ${found().length}`,
+      `Removidas ${records.length - found().length}`,
+    ])
+    expect(index('#tabs button[aria-pressed="true"]').attr('data-tab')).toBe('live')
+    expect(index('input#q[type="search"]').attr('value')).toBeUndefined()
+  })
+
   it('inlines records and config as JSON that a quote cannot break out of', () => {
     const data = JSON.parse(index('script#data[type="application/json"]').text())
     expect(data.records).toEqual(records)

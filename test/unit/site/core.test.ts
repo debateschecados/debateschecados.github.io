@@ -4,10 +4,12 @@ import {
   createContext,
   emptyState,
   listed,
+  liveCount,
   NOTICE,
   notice,
   optionCount,
   options,
+  REMOVED_NOTICE,
   readState,
   removedCount,
   scoreboard,
@@ -179,23 +181,25 @@ describe('scoreboard', () => {
 })
 
 describe('removed records (HIST-02)', () => {
-  it('hides them from the list unless the toggle is on', () => {
+  it('lists them only on the removed tab, and only them', () => {
     const ctx = context()
     const removed = records.filter((r) => r.missingSince).map((r) => r.id)
     expect(removed).toHaveLength(2)
     expect(ids(listed(ctx, state()))).not.toContain(removed[0])
     expect(listed(ctx, state())).toHaveLength(records.length - 2)
-    const shown = ids(listed(ctx, state({ removed: true })))
-    expect(shown).toEqual(expect.arrayContaining(removed))
-    expect(shown).toHaveLength(records.length)
+    expect(ids(listed(ctx, state({ removed: true }))).sort()).toEqual(removed.sort())
   })
 
-  it('leaves them out of every scoreboard, even when shown', () => {
+  it('leaves them out of every scoreboard, even on their own tab', () => {
     const ctx = context()
-    const off = scoreboard(ctx, listed(ctx, state()))
-    const on = scoreboard(ctx, listed(ctx, state({ removed: true })))
-    expect(on).toEqual(off)
-    expect(off.reduce((s, r) => s + r.total, 0)).toBe(records.length - 2)
+    const live = scoreboard(ctx, listed(ctx, state()))
+    const gone = scoreboard(ctx, listed(ctx, state({ removed: true })))
+    expect(live.reduce((s, r) => s + r.total, 0)).toBe(records.length - 2)
+    expect(gone.reduce((s, r) => s + r.total, 0)).toBe(0)
+  })
+
+  it('explains the removed tab in the notice', () => {
+    expect(notice(context(), state({ removed: true }))).toBe(REMOVED_NOTICE)
   })
 
   it('counts removed records under the current filters', () => {
@@ -203,11 +207,51 @@ describe('removed records (HIST-02)', () => {
     expect(removedCount(ctx, state())).toBe(2)
     expect(removedCount(ctx, state({ debate: 'globo-2026-10-23' }))).toBe(1)
     expect(removedCount(ctx, state({ outlet: 'aosfatos' }))).toBe(0)
+    expect(liveCount(ctx, state())).toBe(records.length - 2)
+  })
+})
+
+describe('search', () => {
+  it('matches the quote or the excerpt, ignoring case and accents', () => {
+    const ctx = context()
+    expect(ids(listed(ctx, state({ q: 'NUMERO 12,' })))).toEqual(['00000000000c'])
+    expect(ids(listed(ctx, state({ q: 'explicacao de teste 12.' })))).toEqual(['00000000000c'])
+    expect(listed(ctx, state({ q: 'inventada' }))).toHaveLength(records.length - 3)
+  })
+
+  it('needs every word, in any order', () => {
+    const ctx = context()
+    expect(ids(listed(ctx, state({ q: 'aspas  disse' })))).toEqual(['000000000009'])
+    expect(listed(ctx, state({ q: 'aspas inventada' }))).toHaveLength(0)
+  })
+
+  it('combines with the other filters and with the removed tab', () => {
+    const ctx = context()
+    const lula = listed(ctx, state({ q: 'inventada', speaker: 'lula' }))
+    expect(lula.length).toBeGreaterThan(0)
+    expect(lula.every((r) => r.speaker === 'lula')).toBe(true)
+    expect(ids(listed(ctx, state({ q: 'numero 23,', removed: true })))).toEqual(['000000000017'])
+    expect(listed(ctx, state({ q: 'numero 23,' }))).toHaveLength(0)
+  })
+
+  it('narrows option and tab counts', () => {
+    const ctx = context()
+    expect(removedCount(ctx, state({ q: 'numero 23,' }))).toBe(1)
+    expect(liveCount(ctx, state({ q: 'numero 23,' }))).toBe(0)
+    expect(optionCount(ctx, state({ q: 'inventada' }), 'speaker', 'lula')).toBe(
+      listed(ctx, state({ q: 'inventada', speaker: 'lula' })).length,
+    )
+  })
+
+  it('round-trips through the URL', () => {
+    const ctx = context()
+    expect(writeState(state({ q: ' obras ' }))).toBe('?q=obras')
+    expect(readState('?q=obras+paralisadas', ctx).q).toBe('obras paralisadas')
   })
 })
 
 describe('URL state', () => {
-  it('writes every active filter and the toggle to the query (SHARE-01)', () => {
+  it('writes every active filter and the removed tab to the query (SHARE-01)', () => {
     const qs = writeState(
       state({ debate: 'band-2026-10-18', outlet: 'lupa', speaker: 'flavio', band: 'sem faixa' }),
     )
