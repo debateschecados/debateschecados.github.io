@@ -136,13 +136,18 @@ function renderList(items) {
       width: `${r.width}px`,
       pointerEvents: 'none',
     })
-    el.animate([{ opacity: 1 }, { opacity: 0, transform: 'translateY(-8px)' }], {
+    const exit = el.animate([{ opacity: 1 }, { opacity: 0, transform: 'translateY(-8px)' }], {
       duration: 160,
       easing: 'ease-in',
       fill: 'forwards',
-    }).finished.then(
+    })
+    exit.finished.then(
       () => {
-        if (!shown.has(id)) el.remove()
+        if (shown.has(id)) return
+        // Cancel before detaching: a detached element reports no animations, so the
+        // forwards fill would survive and hide the item when a filter brings it back.
+        exit.cancel()
+        el.remove()
       },
       () => {},
     )

@@ -202,6 +202,19 @@ describe('list, filters and URL (SITE-01, SITE-03, SHARE-01, SHARE-02)', () => {
     expect(await shared.inputValue('select[data-key="outlet"]')).toBe('lupa')
   })
 
+  it('shows items again at full opacity when a filter brings them back', async () => {
+    const page = await open()
+    for (const debate of ['globo-2026-10-23', 'band-2026-10-18', '']) {
+      await page.click(`[data-debate="${debate}"]`)
+      await settle(page)
+    }
+    const opacities = await page.$$eval('#list > li.item', (lis) =>
+      lis.map((li) => getComputedStyle(li).opacity),
+    )
+    expect(opacities).toHaveLength(records.length - removed.length)
+    expect(opacities.filter((o) => o !== '1')).toEqual([])
+  })
+
   it('shows the empty state and clears every filter from it (SITE-05)', async () => {
     const page = await open()
     await choose(page, 'outlet', 'g1')
