@@ -43,6 +43,17 @@ describe('resolveSpeaker (INGEST-05)', () => {
     expect(resolveSpeaker(raw, config.candidates)).toBeNull()
   })
 
+  // Another person who shares a first name with a candidate is not that candidate.
+  it.each([
+    'Flávio Dino',
+    'Lula Marques',
+    'Flávio Bolsonaro Filho',
+    'Carlos Flávio Souza',
+    'Ana Lula',
+  ])('returns null for %s, which only contains an alias', (raw) => {
+    expect(resolveSpeaker(raw, config.candidates)).toBeNull()
+  })
+
   it('only resolves candidates of the given debate', () => {
     const onlyLula = config.candidates.filter((c) => c.id === 'lula')
     expect(resolveSpeaker('Flávio', onlyLula)).toBeNull()

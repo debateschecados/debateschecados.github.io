@@ -250,6 +250,23 @@ describe('ingest (INGEST-01, INGEST-02, INGEST-05, INGEST-09)', () => {
     expect(sources[`alpha-${BAND}`]).toMatchObject({ status: 'ok', items: 5, unmappedLabels: [] })
   })
 
+  it('excludes a speaker whose name only starts with a candidate alias (INGEST-05)', async () => {
+    await writePage(`beta-${BAND}`, {
+      items: [item(1), item(2, { speakerRaw: 'Lula Marques, fotógrafo' }), item(3)],
+    })
+    await run(fakeClock())
+    const beta = url(`beta-${BAND}`)
+    expect((await reported()).sources[`beta-${BAND}`]).toMatchObject({
+      items: 2,
+      excluded: [{ url: beta, pos: 2, reason: 'speaker not resolved: "Lula Marques, fotógrafo"' }],
+    })
+    const records = (await published()).filter((r) => r.sourceId === `beta-${BAND}`)
+    expect(records.map((r) => [r.pos, r.speaker])).toEqual([
+      [1, 'lula'],
+      [3, 'lula'],
+    ])
+  })
+
   it('keeps the old records of a source that fails and reports the failure (INGEST-06)', async () => {
     await run(fakeClock())
     const before = (await published()).filter((r) => r.sourceId === `alpha-${BAND}`)
