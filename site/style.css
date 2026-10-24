@@ -974,13 +974,21 @@ body {
   overflow-wrap: anywhere;
 }
 .verdict small {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-family: Inter, sans-serif;
   font-size: 13px;
   font-weight: 400;
   color: var(--muted);
   margin-top: 6px;
   letter-spacing: 0;
+}
+.outlet-logo {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
 }
 .who {
   font-size: 14px;

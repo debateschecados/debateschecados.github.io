@@ -29,6 +29,7 @@ describe('itemHtml (SITE-02)', () => {
     expect(li.find('h3')).toHaveLength(1)
     expect(li.find('.verdict').attr('title')).toBe('Rótulo da agência: FALSO')
     expect(li.find('.verdict small').text()).toBe('Lupa')
+    expect(li.find('.verdict small img.outlet-logo').attr('src')).toBe('logos/lupa.png')
     expect(li.hasClass('band-falso')).toBe(true)
     expect(li.find('.who').text()).toBe('Lula no debate da Band, 18/10')
     expect(li.find('.quote').text()).toBe(`“${r.quote}”`)
