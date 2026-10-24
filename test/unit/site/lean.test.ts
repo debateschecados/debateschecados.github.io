@@ -204,18 +204,43 @@ describe('sentence rule (LEAN-03, LEAN-04)', () => {
 })
 
 describe('headline (LEAN-05)', () => {
-  it('says no agency differs when every sentence is "sem diferença clara"', () => {
-    const none = OUTLETS.map((outlet) => ({ outlet, verdict: 'none' }))
-    expect(headline(none as never, ctx)).toBe(
+  // Verdicts in agency order: Aos Fatos, Estadão Verifica, g1 Fato ou Fake, Lupa.
+  const say = (...verdicts: string[]) =>
+    headline(OUTLETS.map((outlet, i) => ({ outlet, verdict: verdicts[i] })) as never, ctx)
+
+  it('says none of the four differs when every agency has the sentence "sem diferença clara"', () => {
+    expect(say('none', 'none', 'none', 'none')).toBe(
       'Pelos dados de hoje, nenhuma das quatro mostra diferença clara entre os candidatos.',
     )
   })
 
   it('names each agency with a clear difference, in agency order', () => {
-    const verdicts = { aosfatos: 'c2', estadao: 'none', g1: 'c1', lupa: 'small' }
-    const result = OUTLETS.map((outlet) => ({ outlet, verdict: verdicts[outlet as 'g1'] }))
-    expect(headline(result as never, ctx)).toBe(
+    expect(say('c2', 'none', 'c1', 'none')).toBe(
       'Aos Fatos foi mais dura com Flávio Bolsonaro do que as outras agências. g1 Fato ou Fake foi mais dura com Lula do que as outras agências.',
+    )
+  })
+
+  it('adds the agencies with a small sample after the clear differences', () => {
+    expect(say('c2', 'none', 'c1', 'small')).toBe(
+      'Aos Fatos foi mais dura com Flávio Bolsonaro do que as outras agências. g1 Fato ou Fake foi mais dura com Lula do que as outras agências. Lupa tem amostra pequena.',
+    )
+    expect(say('small', 'c1', 'small', 'none')).toBe(
+      'Estadão Verifica foi mais dura com Lula do que as outras agências. Aos Fatos e g1 Fato ou Fake têm amostra pequena.',
+    )
+  })
+
+  it('names only the agencies with enough claims when none differs and some have a small sample', () => {
+    expect(say('none', 'small', 'none', 'none')).toBe(
+      'Pelos dados de hoje, Aos Fatos, g1 Fato ou Fake e Lupa não mostram diferença clara entre os candidatos. Estadão Verifica tem amostra pequena.',
+    )
+    expect(say('small', 'small', 'none', 'small')).toBe(
+      'Pelos dados de hoje, g1 Fato ou Fake não mostra diferença clara entre os candidatos. Aos Fatos, Estadão Verifica e Lupa têm amostra pequena.',
+    )
+  })
+
+  it('says no agency has enough claims when every agency has a small sample', () => {
+    expect(say('small', 'small', 'small', 'small')).toBe(
+      'Pelos dados de hoje, nenhuma agência tem falas suficientes para medir a diferença.',
     )
   })
 })

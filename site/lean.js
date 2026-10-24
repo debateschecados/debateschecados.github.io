@@ -112,21 +112,39 @@ export function sentence(verdict, ctx) {
   return `mais dura com ${called(c)} do que as outras agências`
 }
 
-// The page's opening line (LEAN-05): one sentence per agency with a clear difference, in agency
-// order, or the "nenhuma" sentence when no agency has one.
+// "A", "A e B", "A, B e C".
+const list = (/** @type {string[]} */ xs) =>
+  xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join(', ')} e ${xs.at(-1)}`
+
+// The page's opening line (LEAN-05), in agency order: one sentence per agency with a clear
+// difference; when there is none, which agencies show no clear difference, or that none has
+// enough claims; then which agencies have a small sample, unless all of them do.
 /** @param {Lean} result @param {Context} ctx */
 export function headline(result, ctx) {
-  const clear = result.filter((r) => r.verdict === 'c1' || r.verdict === 'c2')
-  if (!clear.length) {
+  const names = (/** @type {Verdict} */ verdict) =>
+    result.filter((r) => r.verdict === verdict).map((r) => ctx.outlets[r.outlet].name)
+  const lines = result.flatMap((r) => {
+    if (r.verdict !== 'c1' && r.verdict !== 'c2') return []
+    const c = ctx.candidates[r.verdict === 'c1' ? 0 : 1]
+    return [
+      `${ctx.outlets[r.outlet].name} foi mais dura com ${called(c)} do que as outras agências.`,
+    ]
+  })
+  const none = names('none')
+  const small = names('small')
+  if (!lines.length && !none.length)
+    return 'Pelos dados de hoje, nenhuma agência tem falas suficientes para medir a diferença.'
+  if (!lines.length && !small.length) {
     const n = ctx.outletIds.length
     return `Pelos dados de hoje, nenhuma das ${COUNT[n] ?? n} mostra diferença clara entre os candidatos.`
   }
-  return clear
-    .map((r) => {
-      const c = ctx.candidates[r.verdict === 'c1' ? 0 : 1]
-      return `${ctx.outlets[r.outlet].name} foi mais dura com ${called(c)} do que as outras agências.`
-    })
-    .join(' ')
+  if (!lines.length)
+    lines.push(
+      `Pelos dados de hoje, ${list(none)} ${none.length === 1 ? 'não mostra' : 'não mostram'} diferença clara entre os candidatos.`,
+    )
+  if (small.length)
+    lines.push(`${list(small)} ${small.length === 1 ? 'tem' : 'têm'} amostra pequena.`)
+  return lines.join(' ')
 }
 
 // "+0,12", "−0,05", "0,00": two decimals, pt-BR comma, a real minus sign, never "−0,00".

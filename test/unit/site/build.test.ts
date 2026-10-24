@@ -309,6 +309,9 @@ describe('metodologia.html, distance and changed verdicts (LEAN-08)', () => {
       'A regra olha as pontas do intervalo arredondadas para duas casas, como a página mostra: uma ponta que aparece como 0,00 conta como zero.',
     )
     expect(sentence('small', ctx)).toBe('amostra pequena')
+    expect(text).toContain(
+      'Uma agência com amostra pequena nunca conta como “sem diferença clara”: a frase diz à parte quais têm amostra pequena e, se todas têm, que nenhuma agência tem falas suficientes para medir a diferença.',
+    )
     for (const limit of [
       'a conta só usa falas que duas ou mais agências checaram',
       'o que cada agência escolheu checar, e o que deixou de checar, não entra',
@@ -524,7 +527,7 @@ describe('comparar.html (CMP-01, CMP-06, CMP-08, LEAN-06, DRIFT-03)', () => {
         .get(),
     ).toEqual(Array(4).fill('Amostra pequena.'))
     expect(text('#answer')).toBe(
-      'Pelos dados de hoje, nenhuma das quatro mostra diferença clara entre os candidatos.',
+      'Pelos dados de hoje, nenhuma agência tem falas suficientes para medir a diferença.',
     )
   })
 
