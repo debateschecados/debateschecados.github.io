@@ -622,6 +622,8 @@ T22 → T24
 
 **Commit**: `feat(site): Add shared item and scoreboard templates`
 
+**Status**: ✅ Complete
+
 ---
 
 ### T19: Move the page shell and assets out of the mock
