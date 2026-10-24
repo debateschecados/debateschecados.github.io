@@ -1,0 +1,14 @@
+{
+  "aosfatos": { "name": "Aos Fatos", "type": "fact-checker", "url": "https://www.aosfatos.org" },
+  "estadao": {
+    "name": "Estadão Verifica",
+    "type": "fact-checker",
+    "url": "https://www.estadao.com.br/estadao-verifica/"
+  },
+  "g1": {
+    "name": "g1 Fato ou Fake",
+    "type": "fact-checker",
+    "url": "https://g1.globo.com/fato-ou-fake/"
+  },
+  "lupa": { "name": "Lupa", "type": "fact-checker", "url": "https://www.agencialupa.org" }
+}

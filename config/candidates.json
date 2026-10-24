@@ -1,0 +1,22 @@
+[
+  {
+    "id": "lula",
+    "name": "Luiz Inácio Lula da Silva",
+    "short": "Lula",
+    "party": "PT",
+    "number": 13,
+    "aliases": ["lula", "luiz inacio lula da silva"],
+    "partyLogo": "logos/pt.svg",
+    "sprite": "lula"
+  },
+  {
+    "id": "flavio",
+    "name": "Flávio Nantes Bolsonaro",
+    "short": "Flávio",
+    "party": "PL",
+    "number": 22,
+    "aliases": ["flavio", "flavio bolsonaro"],
+    "partyLogo": "logos/pl.svg",
+    "sprite": "flavio"
+  }
+]

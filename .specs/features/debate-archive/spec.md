@@ -254,7 +254,7 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 | SCORE-05 | P1: Scoreboards | Tasks: T17 | Pending |
 | DATA-01 | P1: Open, auditable data | Tasks: T7, T20 | Pending |
 | DATA-02 | P1: Open, auditable data | Tasks: T14 | Pending |
-| DATA-03 | P1: Open, auditable data | Tasks: T3, T16, T20 | Pending |
+| DATA-03 | P1: Open, auditable data | Tasks: T3, T16, T20 | In Progress |
 | DATA-04 | P1: Open, auditable data | Tasks: T7, T13 | Pending |
 | DATA-05 | P1: Open, auditable data | Tasks: T1, T20 | In Progress |
 | DATA-06 | P1: Open, auditable data | Tasks: T14 | Pending |
@@ -271,7 +271,7 @@ During the 2026 presidential runoff, four fact-checking agencies checked the Ban
 | HIST-02 | P2: Re-runs keep history | Tasks: T6, T17, T21 | Pending |
 | SHARE-01 | P2: Shareable filters | Tasks: T17 | Pending |
 | SHARE-02 | P2: Shareable filters | Tasks: T17 | Pending |
-| CONF-01 | P2: New debate by configuration | Tasks: T3, T15 | Pending |
+| CONF-01 | P2: New debate by configuration | Tasks: T3, T15 | In Progress |
 | CONF-02 | P2: New debate by configuration | Tasks: T15 | Pending |
 
 **Coverage:** 42 total, 42 mapped to tasks, 0 unmapped

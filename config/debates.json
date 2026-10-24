@@ -1,0 +1,70 @@
+{
+  "debates": [
+    {
+      "id": "band-2026-10-18",
+      "broadcaster": { "name": "Band", "logo": "logos/band.png" },
+      "date": "2026-10-18",
+      "round": 2,
+      "candidates": ["lula", "flavio"],
+      "sources": [
+        {
+          "id": "g1-band-2026-10-18",
+          "outlet": "g1",
+          "adapter": "g1-page",
+          "url": "https://g1.globo.com/fato-ou-fake/eleicoes/noticia/2026/10/19/veja-o-que-e-fato-ou-fake-nas-falas-de-flavio-bolsonaro-e-lula-no-debate-da-band-no-2o-turno-das-eleicoes-2026.ghtml"
+        },
+        {
+          "id": "lupa-band-2026-10-18",
+          "outlet": "lupa",
+          "adapter": "lupa-page",
+          "url": "https://www.agencialupa.org/checagem/2026/10/18/ao-vivo-checagem-do-debate-entre-lula-e-flavio-bolsonaro-na-band/"
+        },
+        {
+          "id": "aosfatos-band-2026-10-18",
+          "outlet": "aosfatos",
+          "adapter": "aosfatos",
+          "url": "https://www.aosfatos.org/noticias/checamos-lula-flavio-bolsonaro-debate-band/"
+        },
+        {
+          "id": "estadao-band-2026-10-18",
+          "outlet": "estadao",
+          "adapter": "estadao-page",
+          "url": "https://www.estadao.com.br/estadao-verifica/checamos-o-debate-entre-lula-e-flavio-na-band/"
+        }
+      ]
+    },
+    {
+      "id": "globo-2026-10-23",
+      "broadcaster": { "name": "Globo", "logo": "logos/globo.svg" },
+      "date": "2026-10-23",
+      "round": 2,
+      "candidates": ["lula", "flavio"],
+      "sources": [
+        {
+          "id": "g1-globo-2026-10-23",
+          "outlet": "g1",
+          "adapter": "g1-page",
+          "url": "https://g1.globo.com/fato-ou-fake/eleicoes/noticia/2026/10/23/veja-o-que-e-fato-ou-fake-nas-falas-de-flavio-bolsonaro-e-lula-no-debate-da-globo-no-2o-turno-das-eleicoes-2026.ghtml"
+        },
+        {
+          "id": "lupa-globo-2026-10-23",
+          "outlet": "lupa",
+          "adapter": "lupa-page",
+          "url": "https://www.agencialupa.org/checagem/2026/10/23/ao-vivo-checagem-do-ultimo-debate-entre-lula-e-flavio-bolsonaro-no-segundo-turno/"
+        },
+        {
+          "id": "aosfatos-globo-2026-10-23",
+          "outlet": "aosfatos",
+          "adapter": "aosfatos",
+          "url": "https://www.aosfatos.org/noticias/checamos-flavio-bolsonaro-lula-debate-globo/"
+        },
+        {
+          "id": "estadao-globo-2026-10-23",
+          "outlet": "estadao",
+          "adapter": "estadao-page",
+          "url": "https://www.estadao.com.br/estadao-verifica/debate-tv-globo-checagem-tempo-real-ao-vivo/"
+        }
+      ]
+    }
+  ]
+}

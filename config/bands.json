@@ -1,0 +1,31 @@
+{
+  "aosfatos": [
+    { "label": "verdadeiro", "band": "verdadeiro", "definitionUrl": null },
+    { "label": "não é bem assim", "band": "impreciso", "definitionUrl": null },
+    { "label": "falso", "band": "falso", "definitionUrl": null }
+  ],
+  "estadao": [
+    { "label": "é verdadeiro", "band": "verdadeiro", "definitionUrl": null },
+    { "label": "é enganoso", "band": "impreciso", "definitionUrl": null },
+    { "label": "é impreciso", "band": "impreciso", "definitionUrl": null },
+    { "label": "falta contexto", "band": "impreciso", "definitionUrl": null },
+    { "label": "é exagerado", "band": "impreciso", "definitionUrl": null },
+    { "label": "é subestimado", "band": "impreciso", "definitionUrl": null },
+    { "label": "está subestimado", "band": "impreciso", "definitionUrl": null },
+    { "label": "é falso", "band": "falso", "definitionUrl": null },
+    { "label": "é inconclusivo", "band": "sem faixa", "definitionUrl": null }
+  ],
+  "g1": [
+    { "label": "#FATO", "band": "verdadeiro", "definitionUrl": null },
+    { "label": "#NÃOÉBEMASSIM", "band": "impreciso", "definitionUrl": null },
+    { "label": "#FAKE", "band": "falso", "definitionUrl": null }
+  ],
+  "lupa": [
+    { "label": "VERDADEIRO", "band": "verdadeiro", "definitionUrl": null },
+    { "label": "EXAGERADO", "band": "impreciso", "definitionUrl": null },
+    { "label": "SUBESTIMADO", "band": "impreciso", "definitionUrl": null },
+    { "label": "FALTA CONTEXTO", "band": "impreciso", "definitionUrl": null },
+    { "label": "FALSO", "band": "falso", "definitionUrl": null },
+    { "label": "INSUSTENTÁVEL", "band": "sem faixa", "definitionUrl": null }
+  ]
+}
