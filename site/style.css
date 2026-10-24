@@ -962,6 +962,7 @@ textarea:focus-visible {
 }
 .doc a {
   color: var(--link);
+  overflow-wrap: anywhere;
 }
 .table-wrap {
   overflow-x: auto;
