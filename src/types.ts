@@ -54,6 +54,7 @@ export interface HistoryEntry {
   label?: string
   quote?: string
   speaker?: string
+  key?: string | null // the source's previous item id (DRIFT-01)
   until: string
 }
 
