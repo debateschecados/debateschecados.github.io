@@ -353,8 +353,10 @@ describe('interval bar (LEAN-06)', () => {
       svg.append(rect)
       document.querySelector('#balance')?.append(svg)
       const style = getComputedStyle(rect)
-      // Opacity and fill-opacity fade the fill as much as its own alpha does.
-      const fade = Number(style.opacity) * Number(style.fillOpacity)
+      // Opacity on the bar or any parent, and fill-opacity, fade the fill as its alpha does.
+      let fade = Number(style.fillOpacity)
+      for (let el: Element | null = rect; el; el = el.parentElement)
+        fade *= Number(getComputedStyle(el).opacity)
       return [style.fill, getComputedStyle(document.body).backgroundColor, fade] as const
     })
     const rgba = (c: string) => {
