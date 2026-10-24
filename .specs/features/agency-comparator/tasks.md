@@ -279,7 +279,7 @@ T13 → T15
 ### T9: Keep key changes in history
 
 **What**: `HistoryEntry.key`; `update` in `src/pipeline/merge.ts` records the previous key in the same history entry.
-**Where**: `src/types.ts`, `src/pipeline/merge.ts`, `test/unit/merge.test.ts`
+**Where**: `src/types.ts`, `src/pipeline/merge.ts`, `src/pipeline/write.ts`, `test/unit/merge.test.ts`, `test/unit/write.test.ts`
 **Depends on**: None
 **Reuses**: existing history entry logic
 **Requirement**: DRIFT-01
@@ -302,7 +302,7 @@ T13 → T15
 ### T10: Repair the 2026-10-24 Estadão run
 
 **What**: `src/repair/estadao-2026-10-24.ts`, its run on the data, the report `data/repairs/2026-10-24-estadao.json`, and the repaired `data/checks.json` and `data/checks.csv`.
-**Where**: `src/repair/estadao-2026-10-24.ts`, `test/unit/repair.test.ts`, `data/`
+**Where**: `src/repair/estadao-2026-10-24.ts`, `test/unit/repair.test.ts`, `test/fixtures/estadao-globo-after-2026-10-24.json`, `data/`
 **Depends on**: T9
 **Reuses**: `merge`, the data writer
 **Requirement**: DRIFT-02
@@ -327,7 +327,7 @@ T13 → T15
 ### T11: Compute the distance from the other agencies
 
 **What**: `site/lean.js`, `src/lean.ts`, script `lean`.
-**Where**: `site/lean.js`, `src/lean.ts`, `package.json`, `test/unit/site/lean.test.ts`
+**Where**: `site/lean.js`, `src/lean.ts`, `package.json`, `test/unit/site/lean.test.ts`, `test/fixtures/lean.ts`
 **Depends on**: None
 **Reuses**: `site/compare.js` rows
 **Requirement**: LEAN-01, LEAN-02, LEAN-03, LEAN-04, LEAN-05, LEAN-07
@@ -352,7 +352,7 @@ T13 → T15
 ### T12: Rebuild verdict versions
 
 **What**: `site/drift.js` (versions, wordDiff, changed, driftCounts).
-**Where**: `site/drift.js`, `test/unit/site/drift.test.ts`
+**Where**: `site/drift.js`, `site/core.js`, `test/unit/site/drift.test.ts`
 **Depends on**: None
 **Reuses**: `site/core.js` context and band lookup
 **Requirement**: DRIFT-03, DRIFT-04, DRIFT-05
@@ -376,7 +376,7 @@ T13 → T15
 ### T13: Render the comparison page in direction A
 
 **What**: new sections, axes SVG, dot matrix, claim detail, coverage ticks, timelines and counts in `site/render.js` and `site/comparar.html`; build wiring; remove the pairwise table and `rigor`; agency count from config; the two test gaps from the phase 2 review (removed record in `curated` stays out of "só ela checou"; escaping of claim and label).
-**Where**: `site/render.js`, `site/comparar.html`, `site/compare.js`, `src/site/build.ts`, `test/unit/site/render.test.ts`, `test/unit/site/build.test.ts`, `test/unit/site/compare.test.ts`, `test/fixtures/site.ts`
+**Where**: `site/render.js`, `site/comparar.html`, `site/compare.js`, `site/comparar.js`, `src/site/build.ts`, `test/unit/site/render.test.ts`, `test/unit/site/build.test.ts`, `test/unit/site/compare.test.ts`, `test/fixtures/site.ts`, `test/e2e/compare.test.ts`
 **Depends on**: T11, T12
 **Reuses**: `fill`, `jsonScript`, mock `a-balanca.html` markup
 **Requirement**: CMP-01, CMP-02, CMP-08, RIGOR-01, RIGOR-05, LEAN-06, DRIFT-03, DRIFT-05
@@ -401,7 +401,7 @@ T13 → T15
 ### T14: Browser interactions and layout
 
 **What**: `site/comparar.js` re-renders axes, matrix visibility, ticks and counts on filter change; claim detail by click and keyboard; CSS for desktop and the list layout below 720 px.
-**Where**: `site/comparar.js`, `site/style.css`, `test/e2e/compare.test.ts`
+**Where**: `site/comparar.js`, `site/style.css`, `site/render.js`, `site/comparar.html`, `test/e2e/compare.test.ts`
 **Depends on**: T13
 **Reuses**: existing URL state and focus handling
 **Requirement**: CMP-03, CMP-07, LEAN-06
@@ -425,7 +425,7 @@ T13 → T15
 ### T15: Explain the distance and the changes
 
 **What**: methodology sections "Distância das outras agências" and "Vereditos que mudaram" (LEAN-08), README "Comparador" lines with `pnpm lean` and the repair report.
-**Where**: `site/metodologia.html`, `README.md`, `test/unit/site/build.test.ts`
+**Where**: `site/metodologia.html`, `README.md`, `site/style.css`, `test/unit/site/build.test.ts`
 **Depends on**: T13
 **Reuses**: existing pages
 **Requirement**: LEAN-08
