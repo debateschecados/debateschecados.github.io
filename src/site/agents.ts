@@ -68,7 +68,7 @@ O que significa cada coluna do CSV: ${abs(origin, 'checks.csv-metadata.json')}
 Histórico de mudanças do CSV, em JSON: ${api}/commits?path=data/checks.csv&per_page=100
 O que mudou em cada commit: ${repo}/commit/<sha>.diff
 
-A coleta não usa modelo de linguagem. No CSV, speaker é quem falou, label é o rótulo original da agência e band é a faixa da escala comum. Linhas com missing_since preenchido sumiram da página da agência e ficam fora do placar. archive_url é a cópia na Wayback Machine, quando já existe. history guarda versões anteriores do rótulo, da fala ou de quem falou.
+A coleta não usa modelo de linguagem. No CSV, speaker é quem falou, label é o rótulo original da agência e band é a faixa da escala comum. Linhas com missing_since preenchido sumiram da página da agência e ficam fora do placar. archive_url é a cópia na Wayback Machine, quando já existe. history guarda versões anteriores do rótulo, da fala ou de quem falou, e a chave antiga quando a agência reemitiu a chave da checagem.
 
 Faça cada passo e mostre a evidência (arquivo e linha, link ou o código que você rodou):
 
@@ -103,7 +103,7 @@ const COLUMN_NOTES: Record<(typeof CSV_COLUMNS)[number], string> = {
   missing_since:
     'Data em que a checagem deixou de aparecer na página. Vazio se ainda está lá. Fora do placar quando preenchido.',
   history:
-    'JSON com rótulo, fala ou candidato anteriores, e a data until em que mudaram. Vazio se nunca mudou.',
+    'JSON com rótulo, fala, candidato ou chave da agência anteriores, e a data until em que mudaram. Vazio se nunca mudou.',
 }
 
 function sourcesTable(config: Config, ctx: Context) {
