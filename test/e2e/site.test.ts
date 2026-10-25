@@ -411,7 +411,7 @@ describe('audit panel (AUDIT-01, AUDIT-02, AUDIT-04, AUDIT-05)', () => {
       true,
     )
     expect(await page.evaluate(() => Boolean(document.activeElement?.closest('dialog')))).toBe(true)
-    expect(await page.locator('#rules li').count()).toBe(5)
+    expect(await page.locator('#rules li').count()).toBe(4)
     await page.click('[data-close-audit]')
     expect(await page.evaluate(() => document.activeElement?.textContent)).toBe('Veja como auditar')
   })

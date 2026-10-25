@@ -1,0 +1,652 @@
+{
+  "groups": [
+    {
+      "id": "g001",
+      "debate": "band-2026-10-18",
+      "speaker": "lula",
+      "refs": ["120cc15ce959", "5a2c7c620d1b", "d7b580086470"],
+      "claim": "Lula foi o primeiro presidente a conseguir dois graus de investimento para o Brasil, de 2007 a 2010",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g002",
+      "debate": "band-2026-10-18",
+      "speaker": "lula",
+      "refs": ["196e2c2afaaa", "7560dc36878c", "9a966cc908fe"],
+      "claim": "Lula fez a Lei Antifacção, que foi aprovada e aumentou o tempo de prisão de quem participa de facções",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g003",
+      "debate": "band-2026-10-18",
+      "speaker": "lula",
+      "refs": ["2dbb0d7eb944", "f8dad3530f7b"],
+      "claim": "O governo Bolsonaro deixou um déficit de 2,8% quando Lula assumiu",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g004",
+      "debate": "band-2026-10-18",
+      "speaker": "lula",
+      "refs": ["7856c8d339bb", "b3cd63509af8"],
+      "claim": "O governo Lula criou o MEI",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g005",
+      "debate": "band-2026-10-18",
+      "speaker": "lula",
+      "refs": ["b5660c421756", "d869ff63b4f1", "e696ad19466a", "e824427f6b63"],
+      "claim": "Em 2009, Flávio foi o único de 49 deputados da Alerj a votar contra ampliar a licença-maternidade",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g006",
+      "debate": "band-2026-10-18",
+      "speaker": "lula",
+      "refs": ["2397097a9421", "598a301ccc52"],
+      "claim": "Flávio interferiu para que o policial que matou uma criança de 5 anos com tiro de fuzil não fosse preso",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g007",
+      "debate": "band-2026-10-18",
+      "speaker": "lula",
+      "refs": ["03d1329aef95", "2d342135b968"],
+      "claim": "Quando Lula assumiu a Presidência, o Brasil devia US$ 30 bilhões ao FMI",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g008",
+      "debate": "band-2026-10-18",
+      "speaker": "lula",
+      "refs": ["0281621a9164", "18ef0c5fb37f"],
+      "claim": "Os governos Lula fizeram US$ 270 bilhões de reservas internacionais",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g009",
+      "debate": "band-2026-10-18",
+      "speaker": "lula",
+      "refs": ["2f877bddeba2", "becd510a2e0f", "e7bdd0998a4c"],
+      "claim": "O Brasil cresceu 7,5% em 2010",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g010",
+      "debate": "band-2026-10-18",
+      "speaker": "lula",
+      "refs": ["9c8015a35d39", "b71ff1f6ecec", "cf92610b0f0a", "f54199a9adb8"],
+      "claim": "Depois que Lula deixou a Presidência, o país só voltou a crescer acima de 3% quando ele voltou",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g011",
+      "debate": "band-2026-10-18",
+      "speaker": "lula",
+      "refs": ["78b487d79382", "93ac69fa9bb5"],
+      "claim": "O governo Lula fez a maior demarcação de terras indígenas do país",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g012",
+      "debate": "band-2026-10-18",
+      "speaker": "lula",
+      "refs": ["009c38ef89cc", "2cf6174a5c4a", "f60c0a37e16c"],
+      "claim": "A inflação de alimentos foi de 56,17% no governo Bolsonaro e está em 13% nos quatro anos de Lula",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g013",
+      "debate": "band-2026-10-18",
+      "speaker": "lula",
+      "refs": ["853cc0d945e7", "b86313a53155"],
+      "claim": "O governo Lula perdoou R$ 12,6 bilhões em dívidas dos MEIs",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g014",
+      "debate": "band-2026-10-18",
+      "speaker": "lula",
+      "refs": ["7f9f9e85f9b9", "b2f10795fe53"],
+      "claim": "O governo já devolveu R$ 3,5 bilhões a aposentados afetados por descontos indevidos no INSS",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g015",
+      "debate": "band-2026-10-18",
+      "speaker": "lula",
+      "refs": ["534c834196b4", "8f3e6d8dd23c", "a771cedf37c9"],
+      "claim": "O governo Bolsonaro liberou mais de 1 milhão de armas",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g016",
+      "debate": "band-2026-10-18",
+      "speaker": "lula",
+      "refs": ["5c272ee42574", "8699d567b425"],
+      "claim": "O governo Bolsonaro liberou 1,1 bilhão de balas",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g017",
+      "debate": "band-2026-10-18",
+      "speaker": "lula",
+      "refs": ["12bda5bb2ad5", "81430573386b"],
+      "claim": "A economia voltou a crescer, com PIB industrial de 3,4%",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g018",
+      "debate": "band-2026-10-18",
+      "speaker": "lula",
+      "refs": ["0eef313aba9a", "233a376864a9", "cbba70ab7f72"],
+      "claim": "Flávio comprou uma casa de R$ 10 milhões e pagou à vista parte dela com dinheiro do BRB",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g019",
+      "debate": "band-2026-10-18",
+      "speaker": "lula",
+      "refs": ["0737ae5be3a7", "aba112f810da"],
+      "claim": "Só no caso Vorcaro, Flávio contou 43 mentiras",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g020",
+      "debate": "band-2026-10-18",
+      "speaker": "lula",
+      "refs": ["129535c8c12b", "8d0bdfe3ba10"],
+      "claim": "O governo Bolsonaro não reajustou o salário mínimo acima da inflação em nenhum ano",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g021",
+      "debate": "band-2026-10-18",
+      "speaker": "lula",
+      "refs": ["7c8230bde0ab", "af1ea60bc831"],
+      "claim": "Flávio deu emprego à irmã e à mulher de um integrante do Escritório do Crime, que mandou matar Marielle",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g022",
+      "debate": "band-2026-10-18",
+      "speaker": "lula",
+      "refs": ["7b8e574e643f", "c09d210887b2"],
+      "claim": "O Mais Médicos teve 18 mil médicos, estava com 12 mil em 2023 e hoje tem quase 28 mil",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g023",
+      "debate": "band-2026-10-18",
+      "speaker": "flavio",
+      "refs": ["737d9a8f1a73", "83324fa4d83c", "f5868d38b9cb"],
+      "claim": "Com Lula, a criminalidade explodiu no Brasil",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g024",
+      "debate": "band-2026-10-18",
+      "speaker": "flavio",
+      "refs": ["1be72a452e27", "767a2d50b352", "8735cddbc93e", "d805114b8e1f"],
+      "claim": "Lula gastou R$ 7 bilhões em viagens com a Janja",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g025",
+      "debate": "band-2026-10-18",
+      "speaker": "flavio",
+      "refs": ["30c6a3a9541a", "5e9df1a6b391"],
+      "claim": "O governo Lula põe nas ruas marginais perigosos alegando falta de vagas no sistema penitenciário",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g026",
+      "debate": "band-2026-10-18",
+      "speaker": "flavio",
+      "refs": ["0d5a290e9a59", "aca4df9dee07"],
+      "claim": "Bolsonaro passou o Bolsa Família para no mínimo R$ 600",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g027",
+      "debate": "band-2026-10-18",
+      "speaker": "flavio",
+      "refs": ["28d018558539", "46e75a21d400"],
+      "claim": "Lula foi condenado no STJ, no STF e em todas as instâncias, e descondenado pelos amigos",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g028",
+      "debate": "band-2026-10-18",
+      "speaker": "flavio",
+      "refs": ["837d332bc164", "950cbdde411e", "e1f6c3ecb84d"],
+      "claim": "Flávio nunca quis tirar a marcação de identificação das munições",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g029",
+      "debate": "band-2026-10-18",
+      "speaker": "flavio",
+      "refs": ["3c9ef108cdc6", "4a59c82326b4", "9550b01a96e9"],
+      "claim": "Áudio de Vorcaro diz que o filme de Lula teve R$ 30 milhões por fora no Instituto Lula",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g030",
+      "debate": "band-2026-10-18",
+      "speaker": "flavio",
+      "refs": ["6fdb58f197a3", "dbe42cd0b35f"],
+      "claim": "O governo Lula tem recorde de mulheres assassinadas",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g031",
+      "debate": "band-2026-10-18",
+      "speaker": "flavio",
+      "refs": ["1a6859cd924d", "7cfbb8a6bcca", "9a4600976942", "c854b396c345"],
+      "claim": "73% dos presidiários votaram em Lula",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g032",
+      "debate": "band-2026-10-18",
+      "speaker": "flavio",
+      "refs": ["8cc5dffbcb0d", "df48f82cc104"],
+      "claim": "Lula acionou a Justiça para tentar fazer a saidinha voltar a valer",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g033",
+      "debate": "band-2026-10-18",
+      "speaker": "flavio",
+      "refs": ["74225ee250b4", "9cf4e3daded0"],
+      "claim": "Lula vetou o fim da saidinha e o Congresso teve que derrubar o veto",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g034",
+      "debate": "band-2026-10-18",
+      "speaker": "flavio",
+      "refs": ["6b448e6a5975", "927247da948d"],
+      "claim": "Lula está dando emprego a condenados por corrupção no Mensalão",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g035",
+      "debate": "band-2026-10-18",
+      "speaker": "flavio",
+      "refs": ["e550a0168091", "f187d03f86be"],
+      "claim": "A Polícia Federal até agora não foi atrás do filho de Lula",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g036",
+      "debate": "band-2026-10-18",
+      "speaker": "flavio",
+      "refs": ["44d5fa32637f", "bd53d67178ac"],
+      "claim": "Com a Lei Antifacção, os líderes das facções vão ficar até 80 anos presos",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g037",
+      "debate": "band-2026-10-18",
+      "speaker": "flavio",
+      "refs": ["381d64ba696c", "395e5b1eb5af", "9f34bd709d2b"],
+      "claim": "O governo Lula está deixando uma dívida de R$ 11 trilhões",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g038",
+      "debate": "band-2026-10-18",
+      "speaker": "flavio",
+      "refs": ["1f0444693ba1", "54e9d18930ac", "972141fee8b9"],
+      "claim": "Mais de 40 milhões de brasileiros moram em áreas dominadas por narcoterroristas",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g039",
+      "debate": "band-2026-10-18",
+      "speaker": "flavio",
+      "refs": ["99113eb7b25b", "f026e38ceef3"],
+      "claim": "Eduardo Bolsonaro está exilado e perseguido",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g040",
+      "debate": "band-2026-10-18",
+      "speaker": "flavio",
+      "refs": ["472431a699de", "5144b36659ca", "89d65ff5a09a"],
+      "claim": "Flávio foi aos EUA defender produtos brasileiros e o governo não mandou ninguém",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g041",
+      "debate": "band-2026-10-18",
+      "speaker": "flavio",
+      "refs": ["68be71b6de6c", "7c6ec33521f7", "8d9724455c44"],
+      "claim": "As medidas do governo Lula não reduziram o roubo de celular",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g042",
+      "debate": "band-2026-10-18",
+      "speaker": "flavio",
+      "refs": ["11138eab3a57", "2ecc7cec0261", "666c19ba412f"],
+      "claim": "O governo Lula tem recorde de empresas fechadas",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g043",
+      "debate": "band-2026-10-18",
+      "speaker": "flavio",
+      "refs": ["b6fd8145ba19", "dfaa8df03dff"],
+      "claim": "Só por Flávio passar à frente no primeiro turno, a taxa de juros futuros já caiu 2%",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g044",
+      "debate": "band-2026-10-18",
+      "speaker": "flavio",
+      "refs": ["4772f0d2fbff", "c9da286dfe85"],
+      "claim": "Quem prendeu Vorcaro foi o ministro André Mendonça, e não Lula",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g045",
+      "debate": "band-2026-10-18",
+      "speaker": "lula",
+      "refs": ["78fc2ef28ae7", "b0c13289fb42"],
+      "claim": "O Brasil tem hoje 17,5 milhões de MEIs",
+      "origin": "adjudicated"
+    },
+    {
+      "id": "g046",
+      "debate": "globo-2026-10-23",
+      "speaker": "lula",
+      "refs": ["04989eabb0cd", "673d8a46f845", "9434ddd37c76", "a7d18869cbb8"],
+      "claim": "Flávio chamou o Bolsa Família de \"bolsa farelo\"",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g047",
+      "debate": "globo-2026-10-23",
+      "speaker": "lula",
+      "refs": ["0685edce88cb", "2fbfdbe7c524", "a556c65ae249"],
+      "claim": "O governo Bolsonaro anulou o Fundo Amazônia e o governo Lula o fez voltar a funcionar",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g048",
+      "debate": "globo-2026-10-23",
+      "speaker": "lula",
+      "refs": ["57b8856addd9", "c4f2905ad6a6", "e5cd0b2a2c2f"],
+      "claim": "No governo Bolsonaro, dizia-se que quem tomasse vacina ia virar gay e virar jacaré",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g049",
+      "debate": "globo-2026-10-23",
+      "speaker": "lula",
+      "refs": ["30c683088488", "42cce5fb67c6", "ac798113d769"],
+      "claim": "O governo Lula herdou a taxa de juros em 13%",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g050",
+      "debate": "globo-2026-10-23",
+      "speaker": "lula",
+      "refs": ["12561b6f71d3", "cd25bcc68692", "f3886e4f06bd"],
+      "claim": "Nunca se exportou tanto no Brasil quanto no governo Lula",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g051",
+      "debate": "globo-2026-10-23",
+      "speaker": "lula",
+      "refs": ["5f9d5a546c36", "8c316c96a936", "e2b4033e9da2"],
+      "claim": "Na Argentina, a pobreza chegou a 40%",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g052",
+      "debate": "globo-2026-10-23",
+      "speaker": "lula",
+      "refs": ["1db722ab7d1a", "b2804fdd2f85"],
+      "claim": "Sem os aumentos acima da inflação dos governos do PT, o salário mínimo seria de apenas R$ 900",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g053",
+      "debate": "globo-2026-10-23",
+      "speaker": "lula",
+      "refs": ["d08ddeb050c2", "fdc679ed7206"],
+      "claim": "O governo Lula levou um computador quântico para a Paraíba",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g054",
+      "debate": "globo-2026-10-23",
+      "speaker": "lula",
+      "refs": ["1569d86e77cb", "48bd323f026c", "b317fad8d4b3", "df548ecb7998"],
+      "claim": "O governo Lula herdou 6 mil obras paradas",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g055",
+      "debate": "globo-2026-10-23",
+      "speaker": "lula",
+      "refs": ["e84a6f94f449", "ffd005e85db7"],
+      "claim": "Quem põe dinheiro no túnel de Santos é o governo federal, com orçamento e financiamento do BNDES",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g056",
+      "debate": "globo-2026-10-23",
+      "speaker": "lula",
+      "refs": ["0243f6ba4f2c", "85c498d5d8b4", "97dd907ad475"],
+      "claim": "A economia não crescia acima de 3% desde que Lula deixou a Presidência, em 2010",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g057",
+      "debate": "globo-2026-10-23",
+      "speaker": "lula",
+      "refs": ["ba283740847c", "cf2adf6d48fd"],
+      "claim": "Como deputado estadual no Rio, Flávio teve a chance de votar pelo aumento da licença-maternidade e não votou",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g058",
+      "debate": "globo-2026-10-23",
+      "speaker": "lula",
+      "refs": ["550f80bf5c6c", "9e519989a5c5", "d5bca87d832d"],
+      "claim": "Lula tinha acabado com a fome no Brasil em 2012",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g059",
+      "debate": "globo-2026-10-23",
+      "speaker": "lula",
+      "refs": ["8f1bba1945a7", "b4fdbfb81dad", "f2de76954f88"],
+      "claim": "Quando Lula voltou à Presidência em 2023, havia 33 milhões de pessoas passando fome",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g060",
+      "debate": "globo-2026-10-23",
+      "speaker": "lula",
+      "refs": ["92e3caa21ac1", "df250d7b4df0"],
+      "claim": "O governo Lula abriu 700 novos mercados",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g061",
+      "debate": "globo-2026-10-23",
+      "speaker": "lula",
+      "refs": ["71424857edcb", "b22ed7086eea"],
+      "claim": "O Tigrinho foi criado pelo governo Bolsonaro em 2022",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g062",
+      "debate": "globo-2026-10-23",
+      "speaker": "lula",
+      "refs": ["42d87610f8d3", "c223b0fdf100"],
+      "claim": "O governo Lula está fazendo a BR-319, entre Porto Velho e Manaus, que ninguém teve coragem de fazer",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g063",
+      "debate": "globo-2026-10-23",
+      "speaker": "flavio",
+      "refs": ["446aabed062e", "ee3691bd7acb"],
+      "claim": "O governo Lula tem recorde de mulheres assassinadas",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g064",
+      "debate": "globo-2026-10-23",
+      "speaker": "flavio",
+      "refs": ["0f85b9f09e96", "5fcb291ef8c3", "8143529f813c", "bd0e58402f86"],
+      "claim": "O governo Lula está deixando uma dívida de R$ 11 trilhões",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g065",
+      "debate": "globo-2026-10-23",
+      "speaker": "flavio",
+      "refs": ["7ac5a0df074f", "a8184c39cd4a", "ed1357093197"],
+      "claim": "Em outubro de 2022, a previsão era de juros em torno de 7% hoje com Bolsonaro, mas a taxa está em cerca de 14%",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g066",
+      "debate": "globo-2026-10-23",
+      "speaker": "flavio",
+      "refs": ["5f7a88d195d1", "65324ba2ae78", "a577a4ac6f02", "ecc1d9eecb7c"],
+      "claim": "Relatório recente do TCU aponta mais de 11,5 mil obras paralisadas no atual governo",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g067",
+      "debate": "globo-2026-10-23",
+      "speaker": "flavio",
+      "refs": ["05f223000002", "4ea3d7478dcd", "b3b15d7a2416"],
+      "claim": "O governo Bolsonaro instalou mais de 21,3 mil pontos de internet em mais de 3,1 mil cidades",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g068",
+      "debate": "globo-2026-10-23",
+      "speaker": "flavio",
+      "refs": ["1f56c0bba5e1", "69fd931392f0", "af414a135d88"],
+      "claim": "Bolsonaro concluiu as obras da transposição do Rio São Francisco e levou água ao Nordeste",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g069",
+      "debate": "globo-2026-10-23",
+      "speaker": "flavio",
+      "refs": ["0d1a23ff22b2", "5f5c2907bfa3"],
+      "claim": "O governo Bolsonaro fez o Marco Legal do Saneamento Básico",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g070",
+      "debate": "globo-2026-10-23",
+      "speaker": "flavio",
+      "refs": ["11d4ee8a9567", "590abbb7ae76"],
+      "claim": "Mais de 80 milhões de brasileiros estão com contas atrasadas",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g071",
+      "debate": "globo-2026-10-23",
+      "speaker": "flavio",
+      "refs": ["383bd641adab", "501b2e33a51d", "84a04c32b045", "fc1bb4ec3de9"],
+      "claim": "Lula diz que ladrão de celular não tem que ser preso porque rouba só para tomar uma cervejinha",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g072",
+      "debate": "globo-2026-10-23",
+      "speaker": "flavio",
+      "refs": ["09f038666df6", "75ecedc97305", "8fdf51d3165f", "c1816d658397"],
+      "claim": "Foi Bolsonaro quem passou o Bolsa Família para no mínimo R$ 600",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g073",
+      "debate": "globo-2026-10-23",
+      "speaker": "flavio",
+      "refs": ["11b7855d11b4", "c077a420a2ca", "c4ef9b6c74b9", "d26d5b66e3e2"],
+      "claim": "No vídeo em que suspira, Bolsonaro não debochava de quem estava sem ar",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g074",
+      "debate": "globo-2026-10-23",
+      "speaker": "flavio",
+      "refs": ["0f6978417369", "1bd5f7c069c2", "33100b1e69a7"],
+      "claim": "Lula é o pai do Tigrinho e do cassino online: ele criou e liberou",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g075",
+      "debate": "globo-2026-10-23",
+      "speaker": "flavio",
+      "refs": ["b3a0e59f91f2", "c7de744df501"],
+      "claim": "Relatório da Polícia Federal diz que não há dinheiro público no filme sobre Bolsonaro",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g076",
+      "debate": "globo-2026-10-23",
+      "speaker": "flavio",
+      "refs": ["1a1e7ae86026", "799fd010e99b"],
+      "claim": "O número de moradores de rua, de 199 mil no CadÚnico, quase dobrou no governo Lula",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g077",
+      "debate": "globo-2026-10-23",
+      "speaker": "flavio",
+      "refs": ["aceb0736b61e", "b4fdaeed9ed5"],
+      "claim": "Flávio nunca foi investigado por envolvimento com milícia",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g078",
+      "debate": "globo-2026-10-23",
+      "speaker": "flavio",
+      "refs": ["53e6524b9091", "6bfee33bc111"],
+      "claim": "Flávio vai criar a Casa da Mulher Brasileira",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g079",
+      "debate": "globo-2026-10-23",
+      "speaker": "flavio",
+      "refs": ["135ef699dad5", "2c899bb6a7f7", "ef63242769b5"],
+      "claim": "A menina Ana Clara morreu numa troca de tiros em uma comunidade conflagrada",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g080",
+      "debate": "globo-2026-10-23",
+      "speaker": "flavio",
+      "refs": ["243423821df2", "9bf4124b481d"],
+      "claim": "Lula disse a frase \"se a comida está cara, não compra\"",
+      "origin": "unanimous"
+    },
+    {
+      "id": "g081",
+      "debate": "globo-2026-10-23",
+      "speaker": "flavio",
+      "refs": ["ab219f5a267e", "d9d2cea5305a"],
+      "claim": "Lula já gastou mais de R$ 400 bilhões para tentar se reeleger",
+      "origin": "adjudicated"
+    }
+  ]
+}

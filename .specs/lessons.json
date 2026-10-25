@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 13,
+  "next_id": 22,
   "lessons": [
     {
       "id": "L-001",
@@ -220,6 +220,168 @@
       ],
       "created": "2026-10-24T09:20:34Z",
       "last_seen": "2026-10-24T09:20:34Z"
+    },
+    {
+      "id": "L-013",
+      "key": "surviving_mutant::when an ac requires an encoding that lives only in css assert the computed style in a browser test",
+      "text": "When an AC requires an encoding that lives only in CSS, assert the computed style in a browser test",
+      "signal": "surviving_mutant",
+      "scope": "site",
+      "status": "candidate",
+      "features": [
+        "agency-comparator"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M16 site/style.css:1258 (CMP-08) (site)"
+      ],
+      "created": "2026-10-24T20:57:06Z",
+      "last_seen": "2026-10-24T20:57:06Z"
+    },
+    {
+      "id": "L-014",
+      "key": "surviving_mutant::feed hostile markup through every field that reaches html including derived text such as diffs and assert it comes out escaped",
+      "text": "Feed hostile markup through every field that reaches HTML, including derived text such as diffs, and assert it comes out escaped",
+      "signal": "surviving_mutant",
+      "scope": "site",
+      "status": "candidate",
+      "features": [
+        "agency-comparator"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M15 site/render.js:421 (DRIFT-03) (site)"
+      ],
+      "created": "2026-10-24T20:57:06Z",
+      "last_seen": "2026-10-24T20:57:06Z"
+    },
+    {
+      "id": "L-015",
+      "key": "surviving_mutant::assert every list a report publishes including the ones expected to be short against an independently derived value",
+      "text": "Assert every list a report publishes, including the ones expected to be short, against an independently derived value",
+      "signal": "surviving_mutant",
+      "scope": "data",
+      "status": "candidate",
+      "features": [
+        "agency-comparator"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M12 src/repair/estadao-2026-10-24.ts:104 (DRIFT-02) (data)"
+      ],
+      "created": "2026-10-24T20:57:06Z",
+      "last_seen": "2026-10-24T20:57:06Z"
+    },
+    {
+      "id": "L-016",
+      "key": "spec_precision_gap::when an ac asks for a range per item state what the first or last item shows when one end is unknown",
+      "text": "When an AC asks for a range per item, state what the first or last item shows when one end is unknown",
+      "signal": "spec_precision_gap",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "agency-comparator"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "DRIFT-03 site/render.js:413 (spec)"
+      ],
+      "created": "2026-10-24T20:57:06Z",
+      "last_seen": "2026-10-24T20:57:06Z"
+    },
+    {
+      "id": "L-017",
+      "key": "spec_precision_gap::turn a comparative visual ac such as at least as visible as into measurable properties like size and contrast",
+      "text": "Turn a comparative visual AC such as at least as visible as into measurable properties like size and contrast",
+      "signal": "spec_precision_gap",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "agency-comparator"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "LEAN-06 spec.md (validation.md iteration 2) (spec)"
+      ],
+      "created": "2026-10-24T21:01:08Z",
+      "last_seen": "2026-10-24T21:01:08Z"
+    },
+    {
+      "id": "L-018",
+      "key": "surviving_mutant::assert the property a visual ac constrains such as size or contrast not only the position of the mark",
+      "text": "Assert the property a visual AC constrains, such as size or contrast, not only the position of the mark",
+      "signal": "surviving_mutant",
+      "scope": "site",
+      "status": "candidate",
+      "features": [
+        "agency-comparator"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M17 site/style.css:1126, M18 site/render.js:345 (validation.md iteration 2) (site)"
+      ],
+      "created": "2026-10-24T21:01:08Z",
+      "last_seen": "2026-10-24T21:01:08Z"
+    },
+    {
+      "id": "L-019",
+      "key": "surviving_mutant::when a test checks a rendered color include every property that changes it such as opacity not only the color value",
+      "text": "When a test checks a rendered color, include every property that changes it, such as opacity, not only the color value",
+      "signal": "surviving_mutant",
+      "scope": "site",
+      "status": "candidate",
+      "features": [
+        "agency-comparator"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M20 site/style.css:1126, test/e2e/compare.test.ts:355 (validation.md iteration 3) (site)"
+      ],
+      "created": "2026-10-24T21:09:09Z",
+      "last_seen": "2026-10-24T21:09:09Z"
+    },
+    {
+      "id": "L-020",
+      "key": "surviving_mutant::when a test computes what a user sees include what ancestors contribute such as inherited opacity not only the element s own style",
+      "text": "When a test computes what a user sees, include what ancestors contribute, such as inherited opacity, not only the element's own style",
+      "signal": "surviving_mutant",
+      "scope": "site",
+      "status": "candidate",
+      "features": [
+        "agency-comparator"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M22 site/style.css:1126, test/e2e/compare.test.ts:357 (validation.md iteration 3b) (site)"
+      ],
+      "created": "2026-10-24T21:11:03Z",
+      "last_seen": "2026-10-24T21:11:03Z"
+    },
+    {
+      "id": "L-021",
+      "key": "surviving_mutant::place a test probe where the real element lives so every rule that styles the real element also styles the probe",
+      "text": "Place a test probe where the real element lives, so every rule that styles the real element also styles the probe",
+      "signal": "surviving_mutant",
+      "scope": "site",
+      "status": "candidate",
+      "features": [
+        "agency-comparator"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M23 site/style.css:1126, test/e2e/compare.test.ts:354 (validation.md iteration 3c) (site)"
+      ],
+      "created": "2026-10-24T21:13:17Z",
+      "last_seen": "2026-10-24T21:13:17Z"
     }
   ]
 }

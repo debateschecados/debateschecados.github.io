@@ -46,22 +46,32 @@ const fresh = (record: CheckRecord): FreshItem => ({
   fetchedAt: record.evidence.fetchedAt,
 })
 
-// Returns the dataset with the source's records rebuilt and the report. Throws when the
-// current records of the source are no longer the ones the CI run wrote.
+// Returns the dataset with the source's records rebuilt and the report; `applied` is true when
+// the current records of the source already are the repaired ones. Throws when they are
+// neither those nor the ones the CI run wrote.
 export function repair(
   before: readonly CheckRecord[],
   after: readonly CheckRecord[],
   current: readonly CheckRecord[],
   config: Pick<Config, 'bands' | 'outlets' | 'debates' | 'idLinks'>,
 ) {
-  const written = ofSource(after)
-  if (!isDeepStrictEqual(ofSource(current), written))
-    throw new RepairError(`${SOURCE} changed since the run of ${DATE}; nothing written`)
+  const own = ofSource(current)
+  const others = current.filter((r) => r.sourceId !== SOURCE)
+  const result = rebuild(before, ofSource(after), others, config)
+  if (isDeepStrictEqual(own, ofSource(after))) return { ...result, applied: false }
+  if (isDeepStrictEqual(own, ofSource(result.records))) return { ...result, applied: true }
+  throw new RepairError(`${SOURCE} changed since the run of ${DATE}; nothing written`)
+}
 
+function rebuild(
+  before: readonly CheckRecord[],
+  written: readonly CheckRecord[],
+  others: readonly CheckRecord[],
+  config: Pick<Config, 'bands' | 'outlets' | 'debates' | 'idLinks'>,
+) {
   const live = written.filter((r) => r.missingSince === undefined)
   const [first] = live
   if (!first) throw new RepairError(`${SOURCE} has no live record after the run`)
-  const others = current.filter((r) => r.sourceId !== SOURCE)
   const { records, events } = merge(
     [...others, ...ofSource(before)],
     [
@@ -116,14 +126,17 @@ if (import.meta.main) {
   const current = JSON.parse(await readFile(join(dataDir, 'checks.json'), 'utf8')) as CheckRecord[]
   const config = await loadConfig(join(ROOT, 'config'))
   try {
-    const { records, report } = repair(pinned(BEFORE), pinned(AFTER), current, config)
-    await writeFile(join(dataDir, 'checks.json'), checksJson(records))
-    await writeFile(join(dataDir, 'checks.csv'), checksCsv(records))
-    await mkdir(join(dataDir, 'repairs'), { recursive: true })
-    await writeFile(join(dataDir, REPORT_FILE), `${JSON.stringify(report, null, 2)}\n`)
-    console.log(
-      `${SOURCE}: ${report.merged.length} ids merged, ${report.new.length} new, ${report.missing.length} missing; report in data/${REPORT_FILE}`,
-    )
+    const { records, report, applied } = repair(pinned(BEFORE), pinned(AFTER), current, config)
+    if (applied) console.log(`${SOURCE}: the repair of ${DATE} is already applied; nothing written`)
+    else {
+      await writeFile(join(dataDir, 'checks.json'), checksJson(records))
+      await writeFile(join(dataDir, 'checks.csv'), checksCsv(records))
+      await mkdir(join(dataDir, 'repairs'), { recursive: true })
+      await writeFile(join(dataDir, REPORT_FILE), `${JSON.stringify(report, null, 2)}\n`)
+      console.log(
+        `${SOURCE}: ${report.merged.length} ids merged, ${report.new.length} new, ${report.missing.length} missing; report in data/${REPORT_FILE}`,
+      )
+    }
   } catch (error) {
     if (!(error instanceof RepairError)) throw error
     console.error(error.message)

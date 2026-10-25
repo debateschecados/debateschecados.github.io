@@ -2,17 +2,35 @@ import { cp, readFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { parseArgs } from 'node:util'
 import pkg from '../../package.json' with { type: 'json' }
+import {
+  coverage,
+  createComparison,
+  emptyCompareState,
+  inDebate,
+  pendingCount,
+} from '../../site/compare.js'
 import { BANDS, createContext, emptyState, listed, notice, scoreboard } from '../../site/core.js'
+import { changed, driftCounts } from '../../site/drift.js'
+import { headline, lean } from '../../site/lean.js'
 import {
   bandClass,
   boardHtml,
+  changesHtml,
+  compareFiltersHtml,
+  coverageHtml,
   debatesHtml,
+  driftCountsHtml,
   esc,
   filtersHtml,
   fullDate,
   itemHtml,
+  leanHtml,
+  matrixHtml,
+  pendingText,
   tabsHtml,
 } from '../../site/render.js'
+import type { BlindDebate } from '../claims/blind.ts'
+import { GROUPS_FILE, loadGroups } from '../claims/groups.ts'
 import { type Config, loadConfig } from '../config.ts'
 import { labelKey } from '../pipeline/normalize.ts'
 import type { CheckRecord } from '../types.ts'
@@ -130,10 +148,21 @@ function countsTable(config: Config, ctx: Context) {
   )
 }
 
+// Record ids the latest curation run was given; none before the first run.
+async function curatedIds(dataDir: string, run: string | null) {
+  if (!run) return []
+  const path = join(dataDir, 'claim-curation', run, 'input.json')
+  const input = JSON.parse(await readFile(path, 'utf8')) as BlindDebate[]
+  return input.flatMap((d) => d.partitions.flatMap((p) => p.records.map((r) => r.ref)))
+}
+
 const SHIELD =
   '<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><path d="M10 2l6 2.5v4.6c0 4-2.6 7.4-6 8.9-3.4-1.5-6-4.9-6-8.9V4.5L10 2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 10l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 
-const NAV = [{ href: 'como-funciona', name: 'Como funciona' }]
+const NAV = [
+  { href: 'comparar', name: 'Comparar' },
+  { href: 'como-funciona', name: 'Como funciona' },
+]
 
 // The same bar on every page. On the home page "Como auditar" opens the panel in place;
 // elsewhere it links there, and app.js opens the panel from the #auditar hash.
@@ -141,8 +170,8 @@ function topbarHtml(page: string) {
   const current = (href: string) => (href === page ? ' aria-current="page"' : '')
   const audit =
     page === 'index.html'
-      ? `<button type="button" class="audit-btn" data-open-audit aria-haspopup="dialog">${SHIELD}Como auditar</button>`
-      : `<a class="audit-btn" href="./#auditar">${SHIELD}Como auditar</a>`
+      ? `<button type="button" class="audit-btn" data-open-audit aria-haspopup="dialog">${SHIELD}<span class="t">Como auditar</span></button>`
+      : `<a class="audit-btn" href="./#auditar">${SHIELD}<span class="t">Como auditar</span></a>`
   return `<header class="topbar"><div class="wrap"><a class="brand" href="./"${current('index.html')}>Debates checados</a><nav aria-label="Páginas">${NAV.map((n) => `<a href="${n.href}"${current(n.href)}>${n.name}</a>`).join('')}${audit}</nav></div></header>`
 }
 
@@ -215,6 +244,10 @@ export async function build({ siteDir, dataDir, configDir, outDir, repo }: Build
   const records = JSON.parse(await readFile(join(dataDir, 'checks.json'), 'utf8')) as CheckRecord[]
   const debates = config.debates.map(({ id, date, broadcaster }) => ({ id, date, broadcaster }))
   const ctx = createContext({ ...config, debates, records })
+  // A broken claim group stops the build before dist/ is touched (CLAIM-02).
+  const groups = await loadGroups(dataDir, records)
+  const curated = await curatedIds(dataDir, groups.run)
+  const comparison = createComparison(ctx, groups, curated)
   const agents = agentBundle({ origin: pkg.homepage.replace(/\/$/, ''), repo, config, ctx })
   const state = emptyState()
   const items = listed(ctx, state)
@@ -224,6 +257,10 @@ export async function build({ siteDir, dataDir, configDir, outDir, repo }: Build
   await cp(siteDir, outDir, { recursive: true, filter: (src) => !src.endsWith('.py') })
   for (const file of DATA_FILES) await cp(join(dataDir, file), join(outDir, file))
   await cp(join(configDir, 'bands.json'), join(outDir, 'bands.json'))
+  // The public copy is the committed file itself; before the first run, an empty file.
+  await cp(join(dataDir, GROUPS_FILE), join(outDir, GROUPS_FILE)).catch(() =>
+    writeFile(join(outDir, GROUPS_FILE), `${JSON.stringify(groups, null, 2)}\n`),
+  )
 
   const duel = await duelHtml(siteDir, ctx)
   const index = fill(await readFile(join(siteDir, 'index.html'), 'utf8'), {
@@ -259,6 +296,47 @@ export async function build({ siteDir, dataDir, configDir, outDir, repo }: Build
   })
   await writeFile(join(outDir, 'metodologia.html'), method)
 
+  const compareState = emptyCompareState()
+  const distances = lean(ctx, inDebate(comparison.rows, compareState.debate))
+  const compare = fill(await readFile(join(siteDir, 'comparar.html'), 'utf8'), {
+    ...repoSlots,
+    topbar: topbarHtml('comparar'),
+    debates: debatesHtml(ctx),
+    answer: esc(headline(distances, ctx)),
+    balance: leanHtml(ctx, distances),
+    filters: compareFiltersHtml(ctx, comparison.rows, compareState, comparison.rows.length),
+    agencyCount: String(ctx.outletIds.length),
+    matrix: matrixHtml(ctx, comparison.rows),
+    coverage: coverageHtml(ctx, coverage(ctx, comparison, compareState.debate)),
+    pending: esc(pendingText(pendingCount(ctx, comparison.curated))),
+    drift: driftCountsHtml(ctx, driftCounts(ctx, compareState.debate)),
+    changes: changesHtml(changed(ctx, null), ctx),
+    // Only the record fields the comparison reads, to keep the page light: history rebuilds
+    // the old bands with the band table.
+    data: jsonScript('compare-data', {
+      records: records.map(
+        ({ id, debate, outlet, speaker, pos, band, label, url, missingSince, history }) => ({
+          id,
+          debate,
+          outlet,
+          speaker,
+          pos,
+          band,
+          label,
+          url,
+          missingSince,
+          history,
+        }),
+      ),
+      candidates: config.candidates,
+      outlets: config.outlets,
+      debates,
+      bands: config.bands,
+      groups: groups.groups,
+      curated,
+    }),
+  })
+  await writeFile(join(outDir, 'comparar.html'), compare)
   const how = fill(await readFile(join(siteDir, 'como-funciona.html'), 'utf8'), {
     repo: repoSlots.repo,
     topbar: topbarHtml('como-funciona'),

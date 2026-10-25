@@ -421,7 +421,8 @@ body {
   letter-spacing: -0.025em;
   margin: 0;
 }
-.audit h3 {
+.audit h3,
+.doc h3 {
   font-family: "Inter Tight", sans-serif;
   font-size: 19px;
   letter-spacing: -0.01em;
@@ -1084,6 +1085,8 @@ textarea:focus-visible {
 .doc p,
 .doc li {
   color: #424245;
+  /* The repository links are one long word; they break rather than widen the page. */
+  overflow-wrap: break-word;
 }
 .doc a {
   color: var(--link);
@@ -1128,6 +1131,930 @@ textarea:focus-visible {
   height: 7px;
   border-radius: 50%;
   background: var(--c);
+}
+
+/* Comparison page */
+.doc.cmp {
+  max-width: 980px;
+}
+.cmp .lede {
+  font-size: 19px;
+  line-height: 1.42;
+  max-width: 62ch;
+}
+.cmp .segmented {
+  margin-top: 12px;
+}
+.pending {
+  display: inline-block;
+  font-size: 13px;
+  color: var(--muted);
+  background: var(--surface);
+  border-radius: 999px;
+  padding: 4px 12px;
+  margin: 14px 0 0;
+}
+.pending:empty {
+  display: none;
+}
+.caveat {
+  background: var(--surface);
+  border-radius: 14px;
+  padding: 14px 18px;
+  font-size: 15px;
+}
+.doc .caveat {
+  color: var(--ink);
+}
+.cmp table {
+  table-layout: fixed;
+}
+.cmp thead th:first-child {
+  width: 34%;
+}
+.cmp tbody th {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.cmp td .line {
+  display: block;
+}
+.cmp td b {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.small {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--muted);
+  background: var(--surface);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+.cmp .filters {
+  position: static;
+  padding-top: 16px;
+}
+.cmp .toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 18px 0 0;
+  font-size: 14px;
+}
+.cmp .toc a {
+  color: var(--muted);
+  text-decoration: none;
+}
+.cmp .toc a:hover {
+  color: var(--ink);
+}
+.cmp > section {
+  padding-top: 8px;
+}
+.cmp .answer {
+  font:
+    500 clamp(19px, 2.6vw, 24px) / 1.3 "Inter Tight",
+    sans-serif;
+  letter-spacing: -0.012em;
+  color: var(--ink);
+  margin: 0 0 12px;
+  max-width: 40ch;
+}
+.narrow {
+  display: none;
+}
+
+/* Axes: one per agency, the distance from the other agencies. */
+.balance {
+  --cols: 150px minmax(0, 1fr) 220px;
+  margin-top: 28px;
+}
+.ends {
+  display: grid;
+  grid-template-columns: var(--cols);
+}
+.balance .end {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.2;
+}
+.balance .end img {
+  width: 30px;
+  height: 30px;
+  image-rendering: pixelated;
+}
+.balance .end.right {
+  justify-self: end;
+  flex-direction: row-reverse;
+  text-align: right;
+}
+.balance .end b {
+  display: block;
+  color: var(--ink);
+  font-weight: 500;
+}
+.lean-rows {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+}
+.doc .lean-row {
+  display: grid;
+  grid-template-columns: var(--cols);
+  align-items: center;
+  color: var(--ink);
+}
+.lean-row .who {
+  margin: 0;
+  padding-right: 16px;
+  color: var(--ink);
+}
+.lean-row .who strong {
+  display: block;
+  font:
+    600 16px / 1.2 "Inter Tight",
+    sans-serif;
+}
+.lean-row .sub {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 3px;
+  line-height: 1.35;
+}
+.lean-row .sub span {
+  display: block;
+}
+.track {
+  display: block;
+  overflow: visible;
+}
+.track .grid {
+  stroke: #e8e8ed;
+}
+.track .base {
+  stroke: var(--line);
+}
+.track .ci {
+  fill: #8e8e93;
+}
+.track .ci-end {
+  stroke: rgba(29, 29, 31, 0.55);
+  stroke-width: 1.5;
+}
+.track .zero {
+  stroke: var(--ink);
+  stroke-width: 1.25;
+}
+.track .pt {
+  fill: var(--ink);
+}
+.track text,
+.axis text {
+  font:
+    12px Inter,
+    sans-serif;
+  fill: var(--muted);
+}
+.track text {
+  paint-order: stroke;
+  stroke: var(--bg);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+.track .pt-label {
+  font-weight: 600;
+  font-size: 13px;
+  fill: var(--ink);
+}
+.doc .lean-row .says {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--ink);
+}
+.says .nums {
+  display: block;
+  color: var(--muted);
+  font-size: 12.5px;
+  margin-top: 4px;
+}
+.axis {
+  display: grid;
+  grid-template-columns: var(--cols);
+}
+.axis .ticks {
+  grid-column: 2;
+  display: block;
+  overflow: visible;
+}
+.axis text.z {
+  fill: var(--ink);
+  font-weight: 500;
+}
+.doc .axis .cap {
+  grid-column: 2;
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+}
+.howto {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  margin: 18px 0 0 150px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.howto .k {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.howto i {
+  display: inline-block;
+}
+.k-ci {
+  width: 40px;
+  height: 8px;
+  border-radius: 4px;
+  background: #8e8e93;
+}
+.k-pt {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+.k-z {
+  width: 1.25px;
+  height: 16px;
+  background: var(--ink);
+}
+.cmp .caveat {
+  margin-top: 28px;
+}
+.cmp .caveat p {
+  margin: 0;
+  color: var(--ink);
+}
+.cmp .caveat p + p {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 13.5px;
+}
+
+/* Bands by color and by shape: verdadeiro circle, impreciso triangle, falso cross, sem faixa
+   square, "não checou" hollow ring. The shape is drawn by ::before, so ::after can mark a
+   band change. */
+.dot {
+  position: relative;
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  flex: none;
+}
+.dot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--c);
+}
+.dot.band-verdadeiro::before {
+  border-radius: 50%;
+}
+.dot.band-impreciso::before {
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+.dot.band-falso::before {
+  clip-path: polygon(
+    20% 0,
+    50% 30%,
+    80% 0,
+    100% 20%,
+    70% 50%,
+    100% 80%,
+    80% 100%,
+    50% 70%,
+    20% 100%,
+    0 80%,
+    30% 50%,
+    0 20%
+  );
+}
+.dot.band-sem-faixa::before {
+  inset: 1px;
+  border-radius: 1px;
+}
+.dot.none::before {
+  background: transparent;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px #a1a1a6;
+}
+.dot.moved::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ink);
+}
+.cmp .legend {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 18px 0 0;
+  padding: 0;
+  font-size: 13px;
+}
+.doc .legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+}
+.divmark {
+  position: relative;
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  background: #e8e8ed;
+}
+.divmark::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: -4px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--ink);
+}
+
+/* Dot matrix: per debate, one lane per agency, one column per claim. */
+.staff {
+  margin-top: 34px;
+}
+.staff[hidden],
+.seg-block[hidden],
+.claim[hidden],
+.change[hidden],
+.keyonly[hidden],
+.detail[hidden] {
+  display: none;
+}
+.doc.cmp .staff h3 {
+  font:
+    600 19px / 1.2 "Inter Tight",
+    sans-serif;
+  letter-spacing: -0.012em;
+  margin: 0;
+}
+.score {
+  display: grid;
+  grid-template-columns: 124px minmax(0, 1fr);
+  margin-top: 14px;
+}
+.lanes {
+  display: grid;
+  grid-template-rows: 30px repeat(var(--agencies), 22px);
+  font-size: 13px;
+  color: var(--muted);
+}
+.cmp .lanes span {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+.cmp .lanes span:first-child {
+  visibility: hidden;
+}
+.segs {
+  display: flex;
+  gap: 22px;
+  overflow-x: auto;
+}
+.seg-label {
+  height: 30px;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  border-top: 1.5px solid var(--ink);
+  padding-top: 5px;
+  white-space: nowrap;
+}
+.score .seg-label img {
+  width: 20px;
+  height: 20px;
+  image-rendering: pixelated;
+  margin-top: -3px;
+}
+.seg-label .n {
+  color: var(--muted);
+  font-weight: 400;
+}
+.cols {
+  display: flex;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 10.5px,
+    #e8e8ed 10.5px 11.5px,
+    transparent 11.5px 22px
+  );
+}
+.claim {
+  appearance: none;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 17px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.claim .dots {
+  display: grid;
+  grid-template-rows: repeat(var(--agencies), 22px);
+  justify-items: center;
+  align-items: center;
+  width: 100%;
+}
+.claim .txt {
+  display: none;
+}
+.claim.div {
+  background: #e8e8ed;
+}
+.claim.div::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: -6px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--ink);
+}
+.claim:hover {
+  background: #dcdce2;
+}
+.claim[aria-expanded="true"] {
+  background: var(--ink);
+}
+.claim[aria-expanded="true"] .dot.none::before {
+  box-shadow: inset 0 0 0 1.5px #8e8e93;
+}
+.claim[aria-expanded="true"] .dot.moved::after {
+  border-color: #fff;
+}
+.cmp .empty {
+  padding: 16px 0;
+  text-align: left;
+  font-size: 15px;
+}
+
+/* Claim detail */
+.detail {
+  position: relative;
+  margin-top: 18px;
+  padding: 22px 24px 18px;
+  background: var(--surface);
+  border-radius: 16px;
+}
+.doc .detail .who-line {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.detail blockquote {
+  margin: 8px 0 0;
+  padding-right: 40px;
+  max-width: 52ch;
+  font:
+    500 clamp(18px, 2.4vw, 22px) / 1.3 "Inter Tight",
+    sans-serif;
+  letter-spacing: -0.012em;
+  overflow-wrap: anywhere;
+}
+.doc .detail .divnote {
+  margin: 10px 0 0;
+  font-size: 14px;
+  color: var(--ink);
+}
+.verdicts {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+}
+.doc .verdicts li {
+  display: grid;
+  grid-template-columns: 150px 110px minmax(0, 1fr) auto;
+  gap: 2px 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+  color: var(--ink);
+}
+.doc .verdicts li.no {
+  color: var(--muted);
+}
+.verdicts .ag {
+  font-weight: 500;
+}
+.verdicts .band {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.verdicts .lab,
+.verdicts .was {
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.verdicts .lab q {
+  color: var(--ink);
+}
+.verdicts .was {
+  grid-column: 3;
+  grid-row: 2;
+  font-size: 13px;
+}
+.verdicts .go {
+  grid-column: 4;
+  grid-row: 1;
+}
+.gid {
+  font:
+    12px / 1.4 ui-monospace,
+    "SF Mono",
+    Menlo,
+    monospace;
+}
+.doc .detail .gid-line {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--ink);
+  cursor: pointer;
+}
+.close svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* Coverage: one mark per claim */
+.marks {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 6px;
+}
+.marks i {
+  flex: 1 1 0;
+  max-width: 8px;
+  height: 16px;
+  border-radius: 2px;
+  background: #e8e8ed;
+}
+.marks i.on {
+  background: var(--ink);
+}
+.cmp td .line.none {
+  color: var(--muted);
+}
+
+/* Changed verdicts */
+.changes {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+}
+.doc .change {
+  position: relative;
+  padding: 20px 0 20px 58px;
+  border-top: 1px solid var(--line);
+  color: var(--ink);
+}
+.changes .change > img {
+  position: absolute;
+  left: 0;
+  top: 20px;
+  width: 44px;
+  height: 44px;
+  image-rendering: pixelated;
+}
+.doc .change .meta {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.doc .change .q {
+  margin: 3px 0 0;
+  font:
+    500 17px / 1.35 "Inter Tight",
+    sans-serif;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.tl {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 30px;
+  margin: 14px 0 0;
+  padding: 0;
+}
+.doc .tl li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 140px;
+  padding: 9px 13px;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  font-size: 14px;
+  color: var(--ink);
+}
+.doc .tl li.now {
+  box-shadow: inset 0 0 0 1.5px var(--ink);
+}
+.tl li + li::before {
+  content: "→";
+  position: absolute;
+  left: -22px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+}
+.tl .v {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.tl li.old .v {
+  color: var(--muted);
+}
+.tl .b,
+.tl .d {
+  font-size: 12px;
+  color: var(--muted);
+}
+.tl .dir {
+  font-size: 12px;
+}
+.doc .qdiff {
+  margin: 10px 0 0;
+  font-size: 14px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.qdiff del {
+  text-decoration-thickness: 1.5px;
+}
+.qdiff ins {
+  text-decoration: none;
+  color: var(--ink);
+  background: #e8e8ed;
+  border-radius: 3px;
+  padding: 0 3px;
+}
+.keyonly {
+  margin-top: 20px;
+  padding: 14px 18px;
+  background: var(--surface);
+  border-radius: 14px;
+}
+.keyonly summary {
+  cursor: pointer;
+  font-size: 15px;
+}
+.keyonly .changes {
+  margin-top: 12px;
+}
+.doc .keyonly .change {
+  padding-left: 44px;
+}
+.keyonly .change > img {
+  width: 30px;
+  height: 30px;
+}
+
+@media (max-width: 720px) {
+  .balance {
+    --cols: minmax(0, 1fr);
+  }
+  .balance .end,
+  .axis .ticks,
+  .doc .axis .cap {
+    grid-column: 1;
+  }
+  .doc .lean-row {
+    padding-top: 14px;
+  }
+  .doc .lean-row + .lean-row {
+    border-top: 1px solid #e8e8ed;
+  }
+  .lean-row .who {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding: 0;
+  }
+  .lean-row .sub {
+    margin: 0;
+    text-align: right;
+  }
+  .doc .lean-row .says {
+    padding: 0 0 10px;
+    font-size: 13.5px;
+  }
+  .howto {
+    margin-left: 0;
+    gap: 8px 18px;
+  }
+  .balance .end {
+    font-size: 12px;
+  }
+  .balance .end img {
+    width: 24px;
+    height: 24px;
+  }
+  /* The matrix becomes a list: one claim per line, the agency lanes as columns. */
+  .score {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .lanes {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    grid-template-rows: none;
+    grid-template-columns: minmax(0, 1fr) repeat(var(--agencies), 44px);
+    padding: 8px 0 6px;
+    border-bottom: 1px solid var(--line);
+    background: var(--bg);
+    font-size: 10px;
+    line-height: 1.15;
+  }
+  .cmp .lanes span {
+    justify-content: center;
+    text-align: center;
+    white-space: normal;
+  }
+  .cmp .lanes span:first-child {
+    visibility: visible;
+    justify-content: flex-start;
+    text-align: left;
+  }
+  .segs {
+    display: block;
+    overflow: visible;
+  }
+  .seg-block + .seg-block {
+    margin-top: 12px;
+  }
+  .seg-label {
+    height: auto;
+    padding: 12px 0 6px;
+    border-top: 0;
+    font-size: 14px;
+  }
+  .cols {
+    display: block;
+    background: none;
+  }
+  .claim {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) calc(var(--agencies) * 44px);
+    align-items: center;
+    width: 100%;
+    padding: 7px 0;
+    border-radius: 0;
+    border-top: 1px solid #e8e8ed;
+  }
+  .claim .dots {
+    grid-template-rows: none;
+    grid-template-columns: repeat(var(--agencies), 44px);
+  }
+  .claim .txt {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    padding-right: 6px;
+    font-size: 13.5px;
+    line-height: 1.3;
+  }
+  .claim.div {
+    background: transparent;
+    box-shadow: inset 3px 0 0 var(--ink);
+    padding-left: 10px;
+  }
+  .claim.div::before {
+    display: none;
+  }
+  .claim:hover,
+  .claim[aria-expanded="true"] {
+    background: var(--surface);
+  }
+  .claim[aria-expanded="true"] .dot.none::before {
+    box-shadow: inset 0 0 0 1.5px #a1a1a6;
+  }
+  .claim[aria-expanded="true"] .dot.moved::after {
+    border-color: var(--ink);
+  }
+  .wide {
+    display: none;
+  }
+  .narrow {
+    display: inline;
+  }
+  .divmark {
+    width: 3px;
+    border-radius: 0;
+    background: var(--ink);
+  }
+  .divmark::before {
+    display: none;
+  }
+  .detail {
+    margin: 0 0 10px;
+    padding: 16px 16px 12px;
+    border-radius: 12px;
+  }
+  .doc .verdicts li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .verdicts .band {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+  }
+  .verdicts .lab,
+  .verdicts .was,
+  .verdicts .go {
+    grid-column: 1 / span 2;
+    grid-row: auto;
+  }
+  .doc .change {
+    padding-left: 40px;
+  }
+  .changes .change > img {
+    width: 30px;
+    height: 30px;
+  }
+  .tl {
+    flex-direction: column;
+    gap: 26px;
+  }
+  .tl li + li::before {
+    content: "↓";
+    left: 18px;
+    top: -21px;
+    transform: none;
+  }
+  .doc .keyonly .change {
+    padding-left: 0;
+  }
+  .keyonly .change > img {
+    display: none;
+  }
 }
 
 /* How it works */
@@ -1472,6 +2399,17 @@ textarea:focus-visible {
   .doc th:last-child {
     padding-right: 0;
   }
+  .cmp .lede {
+    font-size: 17px;
+  }
+  .cmp thead th:first-child {
+    width: 30%;
+  }
+  .small {
+    font-size: 11px;
+    padding: 0 6px;
+    white-space: nowrap;
+  }
   .board {
     grid-template-columns: 1fr;
   }
@@ -1565,6 +2503,23 @@ textarea:focus-visible {
   }
   .topbar nav .audit-btn svg {
     display: none;
+  }
+}
+/* On a small phone the audit button keeps only its shield, so the links still fit. */
+@media (max-width: 400px) {
+  .topbar nav .audit-btn {
+    padding: 9px;
+  }
+  .topbar nav .audit-btn svg {
+    display: block;
+  }
+  .topbar nav .audit-btn .t {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 }
 @media (prefers-reduced-motion: reduce) {

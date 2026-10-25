@@ -16,7 +16,7 @@
 - **Trade-off**: New labels need a manual table update; no automatic grouping or summarizing of checks.
 - **Scope**: Ingestion, data model, site, any future comparator.
 - **Date**: 2026-10-24
-- **Status**: active
+- **Status**: active; partially superseded by AD-007 for claim grouping
 
 ### AD-003
 - **Decision**: The site uses no UI framework: static HTML, CSS and one ES module, pre-rendered by a small build script.
@@ -50,13 +50,30 @@
 - **Date**: 2026-10-24
 - **Status**: active
 
+### AD-007
+- **Decision**: Claim groups for the agency comparator are formed by AI agents and reviewed by the maintainer before commit. Agents see only record IDs, an agency letter, the quote and the excerpt (no agency name, label or band); three curators work independently per debate, a judge decides only where they disagree, an editor writes one neutral claim sentence per group and an adversarial reviewer checks neutrality. Every raw output is committed. AI never sets, changes or summarizes a verdict.
+- **Reason**: Deciding which checks evaluate the same assertion is editorial judgment the maintainer chose to delegate; blindness and independent votes keep that judgment from leaning on agency or verdict.
+- **Trade-off**: Partially supersedes AD-002: agency quotes and excerpts now pass through AI at curation time, which goes against the AI-crawler blocks of three agencies. The public rule "no text passes through AI" is replaced on the site and in the README.
+- **Scope**: Agency comparator, audit panel, methodology page, README.
+- **Date**: 2026-10-24
+- **Status**: active
+
+### AD-008
+- **Decision**: The comparator shows, per agency, its distance from the other agencies on shared claims (Flávio minus Lula of the mean deviation from the others' mean score) with a deterministic 97.5% bootstrap interval and one sentence chosen by a fixed rule; it also shows every verdict, quote or key change with its versions. Visual direction A (axes, dot matrix, timelines).
+- **Reason**: The user wants a public, recomputable answer to "as agências pendem?"; fixing the rule before publication keeps the words from following the results.
+- **Trade-off**: Replaces the "no score per agency" rule of RIGOR-05 with one number plus interval per agency; the measure cannot see what each agency chose to check, which the page states next to it.
+- **Scope**: Agency comparator, methodology page, `pnpm lean`, ingest history (key changes).
+- **Date**: 2026-10-24
+- **Amended 2026-10-24**: the interval went from 90% to 97.5% per agency (user decision). With four agencies, a 90% interval gives about a 34% chance (1 - 0.9^4) that some agency reads "mais dura" by chance alone; 97.5% brings it near 10% (1 - 0.975^4). Same generator, seed and draw order; the ends are `sorted[62]` and `sorted[4937]`.
+- **Status**: active
+
 ## Handoff
 
-- **Feature**: `.specs/features/debate-archive`
-- **Phase / Task**: Execute done, T1 to T24 complete; Verifier PASS at iteration 3 (`validation.md`, validate_state 0 errors)
-- **Completed**: all tasks, reviewer and fix rounds per batch, first live dataset in `data/` (314 records, 8 sources ok), Verifier gaps 1 and 2 of iteration 3 closed by `076d2ef` and `7e97dfb`
+- **Feature**: `.specs/features/agency-comparator`
+- **Phase / Task**: Execute done, T1 to T15 complete (phase 3: T9 to T15 plus review fixes); Verifier PASS at iteration 3c (`validation.md`, validate_state 0 errors)
+- **Completed**: distance per agency with a 97.5% bootstrap interval (AD-008, LEAN-01..08), headline that leaves small samples out of the count, verdict changes as timelines (DRIFT-01..05), repair of the Estadão checks split by the 2026-10-24 run (`data/repairs/2026-10-24-estadao.json`), merge of `main` up to #9 (top bar link "Comparar", links without `.html`, GoatCounter on the page)
 - **In-progress** (file:line): none
-- **Next step**: needs the user's go-ahead for outward actions: create the GitHub repo `debates-checados/debates-checados`, rename `master` to `main`, push, set secrets `IA_S3_ACCESS`/`IA_S3_SECRET` (rotated keys), Pages source "GitHub Actions", run the `update` workflow once
-- **Open items**: 83 records await a Wayback snapshot (g1 Band, Aos Fatos Globo Escriba API); web.archive.org refused IPv4 connections from the dev machine after the first run, CI retries every 2 h. Iteration-3 minor gap: `fetchedAt` on silent changes is untested and unspecified (R04)
+- **Next step**: needs the user's go-ahead to push branch `phase3-merge` and open the PR into `main`; before that, confirm `origin/main` has no data commit after `bc3a25d` (the repair refuses otherwise)
+- **Open items**: two minor test gaps in the LEAN-06 contrast probe (M23 opacity on `.lean-row`, M24 CSS filter), see `validation.md` iteration 3c; `data/run-report.json` keeps the 19 stale Estadão `awaitingArchive` ids until the next ingest; `test/e2e/site.test.ts` was red on `main` (5 rules expected, 4 shipped), fixed on this branch; CI runs unit tests only
 - **Uncommitted files**: none
-- **Branch**: `master` (local only, workflow and site links expect `main`)
+- **Branch**: `phase3-merge` (local, worktree in the session scratchpad), based on `origin/main` `ee538ef`

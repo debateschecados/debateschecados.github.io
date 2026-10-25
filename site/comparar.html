@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comparar agências · Debates checados</title>
+<meta name="description" content="As agências de checagem pendem para um lado? A distância de cada agência em relação às outras nas falas dos debates do 2º turno, fala por fala.">
+<link rel="describedby" href="llms.txt" type="text/markdown">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+<script data-goatcounter="https://debateschecados.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head>
+<body>
+<!--topbar-->
+<main class="wrap doc cmp">
+  <nav class="toc" aria-label="Seções"><a href="#pende">Pendem?</a><a href="#falas">Fala por fala</a><a href="#cobertura">Quem checou o quê</a><a href="#mudancas">Vereditos que mudaram</a></nav>
+  <!-- biome-ignore lint/a11y/useSemanticElements: a pill of toggle buttons, not a form fieldset -->
+  <div class="segmented" id="debates" role="group" aria-label="Debate"><!--debates--></div>
+
+  <section id="pende">
+    <h1>As agências pendem para um lado?</h1>
+    <p class="answer" id="answer"><!--answer--></p>
+    <p class="lede">Comparamos cada agência com as outras nas falas que duas ou mais checaram. A bolinha é a distância média. A barra é o intervalo de 97,5%: a faixa onde essa distância provavelmente está. Se a barra cruza a linha do zero, não dá para dizer que a agência foi mais dura com um dos candidatos.</p>
+    <!-- biome-ignore lint/a11y/useSemanticElements: a figure of one axis per agency, not a form fieldset -->
+    <div class="balance" id="balance" role="group" aria-label="Distância de cada agência em relação às outras"><!--balance--></div>
+    <div class="caveat">
+      <p id="caveat">Cada agência escolhe o que checar e pode checar partes diferentes da mesma fala. Estes números mostram diferenças, não provam favorecimento.</p>
+      <p id="method-note">A conta só usa falas checadas por duas ou mais agências. A referência são as outras agências, não a verdade: a distância diz quem foi mais dura ou mais branda que as outras, não quem acertou. O que cada agência escolheu checar não entra na conta. <a href="metodologia.html#distancia">Como a conta é feita</a>.</p>
+    </div>
+  </section>
+
+  <section id="falas">
+    <h2>Fala por fala</h2>
+    <p class="lede"><span class="wide">Cada coluna é uma fala, cada linha é uma agência.</span><span class="narrow">Cada linha é uma fala, cada coluna é uma agência.</span> Bolinha vazia quer dizer que a agência não checou aquela fala. As falas marcadas são divergências: agências que checaram a mesma fala e deram faixas diferentes. Toque numa fala para ler o rótulo de cada agência.</p>
+    <div class="filters" id="filters"><!--filters--></div>
+    <ul class="legend" id="legend">
+      <li><i class="dot band-verdadeiro" aria-hidden="true"></i>verdadeiro</li>
+      <li><i class="dot band-impreciso" aria-hidden="true"></i>impreciso</li>
+      <li><i class="dot band-falso" aria-hidden="true"></i>falso</li>
+      <li><i class="dot band-sem-faixa" aria-hidden="true"></i>sem faixa</li>
+      <li><i class="dot none" aria-hidden="true"></i>não checou</li>
+      <li><i class="dot band-impreciso moved" aria-hidden="true"></i>mudou de faixa depois de publicada</li>
+      <li><i class="divmark" aria-hidden="true"></i>divergência</li>
+    </ul>
+    <div class="matrix" id="matrix" style="--agencies: {{agencyCount}}"><!--matrix--></div>
+    <p class="empty" id="empty" hidden>Nenhuma fala com esses filtros. <button type="button" data-clear>Limpar filtros</button></p>
+    <section class="detail" id="detail" aria-label="Detalhe da fala" hidden></section>
+  </section>
+
+  <section id="cobertura">
+    <h2>Quem checou o quê</h2>
+    <p class="lede">Quantas das falas checadas por duas ou mais agências cada agência checou, por candidato. Cada tracinho é uma fala, cheio quando a agência checou. “Só ela checou” conta as checagens da agência que nenhuma outra checou.</p>
+    <div class="table-wrap" id="coverage"><!--coverage--></div>
+    <p class="pending" id="pending"><!--pending--></p>
+  </section>
+
+  <section id="mudancas">
+    <h2>Vereditos que mudaram</h2>
+    <p class="lede">Guardamos cada versão das checagens. Quando uma agência troca o rótulo ou edita a citação depois de publicar, a mudança fica registrada aqui com a data. A faixa de um rótulo antigo é a que ele tem hoje na tabela de faixas.</p>
+    <div class="table-wrap" id="drift"><!--drift--></div>
+    <!--changes-->
+    <p class="changes-none" id="changes-none" hidden>Nenhuma checagem deste debate mudou de rótulo nem de citação.</p>
+  </section>
+
+  <h2>Como os grupos foram feitos</h2>
+  <p>Um grupo junta as checagens de agências diferentes que avaliam a mesma fala, do mesmo candidato, no mesmo debate. Os grupos são propostos por agentes de inteligência artificial e revisados pelo mantenedor:</p>
+  <ol>
+    <li>Os agentes recebem só a fala e o trecho de cada checagem, com a agência trocada por uma letra. Não veem o nome da agência, o rótulo nem o veredito.</li>
+    <li>Três agentes agrupam as checagens de cada debate, cada um sem ver o trabalho dos outros. Um grupo em que os três concordam entra direto.</li>
+    <li>Onde eles discordam, um juiz decide só aqueles casos.</li>
+    <li>Um agente escreve uma frase curta para cada fala, e um revisor lê cada frase atrás de palavras que tomem partido.</li>
+    <li>O mantenedor revisa o resultado antes de publicar. Toda mudança feita à mão fica registrada, com o motivo.</li>
+  </ol>
+  <p>A IA nunca define veredito. Cada veredito desta página é o da agência, na faixa da escala comum. Todos os grupos estão em <a href="claim-groups.json">claim-groups.json</a>. A entrada que os agentes receberam, a resposta de cada um e o roteiro da curadoria estão em <a href="{{repo}}/tree/main/data/claim-curation">data/claim-curation</a>.</p>
+
+  <h2>Contestar um grupo</h2>
+  <p>Se um grupo junta checagens que avaliam coisas diferentes, ou se falta nele uma checagem, abra uma issue em <a href="{{repo}}/issues">{{repoLabel}}/issues</a> com o código do grupo, que aparece no detalhe de cada fala, e diga o que está errado. Toda correção vira um commit público, com data.</p>
+</main>
+<footer class="foot">
+  <div class="wrap">
+    <nav><a href="checks.csv">Baixar os dados</a><a href="./">Checagens</a><a href="metodologia.html">Como funciona</a><a href="{{repo}}">Código no GitHub</a></nav>
+    <p>Os vereditos são das agências. Este site só reúne e organiza o que elas publicaram. Ilustrações feitas a partir de retratos oficiais: Palácio do Planalto (CC BY 2.0) e Agência Senado. Logos dos partidos e das emissoras: Wikimedia Commons. Ícones das agências: sites das próprias agências.</p>
+  </div>
+</footer>
+<!--data-->
+<script type="module" src="comparar.js"></script>
+</body>
+</html>

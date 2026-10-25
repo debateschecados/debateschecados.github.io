@@ -1,0 +1,28 @@
+{
+  "components": [
+    {
+      "component": 0,
+      "speaker": "flavio",
+      "refs": [
+        "ab219f5a267e",
+        "d9d2cea5305a"
+      ]
+    }
+  ],
+  "decisions": [
+    {
+      "component": 0,
+      "groups": [
+        {
+          "speaker": "flavio",
+          "refs": [
+            "ab219f5a267e",
+            "d9d2cea5305a"
+          ],
+          "claim": "Lula já gastou mais de R$ 400 bilhões para tentar se reeleger"
+        }
+      ],
+      "reason": "C avalia diretamente o total de R$ 405 bilhões em medidas no ano eleitoral, e o excerpt de D explica a LOA só como contexto antes de chegar à mesma série de medidas de Lula em 2026, então os dois checam o mesmo gasto de mais de R$ 400 bilhões."
+    }
+  ]
+}

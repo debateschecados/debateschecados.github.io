@@ -5,6 +5,7 @@
 /** @typedef {import('../src/config.ts').Candidate} Candidate */
 /** @typedef {import('../src/config.ts').Outlet} Outlet */
 /** @typedef {Pick<import('../src/config.ts').Debate, 'id' | 'date' | 'broadcaster'>} Debate */
+/** @typedef {Record<string, { label: string, band: string }[]>} Bands */
 /** @typedef {ReturnType<typeof createContext>} Context */
 /** @typedef {ReturnType<typeof emptyState>} State */
 
@@ -20,13 +21,21 @@ export const FILTERS = ['debate', 'outlet', 'speaker', 'band']
 export const NOTICE =
   'Cada agência escolhe o que checar. A mesma fala pode aparecer uma vez por agência, então este placar soma checagens, não falas.'
 
+// The matching key of src/pipeline/normalize.ts labelKey: no diacritics, lowercase, only a-z.
+export const labelKey = (/** @type {string} */ label) =>
+  label
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .toLowerCase()
+    .replace(/[^a-z]/g, '')
 export const REMOVED_NOTICE =
   'Checagens que as agências tiraram do ar depois de publicar. Ficam aqui com a cópia arquivada e não entram no placar.'
 
 // Sorts everything once: debates newest first, outlets by name with one pt-BR collator,
 // candidates by ballot number, records by debate, outlet, then position on the page.
-/** @param {{ records: CheckRecord[], candidates: Candidate[], outlets: Record<string, Outlet>, debates: Debate[] }} data */
-export function createContext({ records, candidates, outlets, debates }) {
+// `bands` (config/bands.json) gives the band of a label no record holds anymore.
+/** @param {{ records: CheckRecord[], candidates: Candidate[], outlets: Record<string, Outlet>, debates: Debate[], bands?: Bands }} data */
+export function createContext({ records, candidates, outlets, debates, bands = {} }) {
   const collator = new Intl.Collator('pt-BR')
   const sortedDebates = [...debates].sort((a, b) =>
     a.date < b.date ? 1 : a.date > b.date ? -1 : 0,
@@ -51,6 +60,8 @@ export function createContext({ records, candidates, outlets, debates }) {
     debates: sortedDebates,
     outlets,
     outletIds,
+    bandOf: (/** @type {string} */ outlet, /** @type {string} */ label) =>
+      bands[outlet]?.find((e) => labelKey(e.label) === labelKey(label))?.band ?? 'sem faixa',
   }
 }
 

@@ -89,3 +89,6 @@ jobs:
       # the red run is the notification (DATA-03).
       - name: Fail on labels without a band
         run: pnpm check:labels
+
+      - name: Check claim groups
+        run: pnpm check:claims

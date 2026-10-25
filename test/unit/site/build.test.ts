@@ -1,15 +1,27 @@
+import { existsSync } from 'node:fs'
 import { mkdtemp, readdir, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { type CheerioAPI, load } from 'cheerio'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import pkg from '../../../package.json' with { type: 'json' }
+import { createComparison } from '../../../site/compare.js'
 import { createContext, emptyState, listed } from '../../../site/core.js'
+import { B, deviations, headline, lean, MIN_N, sentence } from '../../../site/lean.js'
+import { leanHtml } from '../../../site/render.js'
 import { type Config, loadConfig } from '../../../src/config.ts'
 import { CSV_COLUMNS } from '../../../src/pipeline/write.ts'
 import { AGENT_FILES, auditPrompt } from '../../../src/site/agents.ts'
 import type { CheckRecord } from '../../../src/types.ts'
-import { buildFixture, fixtureRecords } from '../../fixtures/site.ts'
+import {
+  buildFixture,
+  FIXTURE_GROUPS,
+  FIXTURE_PENDING,
+  fixtureGroupId,
+  fixtureGroups,
+  fixtureRecords,
+  recordId,
+} from '../../fixtures/site.ts'
 
 const ROOT = join(import.meta.dirname, '../../..')
 const REPO = pkg.repository
@@ -22,6 +34,7 @@ let records: CheckRecord[]
 let config: Config
 let index: CheerioAPI
 let method: CheerioAPI
+let compare: CheerioAPI
 let how: CheerioAPI
 let indexHtml: string
 
@@ -32,6 +45,7 @@ beforeAll(async () => {
   indexHtml = await readFile(join(outDir, 'index.html'), 'utf8')
   index = load(indexHtml)
   method = load(await readFile(join(outDir, 'metodologia.html'), 'utf8'))
+  compare = load(await readFile(join(outDir, 'comparar.html'), 'utf8'))
   how = load(await readFile(join(outDir, 'como-funciona.html'), 'utf8'))
 })
 afterAll(() => rm(tmp, { recursive: true, force: true }))
@@ -288,6 +302,101 @@ describe('metodologia.html (DATA-03, DATA-07, AUDIT-08)', () => {
   })
 })
 
+describe('metodologia.html, distance and changed verdicts (LEAN-08)', () => {
+  // The text from an h2 up to the next one, with whitespace collapsed.
+  const section = (title: string) => {
+    const h2 = method('h2').filter((_, h) => method(h).text() === title)
+    expect(h2).toHaveLength(1)
+    const body = h2.nextUntil('h2')
+    return { h2, body, text: body.text().replace(/\s+/g, ' ') }
+  }
+
+  it('explains the formula, scale, interval, sentence rule and limits, and links the spec', () => {
+    const { h2, body, text } = section('Distância das outras agências')
+    // The comparison page's method note points here.
+    expect(h2.attr('id')).toBe('distancia')
+    expect(compare('#method-note a').attr('href')).toBe(`metodologia.html#${h2.attr('id')}`)
+    expect(text).toContain('verdadeiro 0, impreciso 1, falso 2')
+    expect(text).toContain('Checagens em “Sem faixa” ficam de fora.')
+    expect(text).toContain('o número dela menos a média do número das outras')
+    // The worked example gives what lean.js computes for falso, verdadeiro, impreciso.
+    expect(text).toContain('o desvio da Lupa é 2 − 0,5 = +1,5')
+    const [lupa] = deviations([
+      {
+        speaker: 'lula',
+        cells: [
+          { outlet: 'lupa', band: 'falso' },
+          { outlet: 'g1', band: 'verdadeiro' },
+          { outlet: 'estadao', band: 'impreciso' },
+        ],
+      },
+    ] as never)
+    expect(lupa.value).toBe(1.5)
+    expect(text).toContain(
+      'A distância é a média nas falas de Flávio Bolsonaro menos a média nas falas de Lula.',
+    )
+    expect(text).toContain(`recalcula a distância ${B} vezes`)
+    expect(text).toContain('O intervalo de 97,5% vem de um bootstrap')
+    expect(text).toContain('guarda os valores do meio, deixando de fora 1,25% em cada ponta')
+    expect(text).toContain(
+      'Usamos 97,5% para cada agência porque são quatro: assim, a chance de alguma aparecer como mais dura só por acaso fica perto de 1 em 10.',
+    )
+    expect(text).toContain('gerador fixo, então os mesmos dados dão sempre os mesmos números')
+    const ctx = createContext({ ...config, records: [] })
+    for (const [rule, verdict] of [
+      ['intervalo que contém o zero', 'none'],
+      ['intervalo todo acima de zero', 'c2'],
+      ['intervalo todo abaixo de zero', 'c1'],
+    ] as const) {
+      expect(text).toContain(`${rule}: “${sentence(verdict, ctx)}”`)
+    }
+    expect(text).toContain(`menos de ${MIN_N} desvios para algum dos candidatos: “amostra pequena”`)
+    expect(text).toContain(
+      'A regra olha as pontas do intervalo arredondadas para duas casas, como a página mostra: uma ponta que aparece como 0,00 conta como zero.',
+    )
+    expect(sentence('small', ctx)).toBe('amostra pequena')
+    expect(text).toContain(
+      'Uma agência com amostra pequena nunca conta como “sem diferença clara”: a frase diz à parte quais têm amostra pequena e, se todas têm, que nenhuma agência tem falas suficientes para medir a diferença.',
+    )
+    for (const limit of [
+      'a conta só usa falas que duas ou mais agências checaram',
+      'o que cada agência escolheu checar, e o que deixou de checar, não entra',
+      'não quem acertou, e não prova favorecimento',
+    ]) {
+      expect(text).toContain(limit)
+    }
+    const spec = '.specs/features/agency-comparator/spec.md'
+    expect(body.find('a').attr('href')).toBe(`${REPO}/blob/main/${spec}`)
+    expect(existsSync(join(ROOT, spec))).toBe(true)
+  })
+
+  it('explains how changed verdicts are kept, counted and marked, with the repair report', async () => {
+    const { body, text } = section('Vereditos que mudaram')
+    expect(text).toContain('Quando o rótulo, a citação ou o identificador interno')
+    expect(text).toContain('com a data em que a coleta percebeu a mudança')
+    expect(text).toContain('A faixa de um rótulo antigo é a que ele tem hoje na tabela de faixas.')
+    expect(text).toContain('mostra as palavras tiradas e as acrescentadas')
+    expect(text).toContain(
+      'as mudanças de faixa na ordem verdadeiro < impreciso < falso: mais dura, mais branda, ganhou faixa (saiu de “Sem faixa”) ou perdeu a faixa',
+    )
+    expect(text).toContain('o detalhe da fala mostra a faixa anterior')
+    const report = 'data/repairs/2026-10-24-estadao.json'
+    const links = body
+      .find('a')
+      .map((_, a) => a.attribs.href)
+      .get()
+    expect(links).toEqual(['comparar#mudancas', `${REPO}/blob/main/${report}`])
+    expect(compare('section#mudancas')).toHaveLength(1)
+    expect(existsSync(join(ROOT, report))).toBe(true)
+
+    const readme = await readFile(join(ROOT, 'README.md'), 'utf8')
+    const comparator = readme.slice(readme.indexOf('\n## Comparador\n'))
+    expect(comparator.slice(0, comparator.indexOf('\n## ', 1))).toMatch(
+      /```sh\npnpm lean\n```[\s\S]*`src\/repair\/estadao-2026-10-24\.ts`[\s\S]*`data\/repairs\/2026-10-24-estadao\.json`/,
+    )
+  })
+})
+
 describe('credits (AUDIT-08)', () => {
   const credits = [
     'Ilustrações feitas a partir de retratos oficiais: Palácio do Planalto (CC BY 2.0) e Agência Senado.',
@@ -328,6 +437,7 @@ describe('dist layout (DATA-01, DATA-05)', () => {
       ['checks.csv', join(dataDir, 'checks.csv')],
       ['run-report.json', join(dataDir, 'run-report.json')],
       ['bands.json', join(ROOT, 'config/bands.json')],
+      ['claim-groups.json', join(dataDir, 'claim-groups.json')],
     ]) {
       expect(await readFile(join(outDir, file), 'utf8'), file).toBe(await readFile(source, 'utf8'))
     }
@@ -344,14 +454,312 @@ describe('dist layout (DATA-01, DATA-05)', () => {
         'checks.csv',
         'run-report.json',
         'bands.json',
+        'claim-groups.json',
         ...AGENT_FILES,
       ].sort(),
     )
     expect(dist.filter((f) => f.endsWith('.html')).sort()).toEqual([
       'como-funciona.html',
+      'comparar.html',
       'index.html',
       'metodologia.html',
     ])
+  })
+})
+
+describe('comparar.html (CMP-01, CMP-06, CMP-08, LEAN-06, DRIFT-03)', () => {
+  const OUTLETS = ['aosfatos', 'estadao', 'g1', 'lupa']
+  const text = (sel: string) => compare(sel).text().replace(/\s+/g, ' ').trim()
+
+  it('pre-renders the matrix: per debate and candidate, one button per group with two or more live records', () => {
+    // D lost its Lupa record (removed at the source) and has one record left.
+    // Globo: Lula F, E; Flávio G, H. Band: Lula A, B; Flávio I, C.
+    const buttons = compare('#matrix button.claim')
+    expect(buttons.map((_, b) => b.attribs['data-id']).get()).toEqual(
+      ['F', 'E', 'G', 'H', 'A', 'B', 'I', 'C'].map(fixtureGroupId),
+    )
+    buttons.each((_, b) => {
+      const letter = Object.keys(FIXTURE_GROUPS).find(
+        (l) => fixtureGroupId(l) === b.attribs['data-id'],
+      )
+      const members = FIXTURE_GROUPS[letter as string]
+        .map((n) => records[n - 1])
+        .filter((r) => !r.missingSince)
+      const dots = compare(b).find('.dots .dot')
+      expect(dots).toHaveLength(4)
+      OUTLETS.forEach((outlet, i) => {
+        const record = members.find((r) => r.outlet === outlet)
+        const name = config.outlets[outlet].name
+        const dot = dots.eq(i)
+        expect(dot.attr('role')).toBe('img')
+        if (!record) {
+          expect(dot.attr('class')).toBe('dot none')
+          expect(dot.attr('aria-label')).toMatch(
+            new RegExp(`^${name}: não checou\\. Alegação de teste ${letter},`),
+          )
+          return
+        }
+        expect(dot.hasClass(`band-${record.band.replace(' ', '-')}`)).toBe(true)
+        expect(dot.attr('aria-label')).toContain(`${name}: ${record.band}`)
+        expect(dot.attr('aria-label')).toContain(`Alegação de teste ${letter},`)
+      })
+      expect(compare(b).find('.txt').text()).toBe(
+        `Alegação de teste ${letter}, inventada para a suíte do site.`,
+      )
+    })
+    expect(compare('#matrix .dot.none')).toHaveLength(10)
+    // g1 5 in I changed from "#FAKE" to "#FATO": its dot is marked (DRIFT-05).
+    expect(
+      compare('#matrix .dot.moved')
+        .map((_, d) => d.attribs['aria-label'])
+        .get(),
+    ).toEqual([
+      'g1 Fato ou Fake: verdadeiro, antes falso. Alegação de teste I, inventada para a suíte do site',
+    ])
+    expect(compare('#matrix').attr('style')).toBe('--agencies: 4')
+    expect(compare('#detail').attr('hidden')).toBe('hidden')
+    // A section with a name is a region landmark.
+    expect(compare('#detail').prop('tagName')).toBe('SECTION')
+    expect(compare('#detail').attr('aria-label')).toBe('Detalhe da fala')
+    expect(compare('#detail').children()).toHaveLength(0)
+  })
+
+  it('has the four sections in order, linked from the page nav', () => {
+    expect(
+      compare('main > section')
+        .map((_, s) => [[s.attribs.id, compare(s).children('h1, h2').text()]])
+        .get(),
+    ).toEqual([
+      ['pende', 'As agências pendem para um lado?'],
+      ['falas', 'Fala por fala'],
+      ['cobertura', 'Quem checou o quê'],
+      ['mudancas', 'Vereditos que mudaram'],
+    ])
+    expect(
+      compare('nav.toc a')
+        .map((_, a) => [[a.attribs.href, compare(a).text()]])
+        .get(),
+    ).toEqual([
+      ['#pende', 'Pendem?'],
+      ['#falas', 'Fala por fala'],
+      ['#cobertura', 'Quem checou o quê'],
+      ['#mudancas', 'Vereditos que mudaram'],
+    ])
+    // Every band by color and shape in the legend, with "não checou", a band change and divergence.
+    expect(
+      compare('#legend li')
+        .map((_, li) => [[compare(li).find('i').attr('class'), compare(li).text()]])
+        .get(),
+    ).toEqual([
+      ['dot band-verdadeiro', 'verdadeiro'],
+      ['dot band-impreciso', 'impreciso'],
+      ['dot band-falso', 'falso'],
+      ['dot band-sem-faixa', 'sem faixa'],
+      ['dot none', 'não checou'],
+      ['dot band-impreciso moved', 'mudou de faixa depois de publicada'],
+      ['divmark', 'divergência'],
+    ])
+  })
+
+  it('opens with the headline and one axis per agency as lean.js computes them (LEAN-05, LEAN-06)', () => {
+    const ctx = createContext({ ...config, records })
+    const result = lean(ctx, createComparison(ctx, fixtureGroups(), []).rows)
+    expect(text('#answer')).toBe(headline(result, ctx))
+    expect(compare('#balance').html()).toBe(leanHtml(ctx, result))
+    expect(
+      compare('#balance li.lean-row')
+        .map((_, li) => li.attribs['data-outlet'])
+        .get(),
+    ).toEqual(OUTLETS)
+    expect(compare('#balance .lean-row svg[role="img"]')).toHaveLength(4)
+    // The fixture is small: every agency has fewer than 10 deviations per candidate.
+    expect(
+      compare('#balance .rule')
+        .map((_, r) => compare(r).text())
+        .get(),
+    ).toEqual(Array(4).fill('Amostra pequena.'))
+    expect(text('#answer')).toBe(
+      'Pelos dados de hoje, nenhuma agência tem falas suficientes para medir a diferença.',
+    )
+  })
+
+  it('states the caveat and the method note next to the axes, above both tables (RIGOR-04, LEAN-06)', () => {
+    expect(compare('#caveat').text()).toBe(
+      'Cada agência escolhe o que checar e pode checar partes diferentes da mesma fala. Estes números mostram diferenças, não provam favorecimento.',
+    )
+    expect(compare('#caveat').closest('section').attr('id')).toBe('pende')
+    const note = text('#method-note')
+    for (const part of [
+      'A conta só usa falas checadas por duas ou mais agências.',
+      'A referência são as outras agências, não a verdade',
+      'O que cada agência escolheu checar não entra na conta.',
+    ])
+      expect(note).toContain(part)
+    expect(compare('#method-note a').attr('href')).toBe('metodologia.html#distancia')
+    // Document order: the caveat comes before every table.
+    expect(compare('#caveat, table').first().attr('id')).toBe('caveat')
+    expect(compare('table')).toHaveLength(2)
+    for (const id of ['#coverage', '#drift']) {
+      expect(
+        compare(`${id} thead th`)
+          .map((_, th) => compare(th).text())
+          .get(),
+      ).toEqual(['Agência', 'Lula', 'Flávio'])
+      expect(
+        compare(`${id} tbody th`)
+          .map((_, th) => compare(th).text())
+          .get(),
+      ).toEqual(OUTLETS.map((o) => config.outlets[o].name))
+    }
+    // Lupa, both debates: Lula in A, B, E, F; Flávio in C and G.
+    const lupa = compare('#coverage tbody tr').eq(3).find('td').first()
+    expect(lupa.find('.line').first().text()).toBe('4 de 4 falas')
+    expect(lupa.find('.marks i.on')).toHaveLength(4)
+    expect(compare('#pending').closest('section').attr('id')).toBe('cobertura')
+  })
+
+  it('lists the changed verdicts with their counts and timelines (DRIFT-03, DRIFT-04)', () => {
+    // g1 5 (Band, Flávio) is "#FATO" now and was "#FAKE": one milder change.
+    expect(
+      compare('#drift tbody tr')
+        .map((_, tr) => [
+          compare(tr)
+            .find('td')
+            .map((_, td) => compare(td).text())
+            .get(),
+        ])
+        .get(),
+    ).toEqual([
+      ['nenhuma mudança', 'nenhuma mudança'],
+      ['nenhuma mudança', 'nenhuma mudança'],
+      ['nenhuma mudança', '1 ficou mais branda'],
+      ['nenhuma mudança', 'nenhuma mudança'],
+    ])
+    expect(
+      compare('#changes > li.change')
+        .map((_, li) => li.attribs['data-id'])
+        .get(),
+    ).toEqual([recordId(5)])
+    expect(
+      compare('#changes .tl > li')
+        .map((_, li) => compare(li).find('.v').text())
+        .get(),
+    ).toEqual(['#FAKE', '#FATO'])
+    expect(compare('details#keyonly')).toHaveLength(0)
+  })
+
+  it('escapes <, & and " in a claim and a label, and keeps exactly two </script>', async () => {
+    const CLAIM = 'Disse <script>alert("x")</script> & "aspas"'
+    const LABEL = '</script><b>"FALSO"</b> & cia'
+    const dir = await mkdtemp(join(tmpdir(), 'site-build-'))
+    try {
+      const recs = fixtureRecords()
+      Object.assign(recs[13], {
+        label: LABEL,
+        history: [{ label: 'verdadeiro', until: '2026-10-24' }],
+      })
+      const groups = fixtureGroups()
+      const a = groups.groups.find((g) => g.id === fixtureGroupId('A'))
+      Object.assign(a as object, { claim: CLAIM })
+      const built = await buildFixture(dir, recs, groups)
+      const html = await readFile(join(built.outDir, 'comparar.html'), 'utf8')
+      const $ = load(html)
+      // GoatCounter, the inlined data and the page script.
+      expect(html.split('</script>')).toHaveLength(4)
+      expect($('script')).toHaveLength(3)
+      expect($('main script, #matrix b, #changes b')).toHaveLength(0)
+      const button = $(`#matrix button[data-id="${fixtureGroupId('A')}"]`)
+      expect(button.find('.txt').text()).toBe(CLAIM)
+      expect(button.attr('aria-label')).toContain(`Lula: ${CLAIM}. Divergência.`)
+      expect(button.find('.dot').first().attr('aria-label')).toBe(
+        `Aos Fatos: falso, antes verdadeiro. ${CLAIM}`,
+      )
+      const change = $(`#changes li[data-id="${recordId(14)}"]`)
+      expect(
+        change
+          .find('.tl > li .v')
+          .map((_, v) => $(v).text())
+          .get(),
+      ).toEqual(['verdadeiro', LABEL])
+      const data = JSON.parse($('script#compare-data').text())
+      expect(data.groups.find((g: { id: string }) => g.id === fixtureGroupId('A')).claim).toBe(
+        CLAIM,
+      )
+      expect(data.records.find((r: CheckRecord) => r.id === recordId(14)).label).toBe(LABEL)
+    } finally {
+      await rm(dir, { recursive: true, force: true })
+    }
+  })
+
+  it('shows how many published records are not grouped yet', () => {
+    expect(text('#pending')).toBe(
+      `${FIXTURE_PENDING.length} checagens publicadas depois da última revisão ainda não foram agrupadas.`,
+    )
+  })
+
+  it('explains how the groups were made and how to contest one (DISC-02, DISC-03)', () => {
+    const section = compare('h2')
+      .filter((_, h) => compare(h).text() === 'Como os grupos foram feitos')
+      .nextUntil('h2')
+    const how = section.text().replace(/\s+/g, ' ')
+    for (const step of [
+      'com a agência trocada por uma letra. Não veem o nome da agência, o rótulo nem o veredito.',
+      'Três agentes agrupam as checagens de cada debate',
+      'um juiz decide só aqueles casos',
+      'um revisor lê cada frase',
+      'O mantenedor revisa o resultado antes de publicar.',
+      'A IA nunca define veredito.',
+    ]) {
+      expect(how).toContain(step)
+    }
+    expect(
+      section
+        .find('a')
+        .map((_, a) => a.attribs.href)
+        .get(),
+    ).toEqual(['claim-groups.json', `${REPO}/tree/main/data/claim-curation`])
+    const contest = compare('h2')
+      .filter((_, h) => compare(h).text() === 'Contestar um grupo')
+      .next('p')
+    expect(contest.text()).toContain('abra uma issue em')
+    expect(contest.text()).toContain('com o código do grupo')
+    expect(contest.find('a').attr('href')).toBe(`${REPO}/issues`)
+  })
+
+  it('is linked from the main page and the methodology page', () => {
+    expect(index('a[href="comparar"]')).toHaveLength(3)
+    expect(index('header.topbar a[href="comparar"]')).toHaveLength(1)
+    expect(index('#notice + p a[href="comparar"]')).toHaveLength(1)
+    expect(index('footer a[href="comparar"]')).toHaveLength(1)
+    expect(method('a[href="comparar"]').length).toBeGreaterThan(0)
+  })
+
+  it('inlines the groups and the curated record ids for the browser', () => {
+    const data = JSON.parse(compare('script#compare-data[type="application/json"]').text())
+    expect(data.groups).toEqual(fixtureGroups().groups)
+    const pending = new Set(FIXTURE_PENDING.map(recordId))
+    expect(new Set(data.curated)).toEqual(
+      new Set(records.filter((r) => !r.missingSince && !pending.has(r.id)).map((r) => r.id)),
+    )
+    expect(data.records.map((r: CheckRecord) => r.id)).toEqual(records.map((r) => r.id))
+    expect(data.candidates).toEqual(config.candidates)
+    // The band table and the history rebuild old bands in the browser (DRIFT-04, DRIFT-05).
+    expect(data.bands).toEqual(config.bands)
+    expect(data.records[4].history).toEqual(records[4].history)
+    expect(data.records[3].history).toBeUndefined()
+  })
+
+  it('fails the build on a broken claim group and names it (CLAIM-02)', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'site-build-'))
+    try {
+      const groups = fixtureGroups()
+      groups.groups[1] = { ...groups.groups[1], claim: '' }
+      await expect(buildFixture(dir, fixtureRecords(), groups)).rejects.toThrow(
+        `${groups.groups[1].id}: claim is empty`,
+      )
+    } finally {
+      await rm(dir, { recursive: true, force: true })
+    }
   })
 })
 
@@ -419,6 +827,7 @@ describe('agent files', () => {
 describe('top bar (AUDIT-02)', () => {
   const pages = () => ({
     'index.html': index,
+    'comparar.html': compare,
     'como-funciona.html': how,
     'metodologia.html': method,
   })
@@ -433,19 +842,68 @@ describe('top bar (AUDIT-02)', () => {
           .map((_, a) => a.attribs.href)
           .get(),
         file,
-      ).toEqual(['como-funciona'])
+      ).toEqual(['comparar', 'como-funciona'])
       const current = bar.find('[aria-current="page"]').attr('href')
-      expect(current, file).toBe(
-        file === 'index.html' ? './' : file === 'metodologia.html' ? undefined : 'como-funciona',
-      )
+      const expected: Record<string, string | undefined> = {
+        'index.html': './',
+        'comparar.html': 'comparar',
+        'como-funciona.html': 'como-funciona',
+      }
+      expect(current, file).toBe(expected[file])
     }
   })
 
   it('opens the audit panel in place on the home page and links to it elsewhere', () => {
     expect(index('header.topbar button.audit-btn[data-open-audit]').text()).toBe('Como auditar')
-    for (const $ of [how, method]) {
+    for (const $ of [compare, how, method]) {
       expect($('header.topbar a.audit-btn').attr('href')).toBe('./#auditar')
     }
+  })
+})
+
+describe('AI disclosure (DISC-01, DISC-02, DISC-04)', () => {
+  const DISC =
+    'A IA só agrupa checagens da mesma alegação, sem saber a agência nem o veredito. Ela nunca define veredito.'
+  const text = ($: CheerioAPI) => $('body').text().replace(/\s+/g, ' ')
+
+  it('states the new rule in the audit panel, and no page keeps the old one (DISC-01)', () => {
+    const rules = index('dialog#audit #rules li')
+    expect(rules).toHaveLength(4)
+    const ai = rules.filter((_, li) => index(li).text().includes('IA'))
+    expect(ai).toHaveLength(1)
+    expect(ai.text().replace(/\s+/g, ' ')).toContain(DISC)
+    for (const page of [index, method, compare]) {
+      expect(text(page)).not.toContain('Nenhum texto passa por inteligência artificial')
+    }
+  })
+
+  it('explains on the methodology page how the groups are made, with both links (DISC-02)', () => {
+    const section = method('h2')
+      .filter((_, h) => method(h).text() === 'Comparação entre agências')
+      .nextUntil('h2')
+    const how = section.text().replace(/\s+/g, ' ')
+    expect(how).toContain(DISC)
+    for (const step of [
+      'com a agência trocada por uma letra',
+      'Três agentes agrupam as checagens de cada debate',
+      'um juiz decide só aqueles casos',
+      'Um revisor lê a frase de cada fala',
+      'O mantenedor revisa o resultado antes de publicar',
+    ]) {
+      expect(how).toContain(step)
+    }
+    expect(
+      section
+        .find('a')
+        .map((_, a) => a.attribs.href)
+        .get(),
+    ).toEqual(['comparar', 'claim-groups.json', `${REPO}/tree/main/data/claim-curation`])
+  })
+
+  it('puts the same sentence in the README impartiality rules (DISC-04)', async () => {
+    const readme = await readFile(join(ROOT, 'README.md'), 'utf8')
+    expect(readme).toContain(`- ${DISC}`)
+    expect(readme).not.toContain('Nenhum texto das agências passa por IA')
   })
 })
 

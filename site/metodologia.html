@@ -34,6 +34,43 @@
   <h2>Placares</h2>
   <p>Com uma agência escolhida, o placar conta só as checagens dela. Sem agência escolhida, o placar soma as checagens de todas. Cada agência escolhe o que checar, e a mesma fala pode aparecer uma vez por agência, então o placar geral soma checagens, não falas.</p>
 
+  <h2>Comparação entre agências</h2>
+  <p>A página <a href="comparar">Comparar agências</a> mostra, fala por fala, o veredito de cada agência quando duas ou mais checaram a mesma fala de um candidato no mesmo debate. Também conta, por agência e candidato, quantas dessas falas a agência checou e como o veredito dela se compara com o das outras. Os números mostram diferenças, não provam favorecimento: cada agência escolhe o que checar.</p>
+  <p>A IA só agrupa checagens da mesma alegação, sem saber a agência nem o veredito. Ela nunca define veredito. Os grupos são feitos assim:</p>
+  <ol>
+    <li>Os agentes recebem só a fala e o trecho de cada checagem, com a agência trocada por uma letra.</li>
+    <li>Três agentes agrupam as checagens de cada debate, cada um sem ver o trabalho dos outros.</li>
+    <li>Onde eles discordam, um juiz decide só aqueles casos.</li>
+    <li>Um revisor lê a frase de cada fala atrás de palavras que tomem partido.</li>
+    <li>O mantenedor revisa o resultado antes de publicar e registra o motivo de cada mudança feita à mão.</li>
+  </ol>
+  <p>Todos os grupos estão em <a href="claim-groups.json">claim-groups.json</a>. A entrada dos agentes, a resposta de cada um e o roteiro da curadoria estão em <a href="{{repo}}/tree/main/data/claim-curation">data/claim-curation</a>.</p>
+
+  <h2 id="distancia">Distância das outras agências</h2>
+  <p>A distância mede se uma agência, nas falas que outras agências também checaram, deu vereditos mais duros para um candidato do que para o outro. A referência são as outras agências, não a verdade.</p>
+  <ol>
+    <li>Cada faixa vira um número: verdadeiro 0, impreciso 1, falso 2. Checagens em “Sem faixa” ficam de fora.</li>
+    <li>Em cada fala com duas ou mais checagens numa faixa, cada agência recebe um desvio: o número dela menos a média do número das outras. Exemplo: se a Lupa disse falso (2) e duas outras disseram verdadeiro (0) e impreciso (1), o desvio da Lupa é 2 − 0,5 = +1,5.</li>
+    <li>Para cada agência, o site tira a média dos desvios nas falas de cada candidato.</li>
+    <li>A distância é a média nas falas de Flávio Bolsonaro menos a média nas falas de Lula. Positiva quer dizer mais dura com Flávio; negativa, mais dura com Lula; zero, igual às outras.</li>
+  </ol>
+  <p>O intervalo de 97,5% vem de um bootstrap: o site sorteia de novo, com reposição, os desvios de cada candidato, recalcula a distância 5000 vezes e guarda os valores do meio, deixando de fora 1,25% em cada ponta. O sorteio usa um gerador fixo, então os mesmos dados dão sempre os mesmos números. Usamos 97,5% para cada agência porque são quatro: assim, a chance de alguma aparecer como mais dura só por acaso fica perto de 1 em 10.</p>
+  <p>A frase ao lado de cada agência segue uma regra fixa:</p>
+  <ul>
+    <li>intervalo que contém o zero: “sem diferença clara entre os candidatos”;</li>
+    <li>intervalo todo acima de zero: “mais dura com Flávio Bolsonaro do que as outras agências”;</li>
+    <li>intervalo todo abaixo de zero: “mais dura com Lula do que as outras agências”;</li>
+    <li>menos de 10 desvios para algum dos candidatos: “amostra pequena”, sem intervalo nem frase; o eixo fica sem ponto e sem barra, e os números aparecem só em texto.</li>
+  </ul>
+  <p>A regra olha as pontas do intervalo arredondadas para duas casas, como a página mostra: uma ponta que aparece como 0,00 conta como zero.</p>
+  <p>A frase do topo da página nomeia cada agência com diferença clara. Quando nenhuma tem, ela nomeia as agências sem diferença clara, ou diz que nenhuma das quatro mostra diferença clara quando todas têm falas suficientes. Uma agência com amostra pequena nunca conta como “sem diferença clara”: a frase diz à parte quais têm amostra pequena e, se todas têm, que nenhuma agência tem falas suficientes para medir a diferença. Com um debate escolhido, a conta usa só as falas daquele debate. O comando <code>pnpm lean</code> imprime os mesmos números a partir dos dados do repositório.</p>
+  <p>Limites: a conta só usa falas que duas ou mais agências checaram; o que cada agência escolheu checar, e o que deixou de checar, não entra. Agências diferentes podem checar partes diferentes da mesma fala. A distância mostra quem foi mais dura ou mais branda que as outras, não quem acertou, e não prova favorecimento. A regra completa está na <a href="{{repo}}/blob/main/.specs/features/agency-comparator/spec.md">especificação do comparador</a>.</p>
+
+  <h2>Vereditos que mudaram</h2>
+  <p>A cada coleta, o site compara o que a agência publica com a versão guardada. Quando o rótulo, a citação ou o identificador interno de uma checagem muda, a versão anterior fica no histórico do registro com a data em que a coleta percebeu a mudança, que pode ser posterior à edição da agência.</p>
+  <p>A página <a href="comparar#mudancas">Comparar agências</a> mostra cada checagem que mudou como uma linha do tempo, da primeira versão à atual. A faixa de um rótulo antigo é a que ele tem hoje na tabela de faixas. Uma citação editada mostra as palavras tiradas e as acrescentadas. A tabela conta, por agência e candidato, as mudanças de faixa na ordem verdadeiro &lt; impreciso &lt; falso: mais dura, mais branda, ganhou faixa (saiu de “Sem faixa”) ou perdeu a faixa. Na matriz, o ponto de uma checagem cuja faixa mudou ganha um anel, e o detalhe da fala mostra a faixa anterior. Checagens que sumiram da página da agência ficam de fora.</p>
+  <p>Em 24/10/2026 a coleta do Estadão Verifica sobre o debate da Globo gravou parte das checagens como novas, porque as regras daquela coleta confiavam no identificador interno da agência, que tinha mudado. Um script refez a coleta com as regras atuais e juntou cada uma à versão anterior, e o <a href="{{repo}}/blob/main/data/repairs/2026-10-24-estadao.json">relatório do reparo</a> lista cada identificador juntado.</p>
+
   <h2>Dados abertos</h2>
   <p>Todas as checagens estão em <a href="checks.csv">checks.csv</a> e <a href="checks.json">checks.json</a> (CC BY 4.0). Cada registro tem o link da agência, a cópia arquivada na Wayback Machine quando ela já foi conferida, o SHA-256 dessa cópia, a data da coleta e a versão do leitor. O histórico de cada mudança fica nos <a href="{{repo}}/commits/main">commits do repositório</a>.</p>
 
@@ -52,7 +89,7 @@
 </main>
 <footer class="foot">
   <div class="wrap">
-    <nav><a href="checks.csv">Baixar os dados</a><a href="./">Checagens</a><a href="como-funciona">Como funciona</a><a href="llms.txt">Para agentes</a><a href="{{repo}}">Código no GitHub</a></nav>
+    <nav><a href="checks.csv">Baixar os dados</a><a href="./">Checagens</a><a href="comparar">Comparar agências</a><a href="como-funciona">Como funciona</a><a href="llms.txt">Para agentes</a><a href="{{repo}}">Código no GitHub</a></nav>
     <p>Os vereditos são das agências. Este site só reúne e organiza o que elas publicaram. Ilustrações feitas a partir de retratos oficiais: Palácio do Planalto (CC BY 2.0) e Agência Senado. Logos dos partidos e das emissoras: Wikimedia Commons. Ícones das agências: sites das próprias agências.</p>
   </div>
 </footer>

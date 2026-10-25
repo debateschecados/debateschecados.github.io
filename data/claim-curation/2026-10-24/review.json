@@ -1,0 +1,35 @@
+{
+  "rewrites": [
+    {
+      "id": "g008",
+      "problem": "infidelity: ref 18ef0c5fb37f (A) quotes and evaluates only the reserves part ('Nós fizemos 270 bilhões de reserva'). Paying off the IMF is evaluated only by 0281621a9164 (D), and that excerpt also centres on the reserves going from US$ 37.8 bi to 288.6 bi. The IMF payoff is also already covered by g007's ref 2d342135b968. The sentence attributes to the group an assertion that not every record evaluated.",
+      "claim": "Os governos Lula fizeram US$ 270 bilhões de reservas internacionais",
+      "refs": [
+        "0281621a9164",
+        "18ef0c5fb37f"
+      ]
+    },
+    {
+      "id": "g018",
+      "problem": "infidelity that softens the claim: the candidate said he 'pagou à vista uma parte dela com o dinheiro do BRB' (refs 233a376864a9, cbba70ab7f72). The sentence drops 'à vista', and D's excerpt evaluates exactly that point, saying the money came from a BRB loan or financing. Dropping it makes the claim look more consistent than what was said.",
+      "claim": "Flávio comprou uma casa de R$ 10 milhões e pagou à vista parte dela com dinheiro do BRB",
+      "refs": [
+        "0eef313aba9a",
+        "233a376864a9",
+        "cbba70ab7f72"
+      ]
+    }
+  ],
+  "groupingIssues": [
+    {
+      "id": "g018",
+      "problem": "ref cbba70ab7f72 (B) checks a compound statement: Lula's own apartment ('apartamento de 190 m², de R$ 1,5 milhão') and Flávio's house. The excerpt opens with Lula's declared assets on the TSE filing and only then gives the value of Flávio's house, so it gives both assertions about equal weight. Ref 0eef313aba9a (C) evaluates only the R$ 10 million value. Ref 233a376864a9 (D) evaluates the value and the BRB financing.",
+      "suggestion": "drop cbba70ab7f72 from g018, following the rule that a record addressing several assertions equally stays out of every group. The group keeps 0eef313aba9a (C) and 233a376864a9 (D), still 2 agencies on the R$ 10 million house claim. Keep it only if the full excerpt turns out to centre on the value of Flávio's house.",
+      "refs": [
+        "0eef313aba9a",
+        "233a376864a9",
+        "cbba70ab7f72"
+      ]
+    }
+  ]
+}
