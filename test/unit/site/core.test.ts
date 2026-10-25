@@ -93,9 +93,9 @@ describe('ordering (SITE-04)', () => {
 
   it('orders outlet names with the pt-BR collator, not by code point', () => {
     const outlets = {
-      z: { name: 'zeta', type: 'fact-checker', url: 'https://z.test' },
-      e: { name: 'Écran', type: 'fact-checker', url: 'https://e.test' },
-      f: { name: 'Fato', type: 'fact-checker', url: 'https://f.test' },
+      z: { name: 'zeta', type: 'fact-checker', url: 'https://z.test', logo: 'logos/z.png' },
+      e: { name: 'Écran', type: 'fact-checker', url: 'https://e.test', logo: 'logos/e.png' },
+      f: { name: 'Fato', type: 'fact-checker', url: 'https://f.test', logo: 'logos/f.png' },
     }
     const recs = ['z', 'f', 'e'].map((outlet, i) => ({ ...records[0], id: `r${i}`, outlet }))
     const ctx = context(recs, { outlets })
