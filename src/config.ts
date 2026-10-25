@@ -21,6 +21,7 @@ const outletSchema = z.object({
   name: z.string().min(1),
   type: z.string().min(1),
   url: z.url(),
+  logo: z.string().min(1),
 })
 
 // Loose: adapter-specific fields pass through and are checked by the adapter's configSchema.

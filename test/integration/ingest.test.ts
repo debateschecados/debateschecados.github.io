@@ -123,8 +123,18 @@ const writeConfig = (debates: ReturnType<typeof debate>[]) =>
       },
     ]),
     writeJson(join(configDir, 'outlets.json'), {
-      alpha: { name: 'Alpha', type: 'fact-checker', url: 'https://alpha.test' },
-      beta: { name: 'Beta', type: 'fact-checker', url: 'https://beta.test' },
+      alpha: {
+        name: 'Alpha',
+        type: 'fact-checker',
+        url: 'https://alpha.test',
+        logo: 'logos/alpha.png',
+      },
+      beta: {
+        name: 'Beta',
+        type: 'fact-checker',
+        url: 'https://beta.test',
+        logo: 'logos/beta.png',
+      },
     }),
     writeJson(join(configDir, 'debates.json'), { debates }),
     writeJson(join(configDir, 'bands.json'), {

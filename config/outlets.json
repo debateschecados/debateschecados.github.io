@@ -1,14 +1,26 @@
 {
-  "aosfatos": { "name": "Aos Fatos", "type": "fact-checker", "url": "https://www.aosfatos.org" },
+  "aosfatos": {
+    "name": "Aos Fatos",
+    "type": "fact-checker",
+    "url": "https://www.aosfatos.org",
+    "logo": "logos/aosfatos.png"
+  },
   "estadao": {
     "name": "Estadão Verifica",
     "type": "fact-checker",
-    "url": "https://www.estadao.com.br/estadao-verifica/"
+    "url": "https://www.estadao.com.br/estadao-verifica/",
+    "logo": "logos/estadao.png"
   },
   "g1": {
     "name": "g1 Fato ou Fake",
     "type": "fact-checker",
-    "url": "https://g1.globo.com/fato-ou-fake/"
+    "url": "https://g1.globo.com/fato-ou-fake/",
+    "logo": "logos/g1.png"
   },
-  "lupa": { "name": "Lupa", "type": "fact-checker", "url": "https://www.agencialupa.org" }
+  "lupa": {
+    "name": "Lupa",
+    "type": "fact-checker",
+    "url": "https://www.agencialupa.org",
+    "logo": "logos/lupa.png"
+  }
 }

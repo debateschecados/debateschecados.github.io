@@ -401,6 +401,7 @@ describe('credits (AUDIT-08)', () => {
   const credits = [
     'Ilustrações feitas a partir de retratos oficiais: Palácio do Planalto (CC BY 2.0) e Agência Senado.',
     'Logos dos partidos e das emissoras: Wikimedia Commons.',
+    'Ícones das agências: sites das próprias agências.',
   ]
 
   it.each(['index.html', 'metodologia.html'])(
@@ -421,6 +422,9 @@ describe('credits (AUDIT-08)', () => {
     )
     expect(items).toContain(
       'Logos dos partidos e das emissoras: Wikimedia Commons. São marcas dos seus donos, usadas só para identificar.',
+    )
+    expect(items).toContain(
+      'Ícones das agências: tirados dos sites de cada uma. São marcas das agências, usadas só para identificar quem fez a checagem.',
     )
     expect(items).toContain('Fontes Inter e Inter Tight, licença SIL Open Font License 1.1.')
   })
